@@ -1,0 +1,2250 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Personal Finance Tracker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#eef3f8;
+      --card:#ffffff;
+      --text:#0f172a;
+      --muted:#64748b;
+      --line:#dbe3ef;
+      --primary:#2563eb;
+      --primary-soft:#eff6ff;
+      --green:#16a34a;
+      --green-soft:#f0fdf4;
+      --red:#dc2626;
+      --red-soft:#fff1f2;
+      --amber:#b45309;
+      --amber-soft:#fffbeb;
+      --violet:#7c3aed;
+      --violet-soft:#f5f3ff;
+      --shadow:0 12px 30px rgba(15,23,42,.08), 0 2px 8px rgba(15,23,42,.04);
+      --radius:18px;
+      --radius-sm:12px;
+      --radius-xs:10px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:'Sarabun',sans-serif;
+      background:var(--bg);
+      color:var(--text);
+      line-height:1.55;
+    }
+    .hidden{display:none !important}
+    .app{width:min(1320px,calc(100% - 24px)); margin:18px auto 40px}
+    .card{
+      background:var(--card);
+      border:1px solid rgba(219,227,239,.95);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+    }
+    .welcome{
+      min-height:100vh;
+      display:grid;
+      place-items:center;
+      padding:24px;
+      background:radial-gradient(circle at top,#dbeafe 0%, transparent 45%), var(--bg);
+    }
+    .welcome-box{max-width:920px; padding:34px}
+    .welcome-box h1{margin:0 0 10px; font-size:38px; font-weight:800}
+    .welcome-box p{margin:0 0 24px; color:var(--muted)}
+    .welcome-actions{display:grid; grid-template-columns:1fr 1fr; gap:16px}
+    .action-tile{border:1px solid var(--line); border-radius:16px; padding:22px; background:#fff}
+    .action-tile h3{margin:0 0 8px}
+    .action-tile p{margin:0 0 14px; color:var(--muted)}
+    .small-actions{display:flex; gap:8px; flex-wrap:wrap}
+    .small-actions button{width:auto}
+    button{
+      border:none;
+      border-radius:12px;
+      padding:11px 16px;
+      font:inherit;
+      font-weight:700;
+      cursor:pointer;
+      transition:.18s ease;
+    }
+    button:hover{transform:translateY(-1px)}
+    .btn-primary{background:var(--primary); color:#fff}
+    .btn-light{background:#fff; color:var(--primary); border:1px solid #bfd5ff}
+    .btn-success{background:var(--green-soft); color:var(--green); border:1px solid #bbf7d0}
+    .btn-danger{background:var(--red-soft); color:var(--red); border:1px solid #fecdd3}
+    .btn-dark{background:#0f172a; color:#fff}
+    .btn-ghost{background:rgba(255,255,255,.16); color:#fff; border:1px solid rgba(255,255,255,.25)}
+    .btn-sm{padding:8px 12px; font-size:13px}
+    .hint{
+      margin-top:12px; padding:12px 14px; background:#f8fbff; border:1px solid var(--line);
+      border-radius:12px; color:var(--muted); font-size:13px
+    }
+    .main-header{
+      padding:16px 18px;
+      margin-bottom:14px;
+      color:#fff;
+      background:
+        radial-gradient(circle at 18% 12%, rgba(255,255,255,.26), transparent 34%),
+        linear-gradient(135deg,#1e40af,#2563eb 58%,#60a5fa);
+      display:flex; justify-content:space-between; gap:18px; align-items:flex-start;
+      position:relative; overflow:hidden;
+    }
+    .main-header:after{
+      content:""; position:absolute; right:-26px; bottom:-26px; width:120px; height:120px;
+      border-radius:50%;
+      background:radial-gradient(circle, rgba(255,255,255,.22), rgba(255,255,255,.02) 70%);
+      opacity:.9;
+    }
+    .main-header > *{position:relative; z-index:1}
+    .header-title h1{margin:0 0 4px; font-size:23px; line-height:1.15}
+    .header-title p{margin:0; opacity:.92; font-size:14px}
+    .header-right{display:grid; gap:10px; justify-items:end}
+    .main-header .small-actions button{padding:8px 12px; font-size:13px}
+    .file-status{
+      background:rgba(255,255,255,.18);
+      border:1px solid rgba(255,255,255,.3);
+      border-radius:999px;
+      padding:6px 11px;
+      font-size:11px
+    }
+    .layout{display:grid; grid-template-columns:230px 1fr; gap:18px}
+    .sidebar{padding:16px; height:fit-content; position:sticky; top:18px}
+    .menu-title{font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); font-weight:800; margin-bottom:10px}
+    .menu{display:grid; gap:6px}
+    .menu button{
+      width:100%; text-align:left; display:flex; align-items:center; gap:10px;
+      background:transparent; border:1px solid transparent; color:#334155
+    }
+    .menu button.active{background:var(--primary-soft); color:var(--primary); border-color:#bfd5ff}
+    .content{display:grid; gap:16px}
+    .view{display:grid; gap:16px}
+    .panel,.form-card,.table-card{padding:20px}
+    .section-header{display:flex; justify-content:space-between; align-items:flex-start; gap:12px; margin-bottom:14px; flex-wrap:wrap}
+    .section-header h2,.section-header h3{margin:0; font-size:20px}
+    .meta{color:var(--muted); font-size:13px}
+    .toolbar-inline{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px}
+    .stack-grid{display:grid; gap:16px}
+    .form-grid{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:14px}
+    .form-grid .span-2{grid-column:span 2}
+    .form-grid .full{grid-column:1 / -1}
+    label{
+      display:block; margin-bottom:7px; font-size:12px; text-transform:uppercase; letter-spacing:.05em;
+      color:var(--muted); font-weight:800
+    }
+    input,select,textarea{
+      width:100%; padding:11px 13px; border-radius:12px; border:1.5px solid var(--line);
+      font:inherit; color:var(--text); background:#fff; outline:none
+    }
+    input:focus,select:focus,textarea:focus{border-color:var(--primary); box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+    textarea{min-height:92px; resize:vertical}
+    .summary-grid{
+      display:flex;
+      flex-wrap:nowrap;
+      gap:12px;
+      overflow-x:auto;
+      padding-bottom:2px;
+    }
+    .summary-grid-5{display:flex}
+    .summary-card{
+      border-radius:16px; padding:16px 18px; min-height:112px; border:1px solid transparent;
+      display:flex; flex-direction:column; gap:7px;
+      min-width:210px;
+      flex:1 1 0;
+    }
+    .summary-card .name{font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:.05em; opacity:.78}
+    .summary-card .value{font-size:25px; font-weight:800}
+    .income{background:var(--green-soft); border-color:#bbf7d0}
+    .income .name,.income .value{color:var(--green)}
+    .expense{background:var(--red-soft); border-color:#fecdd3}
+    .expense .name,.expense .value{color:var(--red)}
+    .balance{background:var(--primary-soft); border-color:#bfd5ff}
+    .balance .name,.balance .value{color:var(--primary)}
+    .due{background:var(--amber-soft); border-color:#fde68a}
+    .due .name,.due .value{color:var(--amber)}
+    .violet{background:var(--violet-soft); border-color:#ddd6fe}
+    .violet .name,.violet .value{color:var(--violet)}
+    .year-grid{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px}
+    .month-box{
+      border:1px solid var(--line); border-radius:16px; padding:16px; background:#fff; display:grid; gap:10px
+    }
+    .month-box-head{display:flex; justify-content:space-between; gap:8px; align-items:flex-start}
+    .month-box h4{margin:0; font-size:16px}
+    .pill,.badge{
+      display:inline-flex; align-items:center; gap:6px; padding:5px 10px; border-radius:999px;
+      font-size:12px; font-weight:700; border:1px solid var(--line); background:#f8fafc
+    }
+    .badge-income{background:var(--green-soft); color:var(--green); border-color:#bbf7d0}
+    .badge-expense{background:var(--red-soft); color:var(--red); border-color:#fecdd3}
+    .badge-installment{background:var(--primary-soft); color:var(--primary); border-color:#bfd5ff}
+    .bar-row{display:grid; grid-template-columns:52px 1fr auto; gap:8px; align-items:center; font-size:12px; color:var(--muted)}
+    .bar{height:8px; background:#e5e7eb; border-radius:999px; overflow:hidden}
+    .bar > div{height:100%; border-radius:inherit}
+    .bar-income > div{background:linear-gradient(90deg,#22c55e,#86efac)}
+    .bar-expense > div{background:linear-gradient(90deg,#ef4444,#fca5a5)}
+    .month-stack{display:grid; gap:14px}
+    .month-group{border:1px solid var(--line); border-radius:16px; padding:16px; background:#fff}
+    .month-group-head{display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap; margin-bottom:12px}
+    .month-group-stats{display:flex; gap:8px; flex-wrap:wrap}
+    table{width:100%; border-collapse:collapse}
+    th,td{padding:11px 10px; border-bottom:1px solid var(--line); text-align:left; vertical-align:top}
+    th{font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); font-weight:800; background:#fbfdff}
+    tr:last-child td{border-bottom:none}
+    .amount-income{color:var(--green); font-weight:800}
+    .amount-expense{color:var(--red); font-weight:800}
+    .readonly-note{font-size:12px; color:var(--primary); font-weight:700}
+    .installment-list{display:grid; gap:12px}
+    .installment-item{border:1px solid var(--line); border-radius:16px; padding:16px; background:#fff}
+    .installment-headline{display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap}
+    .installment-kv{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin-top:10px}
+    .installment-kv .notice-box{padding:10px 12px}
+    .installment-filters{display:grid; grid-template-columns:1.5fr .9fr 1fr 1fr auto; gap:10px; align-items:end}
+    .installment-view-switch{display:flex; gap:8px; justify-content:flex-end}
+    .calendar-grid{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px}
+    .calendar-month{
+      border:1px solid #cfe1ff;
+      border-radius:18px;
+      background:
+        radial-gradient(circle at top right, rgba(96,165,250,.22), transparent 42%),
+        linear-gradient(180deg,#ffffff,#f3f8ff);
+      padding:14px;
+      display:grid;
+      gap:8px;
+      box-shadow:0 10px 24px rgba(37,99,235,.08);
+      transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+    }
+    .calendar-month:hover{
+      transform:translateY(-2px);
+      border-color:#93c5fd;
+      box-shadow:0 18px 34px rgba(37,99,235,.13);
+    }
+    .calendar-month-head{display:flex; justify-content:space-between; align-items:flex-start; gap:8px}
+    .calendar-month-head .pill{
+      background:#eff6ff;
+      border-color:#bfdbfe;
+      color:#1d4ed8;
+      font-weight:800;
+    }
+    .calendar-list{display:grid; gap:7px}
+    .calendar-item{
+      display:flex; justify-content:space-between; gap:8px; font-size:13px;
+      border-top:1px dashed #dbe7ff; padding-top:7px;
+      background:#ffffffcc;
+      border-radius:10px;
+      padding:8px 10px;
+    }
+    .calendar-item:first-child{border-top:none}
+    .installment-head{display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:10px}
+    .installment-name{font-size:17px; font-weight:800}
+    .progress{height:10px; background:#e5e7eb; border-radius:999px; overflow:hidden; margin:12px 0 10px}
+    .progress > div{height:100%; background:linear-gradient(90deg,#2563eb,#60a5fa)}
+    .empty{padding:32px 18px; text-align:center; color:var(--muted); border:2px dashed var(--line); border-radius:16px; background:#fbfcfe}
+    .notice-box{
+      padding:14px 16px; background:#f8fbff; border:1px solid #d7e7ff; border-radius:14px; color:#1e40af
+    }
+    .checkbox-inline{display:flex; align-items:center; gap:10px; background:#f8fbff; border:1px solid var(--line); border-radius:12px; padding:10px 12px}
+    .checkbox-inline input{width:auto; margin:0}
+    input,select,textarea,button{font-family:inherit}
+    input[type="date"],input[type="month"],select{
+      min-height:46px;
+      background:linear-gradient(180deg,#ffffff,#f8fbff);
+      border-color:#cfd9ea;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.8), 0 1px 2px rgba(15,23,42,.03);
+    }
+    input[type="date"]::-webkit-calendar-picker-indicator,
+    input[type="month"]::-webkit-calendar-picker-indicator{
+      cursor:pointer;
+      padding:6px;
+      border-radius:8px;
+      background:#eef4ff;
+    }
+    .compact-filter-bar{display:grid; grid-template-columns:1.2fr 1fr 1fr 1fr auto; gap:10px; align-items:end}
+    .compact-filter-row{display:grid; grid-template-columns:1.4fr .8fr .8fr auto; gap:10px; align-items:end}
+    .compact-filter-actions{display:flex; gap:8px; align-items:center; justify-content:flex-end; flex-wrap:wrap}
+    .quick-actions{display:flex; justify-content:space-between; gap:12px; align-items:center; flex-wrap:wrap}
+    .quick-actions .small-actions{display:flex; gap:8px; flex-wrap:wrap}
+    .year-nav{display:flex; gap:8px; flex-wrap:wrap; align-items:center}
+    .year-grid.year-grid-enhanced{grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px}
+    .month-box.enhanced{padding:18px; gap:12px; background:linear-gradient(180deg,#ffffff,#fbfdff)}
+    .month-balance-hero{display:flex; justify-content:space-between; gap:12px; align-items:end; padding:14px 16px; border-radius:16px; background:#f8fbff; border:1px solid #dbe7ff}
+    .month-balance-hero.negative{background:#fff5f5; border-color:#fecdd3}
+    .month-balance-label{font-size:12px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); font-weight:800}
+    .month-balance-value{font-size:30px; line-height:1; font-weight:800; color:var(--primary)}
+    .month-balance-hero.negative .month-balance-value{color:var(--red)}
+    .mini-stats{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px}
+    .mini-stat{padding:10px 12px; border-radius:14px; background:#fff; border:1px solid var(--line)}
+    .mini-stat .k{display:block; font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); font-weight:800; margin-bottom:4px}
+    .mini-stat .v{font-weight:800}
+    .card-toggle{margin-left:auto; display:inline-flex; align-items:center; gap:8px; background:#f8fbff; color:#334155; border:1px solid var(--line)}
+    .card-toggle .chev{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      width:18px;
+      height:18px;
+      transition:transform .18s ease;
+    }
+    .card-toggle .chev svg{
+      width:15px;
+      height:15px;
+      stroke:#334155;
+      stroke-width:2.2;
+      fill:none;
+      stroke-linecap:round;
+      stroke-linejoin:round;
+    }
+    .card-collapsed .card-toggle .chev{transform:rotate(-90deg)}
+    .collapsible-body{display:grid; gap:14px}
+    .card-collapsed .collapsible-body{display:none}
+    .section-header.has-toggle{align-items:center}
+    .modal-backdrop{position:fixed; inset:0; background:rgba(15,23,42,.45); display:flex; align-items:center; justify-content:center; padding:20px; z-index:1000}
+    .modal-backdrop.hidden{display:none !important}
+    .modal-dialog{width:min(880px,100%); max-height:min(90vh,920px); overflow:auto; border-radius:22px; background:#fff; box-shadow:0 30px 80px rgba(15,23,42,.28)}
+    .modal-header{position:sticky; top:0; z-index:1; display:flex; justify-content:space-between; gap:12px; align-items:flex-start; padding:22px 24px; background:#fff; border-bottom:1px solid var(--line)}
+    .modal-body{padding:24px}
+    .modal-close{background:#f8fafc; color:#334155; border:1px solid var(--line)}
+    .datepicker-alt-input{
+      width:100%;
+      min-height:46px;
+      padding:11px 13px;
+      border-radius:12px;
+      border:1.5px solid #cfd9ea;
+      font:inherit;
+      color:var(--text);
+      background:linear-gradient(180deg,#ffffff,#f8fbff);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.8), 0 1px 2px rgba(15,23,42,.03);
+      cursor:pointer;
+    }
+    .datepicker-alt-input:focus{
+      border-color:var(--primary);
+      box-shadow:0 0 0 3px rgba(37,99,235,.1);
+      outline:none;
+    }
+    .flatpickr-calendar{
+      border:1px solid #dbe3ef;
+      border-radius:16px;
+      box-shadow:0 22px 42px rgba(15,23,42,.18), 0 3px 10px rgba(15,23,42,.08);
+      overflow:hidden;
+    }
+    .flatpickr-current-month{font-size:15px; font-weight:700}
+    .flatpickr-monthDropdown-months,.numInputWrapper input{font-weight:700}
+    .flatpickr-weekdays{background:#f8fbff}
+    .flatpickr-weekday{color:#64748b; font-weight:700}
+    .flatpickr-day{
+      border-radius:10px;
+      font-weight:600;
+      color:#1e293b;
+    }
+    .flatpickr-day:hover{background:#eaf2ff; border-color:#eaf2ff}
+    .flatpickr-day.today{border-color:#93c5fd; color:#1d4ed8}
+    .flatpickr-day.selected,
+    .flatpickr-day.startRange,
+    .flatpickr-day.endRange,
+    .flatpickr-day.selected:hover{
+      background:#2563eb;
+      border-color:#2563eb;
+      color:#fff;
+    }
+    .flatpickr-monthSelect-month{
+      border-radius:12px !important;
+      font-weight:700;
+      color:#334155 !important;
+    }
+    .flatpickr-monthSelect-month:hover{
+      background:#eaf2ff !important;
+      border-color:#bfdbfe !important;
+      color:#1d4ed8 !important;
+    }
+    .flatpickr-monthSelect-month.selected{
+      background:#2563eb !important;
+      border-color:#2563eb !important;
+      color:#fff !important;
+    }
+    @media (max-width:1180px){
+      .app{padding:12px}
+      .layout{grid-template-columns:1fr}
+      .sidebar{position:static}
+      .toolbar-inline,.year-grid,.form-grid,.welcome-actions,.year-grid.year-grid-enhanced{grid-template-columns:1fr 1fr}
+      .compact-filter-bar,.compact-filter-row{grid-template-columns:1fr 1fr}
+      .installment-filters,.calendar-grid{grid-template-columns:1fr 1fr}
+      .form-grid .span-2,.form-grid .full{grid-column:auto}
+      .sidebar .menu{grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px}
+      .sidebar .menu button{justify-content:center; text-align:center}
+    }
+    @media (max-width:900px){
+      .main-header{gap:12px}
+      .header-title h1{font-size:21px}
+      .header-title p{font-size:13px}
+      .main-header .small-actions button{width:100%}
+      .header-right{justify-items:stretch; width:100%}
+      .sidebar .menu{grid-template-columns:1fr}
+      .file-status{width:100%; text-align:center}
+      .table-card,.month-group{overflow-x:auto}
+      table{min-width:680px}
+      .month-group-stats{flex-wrap:nowrap; overflow:auto}
+      .month-group-stats .pill{white-space:nowrap}
+    }
+    @media (max-width:760px){
+      .toolbar-inline,.year-grid,.form-grid,.welcome-actions,.year-grid.year-grid-enhanced,.compact-filter-bar,.compact-filter-row,.installment-filters,.calendar-grid,.installment-kv{grid-template-columns:1fr}
+      .main-header{flex-direction:column}
+      .header-right{justify-items:start}
+      .month-group-head,.section-header{align-items:flex-start}
+      .app{padding:10px}
+      .panel,.form-card,.table-card{padding:14px}
+      .card{border-radius:14px}
+      .summary-card{min-width:190px}
+      .calendar-item{font-size:12px}
+      .modal-backdrop{padding:0}
+      .modal-dialog{
+        width:100%;
+        height:100%;
+        max-height:none;
+        border-radius:0;
+      }
+      .modal-header{
+        padding:16px 14px;
+      }
+      .modal-body{
+        padding:14px;
+      }
+      .small-actions button{width:100%}
+    }
+
+    html,body{min-height:100%}
+    body{min-width:320px}
+    .app{width:100%; max-width:none; margin:0; padding:16px}
+    .layout{display:grid; gap:18px}
+    .content{min-width:0}
+    .table-card,.panel,.form-card,.sidebar{width:100%}
+    .month-box.clickable{cursor:pointer; transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease}
+    .month-box.clickable:hover{transform:translateY(-2px); border-color:#93c5fd; box-shadow:0 18px 36px rgba(37,99,235,.12)}
+    .month-box-footer{display:flex; justify-content:space-between; gap:8px; align-items:center; font-size:12px; color:var(--primary); font-weight:800}
+    .section-block{display:grid; gap:16px}
+    @media (min-width:1400px){
+      .year-grid,.year-grid.year-grid-enhanced{grid-template-columns:repeat(3,minmax(0,1fr))}
+    }
+
+  </style>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/style.css">
+</head>
+<body>
+  <div id="welcomeScreen" class="welcome">
+    <div class="welcome-box card">
+      <h1>ระบบรายรับ – รายจ่าย</h1>
+      <p>โหลดไฟล์ JSON เดิม หรือสร้างไฟล์ใหม่ จากนั้นจัดการรายรับ รายจ่าย ภาพรวมทั้งปี และยอดผ่อนในไฟล์เดียว</p>
+      <div class="welcome-actions">
+        <div class="action-tile">
+          <h3>📂 โหลด JSON เดิม</h3>
+          <p>ถ้าเบราว์เซอร์รองรับ File System Access API ระบบจะจำไฟล์ไว้ และกด Save เพื่อเขียนทับไฟล์เดิมได้เลย</p>
+          <div class="small-actions">
+            <button id="openJsonWithHandleBtn" class="btn-primary">📁 เปิดไฟล์แบบ Save ทับได้</button>
+            <button id="openJsonSimpleBtn" class="btn-light">โหลดแบบปกติ</button>
+          </div>
+          <input type="file" id="startupJsonFile" accept="application/json" class="hidden">
+          <div class="hint">ถ้าเบราว์เซอร์ไม่รองรับ ระบบจะโหลดแบบปกติ และการ Save จะเป็นการดาวน์โหลดไฟล์ใหม่แทน</div>
+        </div>
+        <div class="action-tile">
+          <h3>✨ สร้างข้อมูลใหม่</h3>
+          <p>เริ่มใช้งานแบบว่างเปล่า แล้วค่อยบันทึกเป็นไฟล์ JSON ภายหลัง</p>
+          <button id="createNewBtn" class="btn-primary">🚀 เริ่มสร้างใหม่</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="appScreen" class="app hidden">
+    <div class="main-header card">
+      <div class="header-title">
+        <h1>แดชบอร์ดการเงินส่วนตัว</h1>
+        <p>รายรับ · รายจ่าย · เมนูรายเดือน · ภาพรวมทั้งปี · ยอดผ่อน</p>
+      </div>
+      <div class="header-right">
+        <div class="small-actions">
+          <button id="saveJsonBtn" class="btn-ghost">💾 Save JSON</button>
+          <button id="loadAnotherBtn" class="btn-ghost">📂 Load JSON</button>
+        </div>
+        <div id="fileStatus" class="file-status">ยังไม่ได้ผูกไฟล์สำหรับ Save ทับ</div>
+      </div>
+    </div>
+
+    <div class="layout">
+      <aside class="sidebar card">
+        <div class="menu-title">เมนูหลัก</div>
+        <div class="menu">
+          <button class="menu-btn" data-view="monthly">📅 รายเดือน</button>
+          <button class="menu-btn active" data-view="yearly">📆 ภาพรวมทั้งปี</button>
+          <button class="menu-btn" data-view="installments">💳 ยอดผ่อน</button>
+        </div>
+      </aside>
+
+      <main class="content">
+
+        <section id="view-monthly" class="view hidden">
+          <div class="panel card">
+            <div class="section-header">
+              <div>
+                <h2>📅 เมนูรายเดือน</h2>
+                <div class="meta">จัดหน้าใหม่ให้แยกเป็นส่วน ๆ จากบนลงล่าง ใช้งานง่ายกว่าเดิม</div>
+              </div>
+            </div>
+            <div class="stack-grid">
+              <div class="compact-filter-bar">
+                <div>
+                  <label for="rangeStartMonth">เริ่มเดือน</label>
+                  <input type="month" id="rangeStartMonth">
+                </div>
+                <div>
+                  <label for="rangeEndMonth">ถึงเดือน</label>
+                  <input type="month" id="rangeEndMonth">
+                </div>
+                <div>
+                  <label for="monthlyKeyword">ค้นหา</label>
+                  <input type="text" id="monthlyKeyword" placeholder="เช่น รถ, ค่าไฟ, เงินเดือน">
+                </div>
+                <div>
+                  <label for="monthlySort">เรียง</label>
+                  <select id="monthlySort">
+                    <option value="date-asc">วันที่เก่า → ใหม่</option>
+                    <option value="date-desc">วันที่ใหม่ → เก่า</option>
+                    <option value="amount-desc">ยอดมาก → น้อย</option>
+                    <option value="amount-asc">ยอดน้อย → มาก</option>
+                    <option value="title-asc">ชื่อรายการ A → Z</option>
+                  </select>
+                </div>
+                <div class="compact-filter-actions">
+                  <button id="openEntryModalBtn" class="btn-primary">＋ เพิ่มรายการ</button>
+                </div>
+              </div>
+
+              <div class="compact-filter-row">
+                <div>
+                  <label for="monthlyCategoryFilter">หมวดหมู่</label>
+                  <select id="monthlyCategoryFilter"><option value="">ทุกหมวดหมู่</option></select>
+                </div>
+                <div>
+                  <label for="monthlyTypeFilter">ประเภท</label>
+                  <select id="monthlyTypeFilter">
+                    <option value="">ทั้งหมด</option>
+                    <option value="income">เฉพาะรายรับ</option>
+                    <option value="expense">เฉพาะรายจ่าย</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="monthlyMinAmount">ช่วงยอดเงิน</label>
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                    <input type="number" id="monthlyMinAmount" min="0" step="0.01" placeholder="ต่ำสุด">
+                    <input type="number" id="monthlyMaxAmount" min="0" step="0.01" placeholder="สูงสุด">
+                  </div>
+                </div>
+                <div class="compact-filter-actions">
+                  <button id="resetMonthlyFiltersBtn" class="btn-light">↺ ล้างตัวกรอง</button>
+                  <div id="monthlyActiveFilterLabel" class="pill">ยังไม่ได้ใช้ตัวกรองเพิ่มเติม</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel card">
+            <div class="section-header">
+              <div>
+                <h3>สรุปช่วงเดือนที่เลือก</h3>
+                <div id="monthlySummaryLabel" class="meta"></div>
+              </div>
+            </div>
+            <div class="summary-grid summary-grid-5">
+              <div class="summary-card income"><div class="name">รายรับรวม</div><div class="value" id="monthlyIncomeTotal">฿0.00</div></div>
+              <div class="summary-card expense"><div class="name">รายจ่ายรวม</div><div class="value" id="monthlyExpenseTotal">฿0.00</div></div>
+              <div class="summary-card balance"><div class="name">คงเหลือสุทธิ</div><div class="value" id="monthlyBalanceTotal">฿0.00</div></div>
+              <div class="summary-card violet"><div class="name">จำนวนรายการ</div><div class="value" id="monthlyEntryCount">0</div></div>
+              <div class="summary-card due"><div class="name">ยอดผ่อนรวม</div><div class="value" id="monthlyInstallmentTotal">฿0.00</div></div>
+            </div>
+            <div class="toolbar-inline" style="margin-top:14px">
+              <div class="notice-box"><strong id="monthlyMonthCount">0 เดือน</strong><br><span class="meta">จำนวนเดือนที่แสดง</span></div>
+              <div class="notice-box"><strong id="monthlyTopCategory">-</strong><br><span class="meta">หมวดที่พบมากสุด</span></div>
+              <div class="notice-box"><strong id="monthlyAverageExpense">฿0.00</strong><br><span class="meta">เฉลี่ยต่อรายการจ่าย</span></div>
+            </div>
+          </div>
+
+          <div class="panel card">
+            <div class="section-header">
+              <div>
+                <h3>✍️ จัดการรายการรายรับ / รายจ่าย</h3>
+                <div class="meta">การเพิ่มและแก้ไขจะเปิดเป็นหน้าต่าง modal เพื่อประหยัดพื้นที่หน้าเมนูรายเดือน</div>
+              </div>
+            </div>
+            <div class="quick-actions">
+              <div class="notice-box">กด <strong>เพิ่มรายการ</strong> เพื่อสร้างรายรับหรือรายจ่ายใหม่ และกด <strong>แก้ไข</strong> จากรายการด้านล่างเพื่อเปิด modal เดิมกลับมา</div>
+              <div class="small-actions">
+                <button id="openEntryModalBtnSecondary" class="btn-primary">＋ เพิ่มรายการใหม่</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="table-card card">
+            <div class="section-header">
+              <div>
+                <h3>📄 รายการตามช่วงเดือน</h3>
+                <div id="entryCountLabel" class="meta"></div>
+              </div>
+            </div>
+            <div class="notice-box" style="margin-bottom:14px">รายการที่มีป้าย <strong>ยอดผ่อน</strong> เป็นรายการอ่านอย่างเดียว ต้องไปแก้ไขในหน้ายอดผ่อน</div>
+            <div id="entriesContainer"></div>
+          </div>
+        </section>
+
+        
+        <section id="view-yearly" class="view">
+          <div class="panel card">
+            <div class="section-header">
+              <div>
+                <h2>📆 ภาพรวมทั้งปี</h2>
+                <div class="meta">รวม Dashboard เข้ามาไว้หน้าเดียว พร้อมดูรายเดือนและทั้งปีได้ในหน้าเดียว</div>
+              </div>
+            </div>
+            <div class="toolbar-inline">
+              <div>
+                <label for="yearlyYearPicker">เลือกปี</label>
+                <select id="yearlyYearPicker"></select>
+              </div>
+              <div class="year-nav">
+                <button id="prevYearBtn" class="btn-light">← ปีย้อนหลัง</button>
+                <button id="nextYearBtn" class="btn-light">ปีถัดไป →</button>
+              </div>
+              <div class="notice-box">
+                ส่วนสรุป 12 เดือนด้านล่างแสดงแถวละ <strong>3 เดือน</strong> และกดดูรายการของเดือนนั้นได้ทันที
+              </div>
+            </div>
+          </div>
+
+          <div class="section-block">
+            <div class="panel card">
+              <div class="section-header">
+                <div>
+                  <h3>สรุปทั้งปี</h3>
+                  <div id="yearlyScreenLabel" class="meta"></div>
+                </div>
+              </div>
+              <div class="summary-grid summary-grid-5">
+                <div class="summary-card income"><div class="name">รายรับทั้งปี</div><div class="value" id="yearlyIncomeTotal">฿0.00</div></div>
+                <div class="summary-card expense"><div class="name">รายจ่ายทั้งปี</div><div class="value" id="yearlyExpenseTotal">฿0.00</div></div>
+                <div class="summary-card balance"><div class="name">คงเหลือทั้งปี</div><div class="value" id="yearlyBalanceTotal">฿0.00</div></div>
+                <div class="summary-card violet"><div class="name">จำนวนรายการ</div><div class="value" id="yearlyEntryCount">0</div></div>
+                <div class="summary-card due"><div class="name">ยอดผ่อนทั้งปี</div><div class="value" id="yearlyInstallmentTotal">฿0.00</div></div>
+              </div>
+            </div>
+
+            <div class="panel card">
+              <div class="section-header">
+                <div>
+                  <h3>สรุป 12 เดือน</h3>
+                  <div class="meta">ยอดผ่อนถูกบวกเข้าในรายจ่ายของแต่ละเดือนอัตโนมัติ</div>
+                </div>
+              </div>
+              <div id="yearlyGrid" class="year-grid"></div>
+            </div>
+          </div>
+        </section>
+
+
+        <section id="view-installments" class="view hidden">
+          <div class="panel card">
+            <div class="section-header">
+              <div>
+                <h2>➕ เพิ่ม/แก้ไขยอดผ่อน</h2>
+                <div class="meta">ใช้ modal สำหรับเพิ่มหรือแก้ไขรายการผ่อน คล้ายเมนูรายเดือน</div>
+              </div>
+              <div class="small-actions">
+                <button id="openLoanModalBtn" class="btn-primary">＋ เพิ่มยอดผ่อน</button>
+              </div>
+            </div>
+            <div class="notice-box">กดปุ่มเพิ่มยอดผ่อนเพื่อเปิดแบบฟอร์ม และเมื่อกดแก้ไขจากรายการ ระบบจะเปิด modal เดิมพร้อมข้อมูลรายการนั้น</div>
+          </div>
+
+          <div class="panel card">
+            <div class="section-header">
+              <div>
+                <h3>สรุปยอดผ่อน</h3>
+                <div class="meta">หน้ารายเดือนและ Dashboard จะใช้ข้อมูลจากส่วนนี้โดยตรง</div>
+              </div>
+            </div>
+            <div class="summary-grid">
+              <div class="summary-card due"><div class="name">รายการผ่อนทั้งหมด</div><div class="value" id="loanTotalCount">0</div></div>
+              <div class="summary-card expense"><div class="name">ยอดคงเหลือรวม</div><div class="value" id="loanRemainingAmount">฿0.00</div></div>
+              <div class="summary-card balance"><div class="name">เดือนที่ยังเหลือรวม</div><div class="value" id="loanRemainingMonths">0</div></div>
+              <div class="summary-card violet"><div class="name">ยอดจ่ายต่อเดือนรวม</div><div class="value" id="loanMonthlyTotal">฿0.00</div></div>
+            </div>
+          </div>
+
+          <div class="panel card">
+            <div class="section-header">
+              <div>
+                <h3>💳 รายการผ่อนทั้งหมด</h3>
+                <div id="loanFilterResultLabel" class="meta">กำลังแสดงทั้งหมด</div>
+              </div>
+              <div class="installment-view-switch">
+                <button id="loanListViewBtn" class="btn-light btn-sm">มุมมองรายการ</button>
+                <button id="loanCalendarViewBtn" class="btn-light btn-sm">มุมมองปฏิทิน</button>
+              </div>
+            </div>
+            <div class="installment-filters" style="margin-bottom:12px">
+              <div>
+                <label for="loanSearchKeyword">ค้นหา</label>
+                <input type="text" id="loanSearchKeyword" placeholder="ชื่อรายการ / หมวด / หมายเหตุ">
+              </div>
+              <div>
+                <label for="loanFilterStatus">สถานะ</label>
+                <select id="loanFilterStatus">
+                  <option value="">ทั้งหมด</option>
+                  <option value="active">ยังผ่อนไม่ครบ</option>
+                  <option value="paid">จ่ายครบแล้ว</option>
+                </select>
+              </div>
+              <div>
+                <label for="loanFilterStartMonth">เริ่มเดือน</label>
+                <input type="month" id="loanFilterStartMonth">
+              </div>
+              <div>
+                <label for="loanFilterEndMonth">ถึงเดือน</label>
+                <input type="month" id="loanFilterEndMonth">
+              </div>
+              <div>
+                <button id="resetLoanFiltersBtn" class="btn-light">↺ ล้างตัวกรอง</button>
+              </div>
+            </div>
+            <div id="installmentContainer" class="installment-list"></div>
+            <div id="installmentCalendarContainer" class="calendar-grid hidden"></div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <div id="entryModal" class="modal-backdrop hidden" aria-hidden="true">
+    <div class="modal-dialog card" role="dialog" aria-modal="true" aria-labelledby="entryFormTitle">
+      <div class="modal-header">
+        <div>
+          <h3 id="entryFormTitle" style="margin:0">➕ เพิ่มรายรับ / รายจ่าย</h3>
+          <div class="meta">เพิ่มหรือแก้ไขรายการในหน้าต่างนี้ โดยไม่กินพื้นที่หน้าหลัก</div>
+        </div>
+        <div class="small-actions">
+          <div id="entryEditBadge" class="badge hidden">✏️ กำลังแก้ไข</div>
+          <button id="closeEntryModalBtn" class="btn-light modal-close">✕ ปิด</button>
+        </div>
+      </div>
+      <div class="modal-body">
+        <div class="form-grid">
+          <div>
+            <label for="entryType">ประเภท</label>
+            <select id="entryType">
+              <option value="expense">💸 รายจ่าย</option>
+              <option value="income">💵 รายรับ</option>
+            </select>
+          </div>
+          <div>
+            <label for="entryDate">วันที่</label>
+            <input type="date" id="entryDate">
+          </div>
+          <div>
+            <label for="entryCategory">หมวดหมู่</label>
+            <select id="entryCategory"></select>
+          </div>
+          <div>
+            <label for="entryAmount">จำนวนเงิน (บาท)</label>
+            <input type="number" id="entryAmount" min="0" step="0.01" placeholder="0.00">
+          </div>
+          <div class="span-2">
+            <label for="entryTitle">รายการ</label>
+            <input type="text" id="entryTitle" placeholder="เช่น เงินเดือนประจำเดือน / ค่างวดรถ">
+          </div>
+          <div class="span-2">
+            <label for="entryNote">หมายเหตุ</label>
+            <textarea id="entryNote" placeholder="รายละเอียดเพิ่มเติม..."></textarea>
+          </div>
+          <div class="full checkbox-inline">
+            <input type="checkbox" id="repeatEnabled">
+            <label for="repeatEnabled" style="margin:0; text-transform:none; letter-spacing:0; font-size:14px; color:var(--text); font-weight:700;">ทำรายการซ้ำรายเดือนในครั้งเดียว</label>
+          </div>
+          <div>
+            <label for="repeatCount">จำนวนเดือนทั้งหมด</label>
+            <input type="number" id="repeatCount" min="1" max="60" step="1" value="1">
+          </div>
+          <div class="span-2 notice-box">
+            เมื่อเปิดการทำซ้ำ ระบบจะสร้างรายการตามเดือนถัดไปต่อเนื่องจากวันที่ที่เลือก โดยใช้วันเดิมให้มากที่สุด
+          </div>
+          <div class="full small-actions">
+            <button id="saveEntryBtn" class="btn-primary">💾 บันทึกรายการ</button>
+            <button id="clearEntryBtn" class="btn-light">✕ ล้างฟอร์ม</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="loanModal" class="modal-backdrop hidden" aria-hidden="true">
+    <div class="modal-dialog card" role="dialog" aria-modal="true" aria-labelledby="loanFormTitle">
+      <div class="modal-header">
+        <div>
+          <h3 id="loanFormTitle" style="margin:0">➕ เพิ่มยอดผ่อน</h3>
+          <div class="meta">กรอกข้อมูลยอดผ่อน ระบบจะคำนวณและบันทึกลงรายการหลักอัตโนมัติ</div>
+        </div>
+        <div class="small-actions">
+          <div id="loanEditBadge" class="badge hidden">✏️ กำลังแก้ไข</div>
+          <button id="closeLoanModalBtn" class="btn-light modal-close">✕ ปิด</button>
+        </div>
+      </div>
+      <div class="modal-body">
+        <div class="form-grid">
+          <div class="span-2">
+            <label for="loanName">ชื่อรายการ</label>
+            <input type="text" id="loanName" placeholder="เช่น รถยนต์ / โทรศัพท์ / บ้าน">
+          </div>
+          <div>
+            <label for="loanCategory">หมวด</label>
+            <select id="loanCategory"></select>
+          </div>
+          <div>
+            <label for="loanMonthlyAmount">ยอดต่อเดือน (บาท)</label>
+            <input type="number" id="loanMonthlyAmount" min="0" step="0.01" placeholder="0.00">
+          </div>
+          <div>
+            <label for="loanMonthsTotal">จำนวนเดือนทั้งหมด</label>
+            <input type="number" id="loanMonthsTotal" min="1" step="1" placeholder="12">
+          </div>
+          <div>
+            <label for="loanMonthsPaid">จ่ายแล้วกี่เดือน</label>
+            <input type="number" id="loanMonthsPaid" min="0" step="1" placeholder="0">
+          </div>
+          <div>
+            <label for="loanStartMonth">เริ่มผ่อนเดือน</label>
+            <input type="month" id="loanStartMonth">
+          </div>
+          <div>
+            <label for="loanPrincipal">ยอดตั้งต้นทั้งหมด</label>
+            <input type="number" id="loanPrincipal" min="0" step="0.01" placeholder="ไม่บังคับ">
+          </div>
+          <div>
+            <label for="loanRemainingOverride">ยอดคงเหลือปัจจุบัน</label>
+            <input type="number" id="loanRemainingOverride" min="0" step="0.01" placeholder="ไม่กรอก = คำนวณให้">
+          </div>
+          <div>
+            <label for="loanDueDay">วันที่ครบกำหนดจ่าย</label>
+            <input type="number" id="loanDueDay" min="1" max="31" step="1" placeholder="เช่น 5">
+          </div>
+          <div>
+            <label for="loanInterestType">รูปแบบดอกเบี้ย</label>
+            <select id="loanInterestType">
+              <option value="none">ไม่มีดอกเบี้ย</option>
+              <option value="reducing">ลดต้นลดดอก (EMI)</option>
+              <option value="flat">Flat Rate</option>
+            </select>
+          </div>
+          <div>
+            <label for="loanInterestRate">ดอกเบี้ยต่อปี (%)</label>
+            <input type="number" id="loanInterestRate" min="0" step="0.01" placeholder="เช่น 12">
+          </div>
+          <div class="span-2">
+            <label for="loanInterestNote">หมายเหตุ / ดอกเบี้ย</label>
+            <input type="text" id="loanInterestNote" placeholder="เช่น ดอกเบี้ย 0%">
+          </div>
+          <div id="loanSmartHint" class="full notice-box">
+            ระบบช่วยคำนวณเปิดอยู่: ใส่ข้อมูลอย่างน้อย 2 ช่องจาก ยอดต่อเดือน / จำนวนเดือนทั้งหมด / ยอดตั้งต้นทั้งหมด และถ้ากรอกดอกเบี้ย ระบบจะคำนวณตามรูปแบบดอกเบี้ยอัตโนมัติ
+          </div>
+          <div class="full small-actions">
+            <button id="saveLoanBtn" class="btn-primary">💾 บันทึกรายการผ่อน</button>
+            <button id="clearLoanBtn" class="btn-light">✕ ล้างฟอร์ม</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/th.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/index.js"></script>
+  <script>
+    const STORAGE_KEY = 'finance_tracker_simple_v4';
+    const CATEGORY_OPTIONS = [
+      'เงินเดือน','โบนัส','รายได้เสริม','ธุรกิจ','ดอกเบี้ย/ปันผล',
+      'รถยนต์','บ้าน/เช่า','ไฟฟ้า','น้ำประปา','อินเทอร์เน็ต','โทรศัพท์',
+      'ของกิน','ค่าน้ำมัน','เดินทาง','ช้อปปิ้ง','สุขภาพ','ประกัน',
+      'การศึกษา','บัตรเครดิต','ผ่อนสินค้า','เงินให้ครอบครัว','ท่องเที่ยว','อื่นๆ'
+    ];
+
+    let appData = { entries: [], installments: [] };
+    let currentView = 'yearly';
+    let fileHandle = null;
+    let loadedFileName = '';
+    let editingEntryId = null;
+    let editingLoanId = null;
+    let installmentViewMode = 'list';
+
+    const $ = (id) => document.getElementById(id);
+
+    const welcomeScreen = $('welcomeScreen');
+    const appScreen = $('appScreen');
+    const startupJsonFile = $('startupJsonFile');
+    const openJsonWithHandleBtn = $('openJsonWithHandleBtn');
+    const openJsonSimpleBtn = $('openJsonSimpleBtn');
+    const createNewBtn = $('createNewBtn');
+    const loadAnotherBtn = $('loadAnotherBtn');
+    const saveJsonBtn = $('saveJsonBtn');
+    const fileStatus = $('fileStatus');
+
+    const rangeStartMonth = $('rangeStartMonth');
+    const rangeEndMonth = $('rangeEndMonth');
+    const monthlyKeyword = $('monthlyKeyword');
+    const monthlyTypeFilter = $('monthlyTypeFilter');
+    const monthlyCategoryFilter = $('monthlyCategoryFilter');
+    const monthlyMinAmount = $('monthlyMinAmount');
+    const monthlyMaxAmount = $('monthlyMaxAmount');
+    const monthlySort = $('monthlySort');
+    const resetMonthlyFiltersBtn = $('resetMonthlyFiltersBtn');
+    const monthlySummaryLabel = $('monthlySummaryLabel');
+    const monthlyIncomeTotal = $('monthlyIncomeTotal');
+    const monthlyExpenseTotal = $('monthlyExpenseTotal');
+    const monthlyBalanceTotal = $('monthlyBalanceTotal');
+    const monthlyEntryCount = $('monthlyEntryCount');
+    const monthlyInstallmentTotal = $('monthlyInstallmentTotal');
+    const monthlyMonthCount = $('monthlyMonthCount');
+    const monthlyTopCategory = $('monthlyTopCategory');
+    const monthlyAverageExpense = $('monthlyAverageExpense');
+    const monthlyActiveFilterLabel = $('monthlyActiveFilterLabel');
+    const entryCountLabel = $('entryCountLabel');
+    const entriesContainer = $('entriesContainer');
+
+    const openEntryModalBtn = $('openEntryModalBtn');
+    const openEntryModalBtnSecondary = $('openEntryModalBtnSecondary');
+    const entryModal = $('entryModal');
+    const closeEntryModalBtn = $('closeEntryModalBtn');
+    const loanModal = $('loanModal');
+    const openLoanModalBtn = $('openLoanModalBtn');
+    const closeLoanModalBtn = $('closeLoanModalBtn');
+    const prevYearBtn = $('prevYearBtn');
+    const nextYearBtn = $('nextYearBtn');
+
+    const entryFormTitle = $('entryFormTitle');
+    const entryEditBadge = $('entryEditBadge');
+    const entryType = $('entryType');
+    const entryDate = $('entryDate');
+    const entryCategory = $('entryCategory');
+    const entryAmount = $('entryAmount');
+    const entryTitle = $('entryTitle');
+    const entryNote = $('entryNote');
+    const repeatEnabled = $('repeatEnabled');
+    const repeatCount = $('repeatCount');
+    const saveEntryBtn = $('saveEntryBtn');
+    const clearEntryBtn = $('clearEntryBtn');
+
+    const yearlyYearPicker = $('yearlyYearPicker');
+    const yearlyScreenLabel = $('yearlyScreenLabel');
+    const yearlyIncomeTotal = $('yearlyIncomeTotal');
+    const yearlyExpenseTotal = $('yearlyExpenseTotal');
+    const yearlyBalanceTotal = $('yearlyBalanceTotal');
+    const yearlyEntryCount = $('yearlyEntryCount');
+    const yearlyInstallmentTotal = $('yearlyInstallmentTotal');
+    const yearlyGrid = $('yearlyGrid');
+
+    const loanFormTitle = $('loanFormTitle');
+    const loanEditBadge = $('loanEditBadge');
+    const loanName = $('loanName');
+    const loanCategory = $('loanCategory');
+    const loanMonthlyAmount = $('loanMonthlyAmount');
+    const loanMonthsTotal = $('loanMonthsTotal');
+    const loanMonthsPaid = $('loanMonthsPaid');
+    const loanStartMonth = $('loanStartMonth');
+    const loanPrincipal = $('loanPrincipal');
+    const loanRemainingOverride = $('loanRemainingOverride');
+    const loanDueDay = $('loanDueDay');
+    const loanInterestType = $('loanInterestType');
+    const loanInterestRate = $('loanInterestRate');
+    const loanInterestNote = $('loanInterestNote');
+    const loanSmartHint = $('loanSmartHint');
+    const saveLoanBtn = $('saveLoanBtn');
+    const clearLoanBtn = $('clearLoanBtn');
+    const installmentContainer = $('installmentContainer');
+    const installmentCalendarContainer = $('installmentCalendarContainer');
+    const loanFilterResultLabel = $('loanFilterResultLabel');
+    const loanSearchKeyword = $('loanSearchKeyword');
+    const loanFilterStatus = $('loanFilterStatus');
+    const loanFilterStartMonth = $('loanFilterStartMonth');
+    const loanFilterEndMonth = $('loanFilterEndMonth');
+    const resetLoanFiltersBtn = $('resetLoanFiltersBtn');
+    const loanListViewBtn = $('loanListViewBtn');
+    const loanCalendarViewBtn = $('loanCalendarViewBtn');
+    const loanTotalCount = $('loanTotalCount');
+    const loanRemainingAmount = $('loanRemainingAmount');
+    const loanRemainingMonths = $('loanRemainingMonths');
+    const loanMonthlyTotal = $('loanMonthlyTotal');
+
+    function formatMoney(value){
+      return new Intl.NumberFormat('th-TH',{style:'currency',currency:'THB',maximumFractionDigits:2}).format(Number(value||0));
+    }
+    function formatMonthThai(monthValue){
+      if(!monthValue) return '-';
+      const [year,month] = monthValue.split('-').map(Number);
+      return new Date(year, month-1, 1).toLocaleDateString('th-TH',{month:'long', year:'numeric'});
+    }
+    function getMonthKeyFromDate(dateText){ return String(dateText || '').slice(0,7); }
+    function escapeHtml(text){
+      return String(text ?? '')
+        .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+        .replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+    }
+    function saveToBrowser(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(appData)); }
+    function loadFromBrowser(){
+      try{
+        const raw = localStorage.getItem(STORAGE_KEY);
+        return raw ? normalizeData(JSON.parse(raw)) : null;
+      }catch{ return null; }
+    }
+    function normalizeData(parsed){
+      return {
+        entries: Array.isArray(parsed.entries) ? parsed.entries.map(x => ({
+          id: x.id || crypto.randomUUID(),
+          type: x.type || 'expense',
+          date: x.date || '',
+          category: x.category || 'อื่นๆ',
+          title: x.title || '',
+          amount: Number(x.amount || 0),
+          note: x.note || ''
+        })) : [],
+        installments: Array.isArray(parsed.installments) ? parsed.installments.map(x => ({
+          id: x.id || crypto.randomUUID(),
+          name: x.name || '',
+          category: x.category || 'ผ่อนสินค้า',
+          monthlyAmount: Number(x.monthlyAmount || 0),
+          totalMonths: Number(x.totalMonths || 0),
+          paidMonths: Number(x.paidMonths || 0),
+          startMonth: x.startMonth || '',
+          principal: Number(x.principal || 0),
+          remainingOverride: x.remainingOverride === '' || x.remainingOverride == null ? '' : Number(x.remainingOverride),
+          dueDay: x.dueDay === '' || x.dueDay == null ? '' : Number(x.dueDay),
+          interestType: x.interestType || 'none',
+          interestRate: x.interestRate === '' || x.interestRate == null ? '' : Number(x.interestRate),
+          interestNote: x.interestNote || ''
+        })) : []
+      };
+    }
+
+    function updateFileStatus(){
+      if(fileHandle && loadedFileName){
+        fileStatus.textContent = `ผูกไฟล์แล้ว: ${loadedFileName} · Save จะพยายามเขียนทับไฟล์เดิม`;
+      }else if(loadedFileName){
+        fileStatus.textContent = `โหลดจากไฟล์: ${loadedFileName} · Save จะดาวน์โหลดไฟล์ใหม่`;
+      }else{
+        fileStatus.textContent = 'ยังไม่ได้ผูกไฟล์สำหรับ Save ทับ';
+      }
+    }
+    function populateCategoryDropdowns(){
+      const options = CATEGORY_OPTIONS.map(x => `<option value="${x}">${x}</option>`).join('');
+      entryCategory.innerHTML = options;
+      loanCategory.innerHTML = options;
+      monthlyCategoryFilter.innerHTML = '<option value="">ทุกหมวดหมู่</option>' + options;
+    }
+
+    function currentMonth(){
+      return new Date().toISOString().slice(0,7);
+    }
+    function currentDate(){
+      return new Date().toISOString().slice(0,10);
+    }
+    function initPickers(){
+      const cm = currentMonth();
+      rangeStartMonth.value = rangeStartMonth.value || cm;
+      rangeEndMonth.value = rangeEndMonth.value || cm;
+      entryDate.value = entryDate.value || currentDate();
+      loanStartMonth.value = loanStartMonth.value || cm;
+      if(loanFilterStartMonth && !loanFilterStartMonth.value) loanFilterStartMonth.value = cm;
+      if(loanFilterEndMonth && !loanFilterEndMonth.value) loanFilterEndMonth.value = addMonths(cm, 5);
+
+      const years = new Set([String(new Date().getFullYear())]);
+      appData.entries.forEach(x => { if(x.date) years.add(String(new Date(x.date).getFullYear())); });
+      appData.installments.forEach(x => {
+        if(x.startMonth){
+          years.add(x.startMonth.slice(0,4));
+          const end = addMonths(x.startMonth, Math.max(0, Number(x.totalMonths||0) - 1));
+          years.add(end.slice(0,4));
+        }
+      });
+
+      const sorted = Array.from(years).sort();
+      const options = sorted.map(y => `<option value="${y}">${y}</option>`).join('');
+      yearlyYearPicker.innerHTML = options;
+      if(!yearlyYearPicker.value || !sorted.includes(yearlyYearPicker.value)) yearlyYearPicker.value = String(new Date().getFullYear());
+    }
+
+    function monthRangeList(startMonth, endMonth){
+      if(!startMonth || !endMonth) return [];
+      const [sy, sm] = startMonth.split('-').map(Number);
+      const [ey, em] = endMonth.split('-').map(Number);
+      const start = new Date(sy, sm - 1, 1);
+      const end = new Date(ey, em - 1, 1);
+      const out = [];
+      const cursor = new Date(start);
+      while(cursor <= end){
+        out.push(`${cursor.getFullYear()}-${String(cursor.getMonth()+1).padStart(2,'0')}`);
+        cursor.setMonth(cursor.getMonth()+1);
+      }
+      return out;
+    }
+    function addMonths(monthKey, plus){
+      const [y,m] = monthKey.split('-').map(Number);
+      const d = new Date(y, m-1+plus, 1);
+      return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    }
+    function safeDateFromMonth(monthKey, day){
+      const [y,m] = monthKey.split('-').map(Number);
+      const lastDay = new Date(y, m, 0).getDate();
+      const safeDay = Math.min(Math.max(1, Number(day||1)), lastDay);
+      return `${monthKey}-${String(safeDay).padStart(2,'0')}`;
+    }
+
+    function getInstallmentVirtualEntries(monthKey){
+      return appData.installments
+        .filter(x => x.startMonth && Number(x.totalMonths) > 0 && Number(x.monthlyAmount) > 0)
+        .filter(x => monthKey >= x.startMonth && monthKey <= addMonths(x.startMonth, Number(x.totalMonths) - 1))
+        .map(x => ({
+          id: `installment-${x.id}-${monthKey}`,
+          type: 'expense',
+          date: safeDateFromMonth(monthKey, x.dueDay || 1),
+          category: x.category || 'ผ่อนสินค้า',
+          title: `ยอดผ่อน: ${x.name}`,
+          amount: Number(x.monthlyAmount || 0),
+          note: x.interestNote || '',
+          sourceType: 'installment',
+          sourceId: x.id,
+          readonly: true
+        }));
+    }
+
+    function getCombinedMonthItems(monthKey){
+      const entryItems = appData.entries
+        .filter(x => getMonthKeyFromDate(x.date) === monthKey)
+        .map(x => ({...x, sourceType:'entry', sourceId:x.id, readonly:false}));
+      return [...entryItems, ...getInstallmentVirtualEntries(monthKey)];
+    }
+
+    function summarizeEntries(items){
+      const income = items.filter(x => x.type === 'income').reduce((s,x) => s + Number(x.amount||0), 0);
+      const expense = items.filter(x => x.type === 'expense').reduce((s,x) => s + Number(x.amount||0), 0);
+      return {
+        income,
+        expense,
+        balance: income - expense,
+        count: items.length,
+        expenseCount: items.filter(x => x.type === 'expense').length
+      };
+    }
+    function getInstallmentTotalFromItems(items){
+      return items
+        .filter(x => x.sourceType === 'installment')
+        .reduce((sum, x) => sum + Number(x.amount || 0), 0);
+    }
+
+    function monthlyFilterState(){
+      return {
+        keyword: (monthlyKeyword.value || '').trim().toLowerCase(),
+        type: monthlyTypeFilter.value || '',
+        category: monthlyCategoryFilter.value || '',
+        minAmount: monthlyMinAmount.value === '' ? null : Number(monthlyMinAmount.value),
+        maxAmount: monthlyMaxAmount.value === '' ? null : Number(monthlyMaxAmount.value),
+        sort: monthlySort.value || 'date-asc'
+      };
+    }
+    function monthlyItemMatch(item){
+      const f = monthlyFilterState();
+      const haystack = `${item.title} ${item.category} ${item.note || ''} ${item.date || ''}`.toLowerCase();
+      if(f.keyword && !haystack.includes(f.keyword)) return false;
+      if(f.type && item.type !== f.type) return false;
+      if(f.category && item.category !== f.category) return false;
+      if(f.minAmount != null && Number(item.amount||0) < f.minAmount) return false;
+      if(f.maxAmount != null && Number(item.amount||0) > f.maxAmount) return false;
+      return true;
+    }
+    function sortItems(items){
+      const sort = monthlyFilterState().sort;
+      return items.slice().sort((a,b) => {
+        if(sort === 'date-desc') return (b.date || '').localeCompare(a.date || '');
+        if(sort === 'amount-desc') return Number(b.amount||0) - Number(a.amount||0) || (a.date||'').localeCompare(b.date||'');
+        if(sort === 'amount-asc') return Number(a.amount||0) - Number(b.amount||0) || (a.date||'').localeCompare(b.date||'');
+        if(sort === 'title-asc') return String(a.title||'').localeCompare(String(b.title||''),'th');
+        return (a.date || '').localeCompare(b.date || '');
+      });
+    }
+    function getActiveMonthlyFilterText(){
+      const f = monthlyFilterState();
+      const parts = [];
+      if(f.keyword) parts.push(`ค้นหา: ${f.keyword}`);
+      if(f.type === 'income') parts.push('เฉพาะรายรับ');
+      if(f.type === 'expense') parts.push('เฉพาะรายจ่าย');
+      if(f.category) parts.push(`หมวด: ${f.category}`);
+      if(f.minAmount != null) parts.push(`ขั้นต่ำ ${formatMoney(f.minAmount)}`);
+      if(f.maxAmount != null) parts.push(`สูงสุด ${formatMoney(f.maxAmount)}`);
+      return parts.length ? parts.join(' • ') : 'ยังไม่ได้ใช้ตัวกรองเพิ่มเติม';
+    }
+
+    
+    function buildYearMonthCards(year){
+      const months = Array.from({length:12}, (_,i) => `${year}-${String(i+1).padStart(2,'0')}`);
+      const monthData = months.map(monthKey => {
+        const items = getCombinedMonthItems(monthKey);
+        return { monthKey, summary: summarizeEntries(items) };
+      });
+      const maxValue = Math.max(1, ...monthData.map(x => Math.max(x.summary.income, x.summary.expense, Math.abs(x.summary.balance))));
+
+      return monthData.map(({monthKey, summary}) => {
+        const isNegative = summary.balance < 0;
+        const balancePercent = Math.min(100, (Math.abs(summary.balance) / maxValue) * 100);
+        return `
+          <div class="month-box enhanced clickable" data-month="${monthKey}">
+            <div class="month-box-head">
+              <h4>${formatMonthThai(monthKey)}</h4>
+              <span class="pill" ${isNegative ? 'style="color:#dc2626;background:#fff1f2;border-color:#fecdd3"' : ''}>${summary.count} รายการ</span>
+            </div>
+            <div class="month-balance-hero ${isNegative ? 'negative' : ''}">
+              <div>
+                <div class="month-balance-label">ยอดคงเหลือสุทธิ</div>
+                <div class="month-balance-value">${formatMoney(summary.balance)}</div>
+              </div>
+              <div class="meta">${isNegative ? 'จ่ายมากกว่ารับ' : 'ยังเป็นบวก'}</div>
+            </div>
+            <div class="mini-stats">
+              <div class="mini-stat">
+                <span class="k">รายรับ</span>
+                <span class="v">${formatMoney(summary.income)}</span>
+              </div>
+              <div class="mini-stat">
+                <span class="k">รายจ่าย</span>
+                <span class="v">${formatMoney(summary.expense)}</span>
+              </div>
+              <div class="mini-stat">
+                <span class="k">ขนาดยอดคงเหลือ</span>
+                <span class="v">${Math.round(balancePercent)}%</span>
+              </div>
+            </div>
+            <div class="bar-row">
+              <span>รับ</span>
+              <div class="bar bar-income"><div style="width:${(summary.income / maxValue) * 100}%"></div></div>
+              <strong>${formatMoney(summary.income)}</strong>
+            </div>
+            <div class="bar-row">
+              <span>จ่าย</span>
+              <div class="bar bar-expense"><div style="width:${(summary.expense / maxValue) * 100}%"></div></div>
+              <strong>${formatMoney(summary.expense)}</strong>
+            </div>
+            <div class="month-box-footer">
+              <span>กดเพื่อดูรายการเดือนนี้</span>
+              <span>→</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    
+    function renderMonthly(){
+      const start = rangeStartMonth.value;
+      const end = rangeEndMonth.value;
+      const fixedStart = start <= end ? start : end;
+      const fixedEnd = start <= end ? end : start;
+      const months = monthRangeList(fixedStart, fixedEnd);
+      syncPickerValue(rangeStartMonth);
+      syncPickerValue(rangeEndMonth);
+
+      const groups = months.map(monthKey => {
+        const items = sortItems(getCombinedMonthItems(monthKey).filter(monthlyItemMatch));
+        return { monthKey, items, summary: summarizeEntries(items) };
+      });
+
+      const allItems = groups.flatMap(g => g.items);
+      const sum = summarizeEntries(allItems);
+      const installmentTotal = getInstallmentTotalFromItems(allItems);
+      const categoryMap = new Map();
+      allItems.forEach(item => categoryMap.set(item.category || 'อื่นๆ', (categoryMap.get(item.category || 'อื่นๆ') || 0) + 1));
+      const topCategory = Array.from(categoryMap.entries()).sort((a,b) => b[1] - a[1])[0];
+      const expenseItems = allItems.filter(x => x.type === 'expense');
+      const avgExpense = expenseItems.length ? expenseItems.reduce((s,x) => s + Number(x.amount||0), 0) / expenseItems.length : 0;
+
+      monthlySummaryLabel.textContent = `${formatMonthThai(fixedStart)} - ${formatMonthThai(fixedEnd)}`;
+      monthlyIncomeTotal.textContent = formatMoney(sum.income);
+      monthlyExpenseTotal.textContent = formatMoney(sum.expense);
+      monthlyBalanceTotal.textContent = formatMoney(sum.balance);
+      monthlyEntryCount.textContent = `${sum.count} รายการ`;
+      monthlyInstallmentTotal.textContent = formatMoney(installmentTotal);
+      monthlyMonthCount.textContent = `${months.length} เดือน`;
+      monthlyTopCategory.textContent = topCategory ? `${topCategory[0]} (${topCategory[1]})` : '-';
+      monthlyAverageExpense.textContent = formatMoney(avgExpense);
+      monthlyActiveFilterLabel.textContent = getActiveMonthlyFilterText();
+      entryCountLabel.textContent = `ทั้งหมด ${sum.count} รายการ ใน ${months.length} เดือน`;
+
+      if(!allItems.length){
+        entriesContainer.innerHTML = '<div class="empty">ยังไม่มีรายการที่ตรงกับช่วงเดือนและตัวกรองที่เลือก</div>';
+        return;
+      }
+
+      entriesContainer.innerHTML = `
+        <div class="month-stack">
+          ${groups.map(group => `
+            <div class="month-group">
+              <div class="month-group-head">
+                <div>
+                  <h3 style="margin:0">${formatMonthThai(group.monthKey)}</h3>
+                  <div class="meta">${group.items.length} รายการ</div>
+                </div>
+                <div class="month-group-stats">
+                  <span class="pill">รายรับ ${formatMoney(group.summary.income)}</span>
+                  <span class="pill">รายจ่าย ${formatMoney(group.summary.expense)}</span>
+                  <span class="pill">คงเหลือ ${formatMoney(group.summary.balance)}</span>
+                  <span class="pill">ยอดผ่อน ${formatMoney(getInstallmentTotalFromItems(group.items))}</span>
+                </div>
+              </div>
+              ${group.items.length ? `
+                <table>
+                  <thead>
+                    <tr>
+                      <th>วันที่</th>
+                      <th>ประเภท</th>
+                      <th>รายการ</th>
+                      <th>จำนวนเงิน</th>
+                      <th>จัดการ</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${group.items.map(item => `
+                      <tr>
+                        <td>${escapeHtml(item.date || '-')}</td>
+                        <td>
+                          <span class="badge ${item.sourceType === 'installment' ? 'badge-installment' : (item.type === 'income' ? 'badge-income' : 'badge-expense')}">
+                            ${item.sourceType === 'installment' ? 'ยอดผ่อน' : (item.type === 'income' ? 'รายรับ' : 'รายจ่าย')}
+                          </span>
+                        </td>
+                        <td>
+                          <div><strong>${escapeHtml(item.title)}</strong></div>
+                          <div class="meta">${escapeHtml(item.category || '-')}</div>
+                          ${item.note ? `<div class="meta">${escapeHtml(item.note)}</div>` : ''}
+                          ${item.sourceType === 'installment' ? '<div class="readonly-note">แก้ไขได้เฉพาะในหน้ายอดผ่อน</div>' : ''}
+                        </td>
+                        <td class="${item.type === 'income' ? 'amount-income' : 'amount-expense'}">${formatMoney(item.amount)}</td>
+                        <td>
+                          ${item.sourceType === 'installment' ? `
+                            <div class="small-actions">
+                              <button class="btn-light btn-sm" onclick="goToInstallments('${item.sourceId}')">ไปหน้ายอดผ่อน</button>
+                            </div>
+                          ` : `
+                            <div class="small-actions">
+                              <button class="btn-light btn-sm" onclick="editEntry('${item.id}')">แก้ไข</button>
+                              <button class="btn-danger btn-sm" onclick="deleteEntry('${item.id}')">ลบ</button>
+                            </div>
+                          `}
+                        </td>
+                      </tr>
+                    `).join('')}
+                  </tbody>
+                </table>
+              ` : '<div class="empty">ไม่มีรายการในเดือนนี้ตามตัวกรองที่เลือก</div>'}
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    
+    function renderYearly(){
+      const year = yearlyYearPicker.value;
+      const items = Array.from({length:12}, (_,i) => `${year}-${String(i+1).padStart(2,'0')}`).flatMap(getCombinedMonthItems);
+      const sum = summarizeEntries(items);
+      const installmentTotal = getInstallmentTotalFromItems(items);
+      yearlyScreenLabel.textContent = `ปี ${year}`;
+      yearlyIncomeTotal.textContent = formatMoney(sum.income);
+      yearlyExpenseTotal.textContent = formatMoney(sum.expense);
+      yearlyBalanceTotal.textContent = formatMoney(sum.balance);
+      yearlyEntryCount.textContent = `${sum.count} รายการ`;
+      yearlyInstallmentTotal.textContent = formatMoney(installmentTotal);
+      yearlyGrid.className = 'year-grid';
+      yearlyGrid.innerHTML = buildYearMonthCards(year);
+      bindYearMonthCards();
+    }
+
+    function toPositiveNumber(value){
+      const n = Number(value);
+      return Number.isFinite(n) && n > 0 ? n : null;
+    }
+    function toNonNegativeInteger(value){
+      const n = Number(value);
+      if(!Number.isFinite(n)) return null;
+      return Math.max(0, Math.floor(n));
+    }
+    function round2(value){
+      return Math.round(Number(value || 0) * 100) / 100;
+    }
+    function toNonNegativeNumber(value){
+      const n = Number(value);
+      return Number.isFinite(n) && n >= 0 ? n : null;
+    }
+    function effectiveInterestType(type, rate){
+      return rate > 0 ? (type || 'reducing') : 'none';
+    }
+    function computeMonthlyFromPrincipal(principal, totalMonths, interestType, annualRate){
+      if(interestType === 'none' || annualRate <= 0){
+        return round2(principal / totalMonths);
+      }
+      if(interestType === 'flat'){
+        const monthlyInterest = principal * (annualRate / 100) / 12;
+        return round2((principal / totalMonths) + monthlyInterest);
+      }
+      const r = (annualRate / 100) / 12;
+      if(r <= 0) return round2(principal / totalMonths);
+      const factor = Math.pow(1 + r, totalMonths);
+      const emi = principal * r * factor / (factor - 1);
+      return round2(emi);
+    }
+    function computePrincipalFromMonthly(monthly, totalMonths, interestType, annualRate){
+      if(interestType === 'none' || annualRate <= 0){
+        return round2(monthly * totalMonths);
+      }
+      if(interestType === 'flat'){
+        const divisor = (1 / totalMonths) + ((annualRate / 100) / 12);
+        if(divisor <= 0) return null;
+        return round2(monthly / divisor);
+      }
+      const r = (annualRate / 100) / 12;
+      if(r <= 0) return round2(monthly * totalMonths);
+      const factor = Math.pow(1 + r, totalMonths);
+      const principal = monthly * (factor - 1) / (r * factor);
+      return round2(principal);
+    }
+    function buildLoanDraftFromForm(){
+      let monthly = toPositiveNumber(loanMonthlyAmount.value);
+      let total = toNonNegativeInteger(loanMonthsTotal.value);
+      let paid = toNonNegativeInteger(loanMonthsPaid.value) ?? 0;
+      let principal = toPositiveNumber(loanPrincipal.value);
+      const override = toPositiveNumber(loanRemainingOverride.value);
+      const interestRateRaw = toNonNegativeNumber(loanInterestRate.value);
+      const annualRate = interestRateRaw == null ? 0 : interestRateRaw;
+      const interestType = effectiveInterestType(loanInterestType.value, annualRate);
+      const autoFilled = [];
+
+      if(total === 0) total = null;
+
+      if(annualRate > 0 && !total){
+        return {
+          ok: false,
+          message: 'เมื่อมีดอกเบี้ย กรุณาระบุจำนวนเดือนทั้งหมดเพื่อคำนวณค่างวด',
+          autoFilled
+        };
+      }
+
+      if(!monthly && principal && total){
+        monthly = computeMonthlyFromPrincipal(principal, total, interestType, annualRate);
+        autoFilled.push(`คำนวณยอดต่อเดือนจากยอดตั้งต้น (${interestType === 'none' ? 'ไม่คิดดอกเบี้ย' : `ดอกเบี้ย ${annualRate}%/ปี แบบ ${interestType === 'flat' ? 'Flat' : 'ลดต้นลดดอก'}`}) = ${formatMoney(monthly)}`);
+      }
+      if(!total && principal && monthly){
+        total = Math.max(1, Math.ceil(principal / monthly));
+        autoFilled.push(`คำนวณจำนวนเดือนจากยอดตั้งต้น ÷ ยอดต่อเดือน = ${total} เดือน`);
+      }
+      if(!principal && monthly && total){
+        const principalCalculated = computePrincipalFromMonthly(monthly, total, interestType, annualRate);
+        principal = principalCalculated != null ? principalCalculated : round2(monthly * total);
+        autoFilled.push(`คำนวณยอดตั้งต้นจากค่างวด (${interestType === 'none' ? 'ไม่คิดดอกเบี้ย' : `ดอกเบี้ย ${annualRate}%/ปี`}) = ${formatMoney(principal)}`);
+      }
+
+      if(!monthly || !total){
+        return {
+          ok: false,
+          message: 'กรอกอย่างน้อย 2 ช่องจาก ยอดต่อเดือน / จำนวนเดือนทั้งหมด / ยอดตั้งต้นทั้งหมด',
+          autoFilled
+        };
+      }
+
+      if(paid > total){
+        paid = total;
+        autoFilled.push(`ปรับจำนวนเดือนที่จ่ายแล้วเป็น ${paid} (ไม่เกินจำนวนเดือนทั้งหมด)`);
+      }
+
+      const remainingMonths = Math.max(0, total - paid);
+      const remainingBySchedule = round2(remainingMonths * monthly);
+      const hasInterest = interestType !== 'none' && annualRate > 0;
+      const remainingByPrincipal = (!hasInterest && principal != null) ? round2(Math.max(0, principal - (paid * monthly))) : null;
+      const autoRemaining = remainingByPrincipal != null ? remainingByPrincipal : remainingBySchedule;
+      const remainingAmount = override != null ? override : autoRemaining;
+
+      return {
+        ok: true,
+        autoFilled,
+        monthlyAmount: round2(monthly),
+        totalMonths: total,
+        paidMonths: paid,
+        principal: principal != null ? round2(principal) : 0,
+        remainingOverride: override != null ? round2(override) : '',
+        interestType,
+        interestRate: annualRate > 0 ? round2(annualRate) : '',
+        remainingAuto: autoRemaining,
+        remainingAmount
+      };
+    }
+
+    function updateLoanSmartHint(){
+      if(!loanSmartHint) return;
+      const draft = buildLoanDraftFromForm();
+      if(!draft.ok){
+        const msg = draft.autoFilled.length
+          ? `กำลังช่วยคำนวณ: ${draft.autoFilled.join(' • ')}`
+          : 'ระบบช่วยคำนวณเปิดอยู่: ใส่ข้อมูลอย่างน้อย 2 ช่องจาก ยอดต่อเดือน / จำนวนเดือนทั้งหมด / ยอดตั้งต้นทั้งหมด และถ้ากรอกดอกเบี้ย ระบบจะคำนวณตามรูปแบบดอกเบี้ยอัตโนมัติ';
+        loanSmartHint.textContent = msg;
+        return;
+      }
+
+      const summary = [
+        `ยอดต่อเดือน ${formatMoney(draft.monthlyAmount)}`,
+        `ทั้งหมด ${draft.totalMonths} เดือน`,
+        `จ่ายแล้ว ${draft.paidMonths} เดือน`,
+        `เหลืออัตโนมัติ ${formatMoney(draft.remainingAuto)}`
+      ];
+      if(draft.interestType !== 'none'){
+        summary.push(`ดอกเบี้ย ${draft.interestRate}%/ปี (${draft.interestType === 'flat' ? 'Flat' : 'ลดต้นลดดอก'})`);
+      }
+      if(draft.autoFilled.length){
+        summary.push(`เติมอัตโนมัติ: ${draft.autoFilled.join(' • ')}`);
+      }
+      if(draft.remainingOverride !== ''){
+        summary.push(`ใช้ยอดคงเหลือที่กรอกเอง ${formatMoney(draft.remainingAmount)}`);
+      }
+      loanSmartHint.textContent = summary.join(' | ');
+    }
+
+    function calcLoanRemaining(item){
+      const totalMonths = Math.max(0, Number(item.totalMonths || 0));
+      const paidMonths = Math.max(0, Number(item.paidMonths || 0));
+      const monthlyAmount = Math.max(0, Number(item.monthlyAmount || 0));
+      const principal = Math.max(0, Number(item.principal || 0));
+      const hasInterest = Number(item.interestRate || 0) > 0 && (item.interestType || 'none') !== 'none';
+      const remainingMonths = Math.max(0, totalMonths - paidMonths);
+      const bySchedule = round2(remainingMonths * monthlyAmount);
+      const byPrincipal = (!hasInterest && principal > 0) ? round2(Math.max(0, principal - (paidMonths * monthlyAmount))) : null;
+      const computed = byPrincipal != null ? byPrincipal : bySchedule;
+      const remainingAmount = item.remainingOverride === '' || item.remainingOverride == null
+        ? computed
+        : round2(Math.max(0, Number(item.remainingOverride || 0)));
+      return { remainingMonths, remainingAmount };
+    }
+    function getLoanEndMonth(item){
+      if(!item.startMonth || !Number(item.totalMonths || 0)) return '';
+      return addMonths(item.startMonth, Math.max(0, Number(item.totalMonths || 0) - 1));
+    }
+
+    function loanFilterState(){
+      return {
+        keyword: (loanSearchKeyword?.value || '').trim().toLowerCase(),
+        status: loanFilterStatus?.value || '',
+        startMonth: loanFilterStartMonth?.value || '',
+        endMonth: loanFilterEndMonth?.value || ''
+      };
+    }
+
+    function loanMatchesFilter(item){
+      const f = loanFilterState();
+      const calc = calcLoanRemaining(item);
+      const status = calc.remainingMonths > 0 ? 'active' : 'paid';
+      const haystack = `${item.name || ''} ${item.category || ''} ${item.interestNote || ''}`.toLowerCase();
+      const startMonth = item.startMonth || '';
+      const endMonth = getLoanEndMonth(item);
+      const filterStart = f.startMonth && f.endMonth ? (f.startMonth <= f.endMonth ? f.startMonth : f.endMonth) : f.startMonth;
+      const filterEnd = f.startMonth && f.endMonth ? (f.startMonth <= f.endMonth ? f.endMonth : f.startMonth) : f.endMonth;
+
+      if(f.keyword && !haystack.includes(f.keyword)) return false;
+      if(f.status && status !== f.status) return false;
+      if(filterStart && endMonth && endMonth < filterStart) return false;
+      if(filterEnd && startMonth && startMonth > filterEnd) return false;
+      return true;
+    }
+
+    function getLoanCalendarMonths(items){
+      const f = loanFilterState();
+      if(f.startMonth && f.endMonth){
+        const start = f.startMonth <= f.endMonth ? f.startMonth : f.endMonth;
+        const end = f.startMonth <= f.endMonth ? f.endMonth : f.startMonth;
+        return monthRangeList(start, end);
+      }
+      const monthSet = new Set();
+      items.forEach(item => {
+        const start = item.startMonth;
+        const end = getLoanEndMonth(item);
+        if(!start || !end) return;
+        monthRangeList(start, end).forEach(m => monthSet.add(m));
+      });
+      if(!monthSet.size){
+        return monthRangeList(currentMonth(), addMonths(currentMonth(), 5));
+      }
+      return Array.from(monthSet).sort().slice(0, 12);
+    }
+
+    function renderInstallments(){
+      const list = appData.installments.slice().sort((a,b) => (a.startMonth || '').localeCompare(b.startMonth || '') || String(a.name || '').localeCompare(String(b.name || ''),'th'));
+      let totalRemainAmount = 0;
+      let totalRemainMonths = 0;
+      let monthlyTotal = 0;
+
+      list.forEach(item => {
+        const calc = calcLoanRemaining(item);
+        totalRemainMonths += calc.remainingMonths;
+        totalRemainAmount += calc.remainingAmount;
+        monthlyTotal += Number(item.monthlyAmount || 0);
+      });
+
+      loanTotalCount.textContent = String(list.length);
+      loanRemainingAmount.textContent = formatMoney(totalRemainAmount);
+      loanRemainingMonths.textContent = `${totalRemainMonths} เดือน`;
+      loanMonthlyTotal.textContent = formatMoney(monthlyTotal);
+
+      if(!list.length){
+        installmentContainer.innerHTML = '<div class="empty">ยังไม่มีรายการผ่อน</div>';
+        installmentCalendarContainer.innerHTML = '<div class="empty">ยังไม่มีข้อมูลสำหรับมุมมองปฏิทิน</div>';
+        loanFilterResultLabel.textContent = 'ยังไม่มีรายการผ่อน';
+        return;
+      }
+
+      const filteredList = list.filter(loanMatchesFilter);
+      loanFilterResultLabel.textContent = `แสดง ${filteredList.length} จากทั้งหมด ${list.length} รายการ`;
+
+      if(!filteredList.length){
+        installmentContainer.innerHTML = '<div class="empty">ไม่พบรายการผ่อนตามตัวกรองที่เลือก</div>';
+        installmentCalendarContainer.innerHTML = '<div class="empty">ไม่พบข้อมูลปฏิทินตามตัวกรองที่เลือก</div>';
+        return;
+      }
+
+      installmentContainer.innerHTML = filteredList.map(item => {
+        const calc = calcLoanRemaining(item);
+        const percent = Math.min(100, Math.max(0, (Number(item.paidMonths||0) / Math.max(1, Number(item.totalMonths||1))) * 100));
+        const endMonth = getLoanEndMonth(item);
+        const loanStatus = calc.remainingMonths > 0 ? `เหลือ ${calc.remainingMonths} เดือน` : 'จ่ายครบแล้ว';
+        return `
+          <div class="installment-item" id="loan-card-${item.id}">
+            <div class="installment-headline">
+              <div>
+                <div class="installment-name">${escapeHtml(item.name)}</div>
+                <div class="meta">หมวด: ${escapeHtml(item.category || '-')}</div>
+              </div>
+              <span class="badge badge-installment">${loanStatus}</span>
+            </div>
+            <div class="installment-kv">
+              <div class="notice-box"><strong>เริ่มผ่อน</strong><br>${escapeHtml(item.startMonth || '-')}</div>
+              <div class="notice-box"><strong>ปิดจบประมาณ</strong><br>${escapeHtml(endMonth ? formatMonthThai(endMonth) : '-')}</div>
+              <div class="notice-box"><strong>ค่างวดต่อเดือน</strong><br>${formatMoney(item.monthlyAmount)}</div>
+              <div class="notice-box"><strong>ยอดคงเหลือ</strong><br>${formatMoney(calc.remainingAmount)}</div>
+              <div class="notice-box"><strong>จ่ายแล้ว</strong><br>${item.paidMonths} / ${item.totalMonths} เดือน</div>
+              <div class="notice-box"><strong>ดอกเบี้ย</strong><br>${Number(item.interestRate || 0) > 0 ? `${item.interestRate}%/ปี (${item.interestType === 'flat' ? 'Flat' : 'ลดต้นลดดอก'})` : '-'}</div>
+            </div>
+            <div class="meta" style="margin-top:8px">ยอดตั้งต้น: ${item.principal ? formatMoney(item.principal) : '-'} · วันครบกำหนด: ${item.dueDay || '-'} · หมายเหตุ: ${escapeHtml(item.interestNote || '-')}</div>
+            <div class="progress"><div style="width:${percent}%"></div></div>
+            <div class="small-actions">
+              <button class="btn-light btn-sm" onclick="editLoan('${item.id}')">แก้ไข</button>
+              <button class="btn-success btn-sm" onclick="markPaidOneMonth('${item.id}')">+ จ่ายเพิ่ม 1 เดือน</button>
+              <button class="btn-danger btn-sm" onclick="deleteInstallment('${item.id}')">ลบ</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      const calendarMonths = getLoanCalendarMonths(filteredList);
+      const calendarHtml = calendarMonths.map(monthKey => {
+        const monthLoans = filteredList
+          .filter(item => item.startMonth && monthKey >= item.startMonth && monthKey <= getLoanEndMonth(item));
+        const total = monthLoans.reduce((sum, item) => sum + Number(item.monthlyAmount || 0), 0);
+        return `
+          <div class="calendar-month">
+            <div class="calendar-month-head">
+              <h4 style="margin:0">${formatMonthThai(monthKey)}</h4>
+              <span class="pill">${monthLoans.length} รายการ</span>
+            </div>
+            <div class="meta">ยอดผ่อนเดือนนี้ ${formatMoney(total)}</div>
+            <div class="calendar-list">
+              ${monthLoans.length ? monthLoans.map(item => `
+                <div class="calendar-item">
+                  <span>${escapeHtml(item.name)}</span>
+                  <strong>${formatMoney(item.monthlyAmount)}</strong>
+                </div>
+              `).join('') : '<div class="meta">ไม่มีค่างวดในเดือนนี้</div>'}
+            </div>
+          </div>
+        `;
+      }).join('');
+      installmentCalendarContainer.innerHTML = calendarHtml;
+      installmentContainer.classList.toggle('hidden', installmentViewMode === 'calendar');
+      installmentCalendarContainer.classList.toggle('hidden', installmentViewMode !== 'calendar');
+      loanListViewBtn.classList.toggle('btn-primary', installmentViewMode === 'list');
+      loanListViewBtn.classList.toggle('btn-light', installmentViewMode !== 'list');
+      loanCalendarViewBtn.classList.toggle('btn-primary', installmentViewMode === 'calendar');
+      loanCalendarViewBtn.classList.toggle('btn-light', installmentViewMode !== 'calendar');
+    }
+
+    function renderAll(){
+      initPickers();
+      syncAllPickerValues();
+      updateFileStatus();
+      renderMonthly();
+      renderYearly();
+      renderInstallments();
+      updateView();
+      saveToBrowser();
+    }
+
+    function updateView(){
+      document.querySelectorAll('.view').forEach(el => el.classList.add('hidden'));
+      document.getElementById(`view-${currentView}`).classList.remove('hidden');
+      document.querySelectorAll('.menu-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.view === currentView));
+    }
+
+    function openEntryModal(){
+      entryModal.classList.remove('hidden');
+      entryModal.setAttribute('aria-hidden','false');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeEntryModal(){
+      entryModal.classList.add('hidden');
+      entryModal.setAttribute('aria-hidden','true');
+      document.body.style.overflow = '';
+    }
+
+    function openLoanModal(){
+      loanModal.classList.remove('hidden');
+      loanModal.setAttribute('aria-hidden','false');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeLoanModal(){
+      loanModal.classList.add('hidden');
+      loanModal.setAttribute('aria-hidden','true');
+      document.body.style.overflow = '';
+    }
+
+
+    function openMonthFromYearly(monthKey){
+      if(!monthKey) return;
+      rangeStartMonth.value = monthKey;
+      rangeEndMonth.value = monthKey;
+      syncPickerValue(rangeStartMonth);
+      syncPickerValue(rangeEndMonth);
+      const year = monthKey.slice(0,4);
+      yearlyYearPicker.value = year;
+      renderMonthly();
+      renderYearly();
+      currentView = 'monthly';
+      updateView();
+      window.scrollTo({ top: 0, behavior:'smooth' });
+    }
+
+    function bindYearMonthCards(){
+      document.querySelectorAll('#yearlyGrid .month-box[data-month]').forEach(box => {
+        if(box.dataset.bound === '1') return;
+        box.dataset.bound = '1';
+        box.addEventListener('click', () => openMonthFromYearly(box.dataset.month));
+      });
+    }
+
+    const pickerInstances = new Map();
+    function createPicker(el, mode){
+      if(!el || typeof flatpickr === 'undefined') return;
+      const oldInstance = pickerInstances.get(el);
+      if(oldInstance){
+        oldInstance.destroy();
+        pickerInstances.delete(el);
+      }
+
+      const pickerLocale = flatpickr.l10ns?.th ? 'th' : 'default';
+      const config = {
+        disableMobile: true,
+        locale: pickerLocale,
+        allowInput: false,
+        clickOpens: true,
+        altInput: true,
+        altInputClass: 'datepicker-alt-input'
+      };
+
+      if(mode === 'month'){
+        if(typeof monthSelectPlugin === 'undefined') return;
+        config.dateFormat = 'Y-m';
+        config.altFormat = 'F Y';
+        config.plugins = [new monthSelectPlugin({
+          shorthand: true,
+          dateFormat: 'Y-m',
+          altFormat: 'F Y'
+        })];
+        config.defaultDate = el.value || currentMonth();
+      }else{
+        config.dateFormat = 'Y-m-d';
+        config.altFormat = 'j M Y';
+        config.defaultDate = el.value || currentDate();
+      }
+
+      config.onChange = (_, dateStr) => {
+        if(el.value === dateStr) return;
+        el.value = dateStr;
+        el.dispatchEvent(new Event('change', { bubbles: true }));
+      };
+
+      const instance = flatpickr(el, config);
+      pickerInstances.set(el, instance);
+      syncPickerValue(el);
+    }
+
+    function syncPickerValue(el){
+      const instance = pickerInstances.get(el);
+      if(!instance) return;
+      const fallback = el.type === 'month' ? currentMonth() : currentDate();
+      instance.setDate(el.value || fallback, false);
+    }
+
+    function syncAllPickerValues(){
+      [entryDate, rangeStartMonth, rangeEndMonth, loanStartMonth, loanFilterStartMonth, loanFilterEndMonth]
+        .forEach(syncPickerValue);
+    }
+
+    function initDatepickers(){
+      if(typeof flatpickr === 'undefined') return;
+      createPicker(entryDate, 'date');
+      createPicker(rangeStartMonth, 'month');
+      createPicker(rangeEndMonth, 'month');
+      createPicker(loanStartMonth, 'month');
+      createPicker(loanFilterStartMonth, 'month');
+      createPicker(loanFilterEndMonth, 'month');
+    }
+
+    function shiftYear(delta){
+      const current = Number(yearlyYearPicker.value || new Date().getFullYear());
+      const next = String(current + delta);
+      if(!Array.from(yearlyYearPicker.options).some(opt => opt.value === next)){
+        yearlyYearPicker.add(new Option(next, next));
+      }
+      yearlyYearPicker.value = next;
+      renderYearly();
+    }
+
+    function initializeCardCollapsibles(){
+      document.querySelectorAll('.view .card').forEach(card => {
+        if(card.dataset.collapsibleReady === '1') return;
+        const header = card.querySelector(':scope > .section-header');
+        if(!header) return;
+        const bodyChildren = Array.from(card.children).filter((child, index) => index > 0);
+        if(!bodyChildren.length) return;
+        const body = document.createElement('div');
+        body.className = 'collapsible-body';
+        bodyChildren.forEach(child => body.appendChild(child));
+        card.appendChild(body);
+
+        const toggle = document.createElement('button');
+        toggle.type = 'button';
+        toggle.className = 'card-toggle btn-sm';
+        toggle.innerHTML = '<span class="chev" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M5 7.5 10 12.5 15 7.5"></path></svg></span>';
+        toggle.addEventListener('click', () => {
+          card.classList.toggle('card-collapsed');
+        });
+        header.classList.add('has-toggle');
+        header.appendChild(toggle);
+        card.dataset.collapsibleReady = '1';
+      });
+    }
+
+    function clearEntryForm(){
+      editingEntryId = null;
+      entryFormTitle.textContent = '➕ เพิ่มรายรับ / รายจ่าย';
+      entryEditBadge.classList.add('hidden');
+      saveEntryBtn.textContent = '💾 บันทึกรายการ';
+      entryType.value = 'expense';
+      entryDate.value = currentDate();
+      entryCategory.value = 'อื่นๆ';
+      entryAmount.value = '';
+      entryTitle.value = '';
+      entryNote.value = '';
+      repeatEnabled.checked = false;
+      repeatCount.value = 1;
+      repeatCount.disabled = true;
+      syncPickerValue(entryDate);
+    }
+
+    function clearLoanForm(){
+      editingLoanId = null;
+      loanFormTitle.textContent = '➕ เพิ่มยอดผ่อน';
+      loanEditBadge.classList.add('hidden');
+      saveLoanBtn.textContent = '💾 บันทึกรายการผ่อน';
+      loanName.value = '';
+      loanCategory.value = 'ผ่อนสินค้า';
+      loanMonthlyAmount.value = '';
+      loanMonthsTotal.value = '';
+      loanMonthsPaid.value = '';
+      loanStartMonth.value = currentMonth();
+      loanPrincipal.value = '';
+      loanRemainingOverride.value = '';
+      loanDueDay.value = '';
+      loanInterestType.value = 'none';
+      loanInterestRate.value = '';
+      loanInterestNote.value = '';
+      syncPickerValue(loanStartMonth);
+      updateLoanSmartHint();
+    }
+
+    function addOrUpdateEntry(){
+      if(!entryDate.value || !entryTitle.value.trim() || !entryAmount.value){
+        alert('กรุณากรอก วันที่ รายการ และจำนวนเงิน');
+        return;
+      }
+
+      const base = {
+        type: entryType.value,
+        date: entryDate.value,
+        category: entryCategory.value,
+        title: entryTitle.value.trim(),
+        amount: Number(entryAmount.value),
+        note: entryNote.value.trim()
+      };
+
+      if(editingEntryId){
+        appData.entries = appData.entries.map(x => x.id === editingEntryId ? { ...base, id: editingEntryId } : x);
+      }else{
+        const totalMonths = repeatEnabled.checked ? Math.max(1, Number(repeatCount.value || 1)) : 1;
+        const day = new Date(entryDate.value).getDate();
+        const startMonth = getMonthKeyFromDate(entryDate.value);
+        for(let i=0; i<totalMonths; i++){
+          const monthKey = addMonths(startMonth, i);
+          appData.entries.push({
+            ...base,
+            id: crypto.randomUUID(),
+            date: i === 0 ? entryDate.value : safeDateFromMonth(monthKey, day)
+          });
+        }
+      }
+
+      yearlyYearPicker.value = String(new Date(entryDate.value).getFullYear());
+      rangeStartMonth.value = getMonthKeyFromDate(entryDate.value);
+      rangeEndMonth.value = repeatEnabled.checked && !editingEntryId
+        ? addMonths(getMonthKeyFromDate(entryDate.value), Math.max(1, Number(repeatCount.value || 1)) - 1)
+        : getMonthKeyFromDate(entryDate.value);
+
+      clearEntryForm();
+      closeEntryModal();
+      renderAll();
+    }
+
+    function addOrUpdateInstallment(){
+      if(!loanName.value.trim()){
+        alert('กรุณากรอกชื่อรายการ');
+        return;
+      }
+      const draft = buildLoanDraftFromForm();
+      if(!draft.ok){
+        alert(draft.message);
+        return;
+      }
+
+      loanMonthlyAmount.value = String(draft.monthlyAmount);
+      loanMonthsTotal.value = String(draft.totalMonths);
+      loanMonthsPaid.value = String(draft.paidMonths);
+      if(!toPositiveNumber(loanPrincipal.value)) loanPrincipal.value = String(draft.principal);
+      loanInterestType.value = draft.interestType;
+      loanInterestRate.value = draft.interestRate === '' ? '' : String(draft.interestRate);
+
+      const payload = {
+        id: editingLoanId || crypto.randomUUID(),
+        name: loanName.value.trim(),
+        category: loanCategory.value,
+        monthlyAmount: draft.monthlyAmount,
+        totalMonths: draft.totalMonths,
+        paidMonths: draft.paidMonths,
+        startMonth: loanStartMonth.value || '',
+        principal: draft.principal,
+        remainingOverride: draft.remainingOverride,
+        dueDay: loanDueDay.value === '' ? '' : Math.min(31, Math.max(1, Number(loanDueDay.value))),
+        interestType: draft.interestType,
+        interestRate: draft.interestRate,
+        interestNote: loanInterestNote.value.trim()
+      };
+
+      if(editingLoanId){
+        appData.installments = appData.installments.map(x => x.id === editingLoanId ? payload : x);
+      }else{
+        appData.installments.push(payload);
+      }
+
+      clearLoanForm();
+      closeLoanModal();
+      renderAll();
+    }
+
+    async function openJsonWithHandle(){
+      if(!window.showOpenFilePicker){
+        alert('เบราว์เซอร์นี้ไม่รองรับการเปิดไฟล์แบบ Save ทับได้ จะสลับไปใช้การโหลดไฟล์แบบปกติแทน');
+        startupJsonFile.click();
+        return;
+      }
+      try{
+        const [handle] = await window.showOpenFilePicker({
+          types:[{ description:'JSON Files', accept:{ 'application/json':['.json'] }}],
+          excludeAcceptAllOption:false,
+          multiple:false
+        });
+        const file = await handle.getFile();
+        const text = await file.text();
+        appData = normalizeData(JSON.parse(text));
+        fileHandle = handle;
+        loadedFileName = file.name;
+        enterApp();
+      }catch(error){
+        if(error?.name !== 'AbortError') console.error(error);
+      }
+    }
+
+    function loadJsonFile(file){
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try{
+          appData = normalizeData(JSON.parse(e.target.result));
+          fileHandle = null;
+          loadedFileName = file.name || '';
+          enterApp();
+        }catch{
+          alert('ไฟล์ JSON ไม่ถูกต้อง');
+        }
+      };
+      reader.readAsText(file,'utf-8');
+    }
+
+    async function saveJsonFile(){
+      const jsonText = JSON.stringify(appData, null, 2);
+      if(fileHandle){
+        try{
+          const writable = await fileHandle.createWritable();
+          await writable.write(jsonText);
+          await writable.close();
+          alert('บันทึกทับไฟล์เดิมเรียบร้อยแล้ว');
+          return;
+        }catch(error){
+          console.error(error);
+          alert('ไม่สามารถบันทึกทับไฟล์เดิมได้ ระบบจะดาวน์โหลดไฟล์ใหม่แทน');
+        }
+      }
+      const blob = new Blob([jsonText], { type:'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = loadedFileName || 'finance-data.json';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function enterApp(){
+      welcomeScreen.classList.add('hidden');
+      appScreen.classList.remove('hidden');
+      renderAll();
+    }
+
+    function createNewData(){
+      appData = { entries: [], installments: [] };
+      fileHandle = null;
+      loadedFileName = '';
+      enterApp();
+    }
+
+    function resetMonthlyFilters(){
+      monthlyKeyword.value = '';
+      monthlyTypeFilter.value = '';
+      monthlyCategoryFilter.value = '';
+      monthlyMinAmount.value = '';
+      monthlyMaxAmount.value = '';
+      monthlySort.value = 'date-asc';
+      renderMonthly();
+    }
+
+    window.editEntry = function(id){
+      const item = appData.entries.find(x => x.id === id);
+      if(!item) return;
+      currentView = 'monthly';
+      updateView();
+      editingEntryId = id;
+      entryFormTitle.textContent = '✏️ แก้ไขรายรับ / รายจ่าย';
+      entryEditBadge.classList.remove('hidden');
+      saveEntryBtn.textContent = '💾 บันทึกการแก้ไข';
+      entryType.value = item.type;
+      entryDate.value = item.date;
+      entryCategory.value = item.category || 'อื่นๆ';
+      entryAmount.value = item.amount;
+      entryTitle.value = item.title;
+      entryNote.value = item.note || '';
+      repeatEnabled.checked = false;
+      repeatCount.value = 1;
+      repeatCount.disabled = true;
+      syncPickerValue(entryDate);
+      openEntryModal();
+    };
+
+    window.deleteEntry = function(id){
+      if(!confirm('ลบรายการนี้ใช่ไหม?')) return;
+      appData.entries = appData.entries.filter(x => x.id !== id);
+      if(editingEntryId === id) clearEntryForm();
+      renderAll();
+    };
+
+    window.goToInstallments = function(id){
+      currentView = 'installments';
+      updateView();
+      const target = document.getElementById(`loan-card-${id}`);
+      if(target) target.scrollIntoView({ behavior:'smooth', block:'center' });
+    };
+
+    window.editLoan = function(id){
+      const item = appData.installments.find(x => x.id === id);
+      if(!item) return;
+      currentView = 'installments';
+      updateView();
+      editingLoanId = id;
+      loanFormTitle.textContent = '✏️ แก้ไขยอดผ่อน';
+      loanEditBadge.classList.remove('hidden');
+      saveLoanBtn.textContent = '💾 บันทึกการแก้ไข';
+      loanName.value = item.name;
+      loanCategory.value = item.category || 'ผ่อนสินค้า';
+      loanMonthlyAmount.value = item.monthlyAmount;
+      loanMonthsTotal.value = item.totalMonths;
+      loanMonthsPaid.value = item.paidMonths;
+      loanStartMonth.value = item.startMonth || '';
+      loanPrincipal.value = item.principal || '';
+      loanRemainingOverride.value = item.remainingOverride === '' ? '' : item.remainingOverride;
+      loanDueDay.value = item.dueDay === '' ? '' : item.dueDay;
+      loanInterestType.value = item.interestType || 'none';
+      loanInterestRate.value = item.interestRate === '' || item.interestRate == null ? '' : item.interestRate;
+      loanInterestNote.value = item.interestNote || '';
+      syncPickerValue(loanStartMonth);
+      updateLoanSmartHint();
+      openLoanModal();
+      window.scrollTo({ top: 0, behavior:'smooth' });
+    };
+
+    window.deleteInstallment = function(id){
+      if(!confirm('ลบรายการผ่อนนี้ใช่ไหม?')) return;
+      appData.installments = appData.installments.filter(x => x.id !== id);
+      if(editingLoanId === id) clearLoanForm();
+      renderAll();
+    };
+
+    window.markPaidOneMonth = function(id){
+      const item = appData.installments.find(x => x.id === id);
+      if(!item) return;
+      if(Number(item.paidMonths) >= Number(item.totalMonths)){
+        alert('รายการนี้จ่ายครบแล้ว');
+        return;
+      }
+      item.paidMonths += 1;
+      if(item.remainingOverride !== '' && item.remainingOverride != null){
+        item.remainingOverride = Math.max(0, Number(item.remainingOverride) - Number(item.monthlyAmount || 0));
+      }
+      renderAll();
+    };
+
+    function bindEvents(){
+      createNewBtn.addEventListener('click', createNewData);
+      openJsonWithHandleBtn.addEventListener('click', openJsonWithHandle);
+      openJsonSimpleBtn.addEventListener('click', () => startupJsonFile.click());
+      startupJsonFile.addEventListener('change', (e) => {
+        const file = e.target.files?.[0];
+        if(file) loadJsonFile(file);
+        e.target.value = '';
+      });
+      loadAnotherBtn.addEventListener('click', () => {
+        if(window.showOpenFilePicker) openJsonWithHandle();
+        else startupJsonFile.click();
+      });
+      saveJsonBtn.addEventListener('click', saveJsonFile);
+
+      rangeStartMonth.addEventListener('change', renderMonthly);
+      rangeEndMonth.addEventListener('change', renderMonthly);
+      monthlyKeyword.addEventListener('input', renderMonthly);
+      monthlyTypeFilter.addEventListener('change', renderMonthly);
+      monthlyCategoryFilter.addEventListener('change', renderMonthly);
+      monthlyMinAmount.addEventListener('input', renderMonthly);
+      monthlyMaxAmount.addEventListener('input', renderMonthly);
+      monthlySort.addEventListener('change', renderMonthly);
+      resetMonthlyFiltersBtn.addEventListener('click', resetMonthlyFilters);
+      openEntryModalBtn.addEventListener('click', () => { clearEntryForm(); openEntryModal(); });
+      openEntryModalBtnSecondary.addEventListener('click', () => { clearEntryForm(); openEntryModal(); });
+      closeEntryModalBtn.addEventListener('click', closeEntryModal);
+      entryModal.addEventListener('click', (e) => { if(e.target === entryModal) closeEntryModal(); });
+      openLoanModalBtn.addEventListener('click', () => { clearLoanForm(); openLoanModal(); });
+      closeLoanModalBtn.addEventListener('click', closeLoanModal);
+      loanModal.addEventListener('click', (e) => { if(e.target === loanModal) closeLoanModal(); });
+      prevYearBtn.addEventListener('click', () => shiftYear(-1));
+      nextYearBtn.addEventListener('click', () => shiftYear(1));
+
+      repeatEnabled.addEventListener('change', () => {
+        repeatCount.disabled = !repeatEnabled.checked;
+        if(!repeatEnabled.checked) repeatCount.value = 1;
+      });
+
+      saveEntryBtn.addEventListener('click', addOrUpdateEntry);
+      clearEntryBtn.addEventListener('click', clearEntryForm);
+      saveLoanBtn.addEventListener('click', addOrUpdateInstallment);
+      clearLoanBtn.addEventListener('click', clearLoanForm);
+      [loanSearchKeyword, loanFilterStatus, loanFilterStartMonth, loanFilterEndMonth].forEach(el => {
+        el.addEventListener('input', renderInstallments);
+        el.addEventListener('change', renderInstallments);
+      });
+      resetLoanFiltersBtn.addEventListener('click', () => {
+        loanSearchKeyword.value = '';
+        loanFilterStatus.value = '';
+        loanFilterStartMonth.value = currentMonth();
+        loanFilterEndMonth.value = addMonths(currentMonth(), 5);
+        syncPickerValue(loanFilterStartMonth);
+        syncPickerValue(loanFilterEndMonth);
+        renderInstallments();
+      });
+      loanListViewBtn.addEventListener('click', () => {
+        installmentViewMode = 'list';
+        renderInstallments();
+      });
+      loanCalendarViewBtn.addEventListener('click', () => {
+        installmentViewMode = 'calendar';
+        renderInstallments();
+      });
+      [loanMonthlyAmount, loanMonthsTotal, loanMonthsPaid, loanPrincipal, loanRemainingOverride, loanInterestRate]
+        .forEach(el => {
+          el.addEventListener('input', updateLoanSmartHint);
+          el.addEventListener('change', updateLoanSmartHint);
+        });
+      loanInterestType.addEventListener('change', () => {
+        if(loanInterestType.value === 'none') loanInterestRate.value = '';
+        updateLoanSmartHint();
+      });
+      yearlyYearPicker.addEventListener('change', () => {
+        renderYearly();
+      });
+
+      document.querySelectorAll('.menu-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          currentView = btn.dataset.view;
+          updateView();
+        });
+      });
+
+      document.addEventListener('keydown', (e) => {
+        if(e.key === 'Escape' && !entryModal.classList.contains('hidden')) closeEntryModal();
+        if(e.key === 'Escape' && !loanModal.classList.contains('hidden')) closeLoanModal();
+      });
+    }
+
+    function boot(){
+      populateCategoryDropdowns();
+      bindEvents();
+      const browserData = loadFromBrowser();
+      if(browserData) appData = browserData;
+      clearEntryForm();
+      clearLoanForm();
+      updateFileStatus();
+      initializeCardCollapsibles();
+      initDatepickers();
+    }
+
+    boot();
+  </script>
+</body>
+</html>
