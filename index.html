@@ -867,6 +867,10 @@
   <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/index.js"></script>
   <script>
     const STORAGE_KEY = 'finance_tracker_simple_v4';
+    const DB_NAME = 'finance_tracker_db';
+    const DB_VERSION = 1;
+    const DB_STORE_NAME = 'app_state';
+    const DB_RECORD_KEY = 'primary';
     const CATEGORY_OPTIONS = [
       'เงินเดือน','โบนัส','รายได้เสริม','ธุรกิจ','ดอกเบี้ย/ปันผล',
       'รถยนต์','บ้าน/เช่า','ไฟฟ้า','น้ำประปา','อินเทอร์เน็ต','โทรศัพท์',
@@ -876,8 +880,9 @@
 
     let appData = { entries: [], installments: [] };
     let currentView = 'yearly';
-    let fileHandle = null;
+    let databasePromise = null;
     let loadedFileName = '';
+    let lastImportAt = '';
     let editingEntryId = null;
     let editingLoanId = null;
     let installmentViewMode = 'list';
@@ -994,12 +999,66 @@
         .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
         .replace(/"/g,'&quot;').replace(/'/g,'&#039;');
     }
-    function saveToBrowser(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(appData)); }
-    function loadFromBrowser(){
+    function openAppDatabase(){
+      if(databasePromise) return databasePromise;
+      databasePromise = new Promise((resolve, reject) => {
+        const request = indexedDB.open(DB_NAME, DB_VERSION);
+        request.onupgradeneeded = () => {
+          const db = request.result;
+          if(!db.objectStoreNames.contains(DB_STORE_NAME)){
+            db.createObjectStore(DB_STORE_NAME);
+          }
+        };
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error || new Error('IndexedDB open failed'));
+      });
+      return databasePromise;
+    }
+
+    async function readAppDataFromDb(){
+      const db = await openAppDatabase();
+      return await new Promise((resolve, reject) => {
+        const tx = db.transaction(DB_STORE_NAME, 'readonly');
+        const request = tx.objectStore(DB_STORE_NAME).get(DB_RECORD_KEY);
+        request.onsuccess = () => resolve(request.result || null);
+        request.onerror = () => reject(request.error || new Error('IndexedDB read failed'));
+      });
+    }
+
+    async function writeAppDataToDb(data, meta = {}){
+      const db = await openAppDatabase();
+      const payload = {
+        data: normalizeData(data),
+        meta: {
+          loadedFileName: meta.loadedFileName ?? loadedFileName,
+          lastImportAt: meta.lastImportAt ?? lastImportAt,
+          updatedAt: new Date().toISOString()
+        }
+      };
+      await new Promise((resolve, reject) => {
+        const tx = db.transaction(DB_STORE_NAME, 'readwrite');
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => reject(tx.error || new Error('IndexedDB write failed'));
+        tx.objectStore(DB_STORE_NAME).put(payload, DB_RECORD_KEY);
+      });
+      loadedFileName = payload.meta.loadedFileName || '';
+      lastImportAt = payload.meta.lastImportAt || '';
+    }
+
+    async function migrateLegacyLocalStorage(){
       try{
+        const existingDb = await readAppDataFromDb();
+        if(existingDb?.data) return existingDb;
         const raw = localStorage.getItem(STORAGE_KEY);
-        return raw ? normalizeData(JSON.parse(raw)) : null;
-      }catch{ return null; }
+        if(!raw) return null;
+        const legacyData = normalizeData(JSON.parse(raw));
+        await writeAppDataToDb(legacyData);
+        localStorage.removeItem(STORAGE_KEY);
+        return { data: legacyData, meta: { loadedFileName: '', lastImportAt: '' } };
+      }catch(error){
+        console.error(error);
+        return null;
+      }
     }
     function normalizeData(parsed){
       return {
@@ -2048,6 +2107,134 @@
       enterApp();
     }
 
+    function updateFileStatus(){
+      if(loadedFileName && lastImportAt){
+        fileStatus.textContent = `IndexedDB active · Last import: ${loadedFileName} · ${new Date(lastImportAt).toLocaleString('th-TH')}`;
+      }else if(loadedFileName){
+        fileStatus.textContent = `IndexedDB active · Imported from: ${loadedFileName}`;
+      }else{
+        fileStatus.textContent = 'IndexedDB active · Data is stored automatically in this browser';
+      }
+    }
+
+    function persistCurrentData(meta = {}){
+      writeAppDataToDb(appData, meta).catch(error => {
+        console.error(error);
+        alert('Unable to save data to IndexedDB');
+      });
+    }
+
+    function renderAll(){
+      initPickers();
+      syncAllPickerValues();
+      updateFileStatus();
+      renderMonthly();
+      renderYearly();
+      renderInstallments();
+      updateView();
+      persistCurrentData();
+    }
+
+    async function importJsonText(jsonText, fileName){
+      const parsed = JSON.parse(jsonText);
+      appData = normalizeData(parsed?.data || parsed);
+      loadedFileName = fileName || '';
+      lastImportAt = new Date().toISOString();
+      await writeAppDataToDb(appData, {
+        loadedFileName,
+        lastImportAt
+      });
+      enterApp();
+    }
+
+    async function openJsonWithHandle(){
+      if(!window.showOpenFilePicker){
+        startupJsonFile.click();
+        return;
+      }
+      try{
+        const [handle] = await window.showOpenFilePicker({
+          types:[{ description:'JSON Files', accept:{ 'application/json':['.json'] }}],
+          excludeAcceptAllOption:false,
+          multiple:false
+        });
+        const file = await handle.getFile();
+        await importJsonText(await file.text(), file.name);
+      }catch(error){
+        if(error?.name !== 'AbortError') console.error(error);
+      }
+    }
+
+    function loadJsonFile(file){
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        try{
+          await importJsonText(String(e.target?.result || ''), file.name || '');
+        }catch(error){
+          console.error(error);
+          alert('JSON file is invalid');
+        }
+      };
+      reader.readAsText(file,'utf-8');
+    }
+
+    async function saveJsonFile(){
+      const exported = {
+        exportedAt: new Date().toISOString(),
+        data: normalizeData(appData)
+      };
+      const jsonText = JSON.stringify(exported.data, null, 2);
+      const blob = new Blob([jsonText], { type:'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = loadedFileName || 'finance-data-export.json';
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 0);
+    }
+
+    function createNewData(){
+      appData = { entries: [], installments: [] };
+      loadedFileName = '';
+      lastImportAt = '';
+      persistCurrentData({ loadedFileName: '', lastImportAt: '' });
+      enterApp();
+    }
+
+    async function boot(){
+      populateCategoryDropdowns();
+      bindEvents();
+      saveJsonBtn.textContent = 'Export JSON';
+      loadAnotherBtn.textContent = 'Import JSON';
+      openJsonWithHandleBtn.textContent = 'Import JSON';
+      openJsonSimpleBtn.textContent = 'Choose JSON File';
+      const welcomeTitle = document.querySelector('#welcomeScreen .welcome-box p');
+      const importDescription = document.querySelector('#welcomeScreen .action-tile:first-child p');
+      const importHint = document.querySelector('#welcomeScreen .hint');
+      const createDescription = document.querySelector('#welcomeScreen .action-tile:last-child p');
+      if(welcomeTitle) welcomeTitle.textContent = 'Import JSON เดิม หรือเริ่มข้อมูลใหม่ ข้อมูลทั้งหมดจะเก็บอัตโนมัติใน IndexedDB ของเบราว์เซอร์ และ Export เป็น JSON เพื่อย้ายเครื่องได้';
+      if(importDescription) importDescription.textContent = 'เลือกไฟล์ JSON เพื่อ import เข้า IndexedDB แล้วใช้งานต่อในเครื่องนี้ได้ทันที';
+      if(importHint) importHint.textContent = 'หลัง import แล้ว ทุกการแก้ไขจะบันทึกลง IndexedDB อัตโนมัติ และใช้ปุ่ม Export JSON เมื่อต้องการย้ายข้อมูลไปเครื่องอื่น';
+      if(createDescription) createDescription.textContent = 'เริ่มใช้งานด้วยข้อมูลว่าง ระบบจะเก็บข้อมูลอัตโนมัติใน IndexedDB และสามารถ Export JSON ภายหลังได้';
+
+      const persistedState = await migrateLegacyLocalStorage() || await readAppDataFromDb();
+      if(persistedState?.data){
+        appData = normalizeData(persistedState.data);
+        loadedFileName = persistedState.meta?.loadedFileName || '';
+        lastImportAt = persistedState.meta?.lastImportAt || '';
+      }
+
+      clearEntryForm();
+      clearLoanForm();
+      updateFileStatus();
+      initializeCardCollapsibles();
+      initDatepickers();
+
+      if(persistedState?.data){
+        enterApp();
+      }
+    }
+
     function resetMonthlyFilters(){
       monthlyKeyword.value = '';
       monthlyTypeFilter.value = '';
@@ -2232,19 +2419,10 @@
       });
     }
 
-    function boot(){
-      populateCategoryDropdowns();
-      bindEvents();
-      const browserData = loadFromBrowser();
-      if(browserData) appData = browserData;
-      clearEntryForm();
-      clearLoanForm();
-      updateFileStatus();
-      initializeCardCollapsibles();
-      initDatepickers();
-    }
-
-    boot();
+    boot().catch(error => {
+      console.error(error);
+      alert('Unable to initialize IndexedDB');
+    });
   </script>
 </body>
 </html>
