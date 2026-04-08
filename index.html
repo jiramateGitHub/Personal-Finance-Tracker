@@ -55,7 +55,6 @@
     .welcome-box{max-width:920px; padding:34px}
     .welcome-box h1{margin:0 0 10px; font-size:38px; font-weight:800}
     .welcome-box p{margin:0 0 24px; color:var(--muted)}
-    .welcome-actions{display:grid; grid-template-columns:1fr 1fr; gap:16px}
     .action-tile{border:1px solid var(--line); border-radius:16px; padding:22px; background:#fff}
     .action-tile h3{margin:0 0 8px}
     .action-tile p{margin:0 0 14px; color:var(--muted)}
@@ -884,7 +883,7 @@
       .app{padding:12px}
       .layout{grid-template-columns:1fr}
       .sidebar{position:static}
-      .toolbar-inline,.year-grid,.form-grid,.welcome-actions,.year-grid.year-grid-enhanced{grid-template-columns:1fr 1fr}
+      .toolbar-inline,.year-grid,.form-grid,.year-grid.year-grid-enhanced{grid-template-columns:1fr 1fr}
       .compact-filter-bar,.compact-filter-row,.trip-inline-filters,.trip-stat-grid{grid-template-columns:1fr 1fr}
       .quick-add-bar{grid-template-columns:1fr}
       .installment-filters,.calendar-grid{grid-template-columns:1fr 1fr}
@@ -923,7 +922,7 @@
         height:58px;
       }
       .floating-back-btn .floating-back-label{display:none}
-      .toolbar-inline,.year-grid,.form-grid,.welcome-actions,.year-grid.year-grid-enhanced,.compact-filter-bar,.compact-filter-row,.installment-filters,.calendar-grid,.installment-kv,.trip-inline-filters,.trip-stat-grid,.trip-detail-grid,.quick-add-bar{grid-template-columns:1fr}
+      .toolbar-inline,.year-grid,.form-grid,.year-grid.year-grid-enhanced,.compact-filter-bar,.compact-filter-row,.installment-filters,.calendar-grid,.installment-kv,.trip-inline-filters,.trip-stat-grid,.trip-detail-grid,.quick-add-bar{grid-template-columns:1fr}
       .trip-card-footer,.trip-detail-top,.trip-section-title{align-items:flex-start}
       .trip-item-card{grid-template-columns:1fr}
       .trip-item-actions{justify-content:flex-start}
@@ -1035,23 +1034,8 @@
         </div>
         <div id="authError" class="hint auth-error hidden"></div>
       </div>
-      <div id="welcomeActions" class="welcome-actions hidden">
-        <div class="action-tile">
-          <h3>📂 โหลด JSON เดิม</h3>
-          <p>ถ้าเบราว์เซอร์รองรับ File System Access API ระบบจะจำไฟล์ไว้ และกด Save เพื่อเขียนทับไฟล์เดิมได้เลย</p>
-          <div class="small-actions">
-            <button id="openJsonWithHandleBtn" class="btn-primary">📁 Import</button>
-            <button id="openJsonSimpleBtn" class="btn-light">Choose File</button>
-          </div>
-          <input type="file" id="startupJsonFile" accept="application/json" class="hidden">
-          <div class="hint">ถ้าเบราว์เซอร์ไม่รองรับ ระบบจะโหลดแบบปกติ และการ Save จะเป็นการดาวน์โหลดไฟล์ใหม่แทน</div>
-        </div>
-        <div class="action-tile">
-          <h3>✨ สร้างข้อมูลใหม่</h3>
-          <p>เริ่มใช้งานแบบว่างเปล่า แล้วค่อยบันทึกเป็นไฟล์ JSON ภายหลัง</p>
-          <button id="createNewBtn" class="btn-primary">🚀 เริ่มสร้างใหม่</button>
-        </div>
-      </div>
+      <!-- REMOVED DEAD UI: welcomeActions was hidden and never shown in the auth-only flow -->
+      <input type="file" id="startupJsonFile" accept="application/json" class="hidden">
     </div>
   </div>
 
@@ -1721,7 +1705,6 @@
     const DB_VERSION = 1;
     const DB_STORE_NAME = 'app_state';
     const DB_RECORD_KEY = 'primary';
-    // FIREBASE: replace TODO values with your Firebase Web App config.
     const firebaseConfig = {
         apiKey: "AIzaSyBRh2xp1ZkBBoThN1QuwkFqkTddxoCfk1Y",
         authDomain: "finance-tracker-game-bf874.firebaseapp.com",
@@ -1814,9 +1797,6 @@
     const authError = $('authError');
     const authUserBadge = $('authUserBadge');
     const startupJsonFile = $('startupJsonFile');
-    const openJsonWithHandleBtn = $('openJsonWithHandleBtn');
-    const openJsonSimpleBtn = $('openJsonSimpleBtn');
-    const createNewBtn = $('createNewBtn');
     const loadAnotherBtn = $('loadAnotherBtn');
     const saveJsonBtn = $('saveJsonBtn');
     const saveStatusBadge = $('saveStatusBadge');
@@ -3935,7 +3915,7 @@
       `;
     }
 
-    // REMOVED UNUSED: legacy renderAll was overridden by the cloud-aware flow below.
+    // REMOVED DEAD CODE: legacy renderAll was overridden by the cloud-aware flow below.
 
     function updateView(){
       document.querySelectorAll('.view').forEach(el => el.classList.add('hidden'));
@@ -4520,16 +4500,6 @@
       persistCurrentData();
     }
 
-    function createNewData(){
-      appData = getEmptyAppData();
-      activeTripId = null;
-      fileHandle = null;
-      loadedFileName = '';
-      lastImportAt = '';
-      persistCurrentData({ loadedFileName: '', lastImportAt: '' });
-      enterApp();
-    }
-
     function resetMonthlyFilters(){
       monthlyKeyword.value = '';
       monthlyTypeFilter.value = '';
@@ -4768,6 +4738,7 @@
       });
     }
     function bindEvents(){
+      // REMOVED DEAD EVENT: old welcome-screen import/create button bindings were removed with dead welcome UI.
       // REFACTOR: normalize repeated event binding patterns in one place.
       const bind = (element, events, handler) => {
         if(!element) return;
@@ -4825,9 +4796,6 @@
         renderInstallments();
       };
 
-      bind(createNewBtn, 'click', createNewData);
-      bind(openJsonWithHandleBtn, 'click', openJsonWithHandle);
-      bind(openJsonSimpleBtn, 'click', () => startupJsonFile.click());
       bind(loginBtn, 'click', handleLogin);
       bind(resetPasswordBtn, 'click', handleResetPassword);
       bind(logoutBtn, 'click', handleLogout);
