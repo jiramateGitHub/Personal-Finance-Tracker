@@ -82,6 +82,17 @@
       margin-top:12px; padding:12px 14px; background:#f8fbff; border:1px solid var(--line);
       border-radius:12px; color:var(--muted); font-size:13px
     }
+    .auth-card{display:grid; gap:16px; margin-bottom:18px}
+    .auth-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .auth-actions{display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap}
+    .auth-status{font-size:13px; color:var(--muted)}
+    .auth-error{
+      margin-top:0;
+      background:var(--red-soft);
+      border-color:#fecdd3;
+      color:var(--red);
+    }
+    .auth-user{max-width:min(42vw,320px); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
     .main-header{
       padding:16px 18px;
       margin-bottom:14px;
@@ -965,7 +976,28 @@
     <div class="welcome-box card">
       <h1>ระบบรายรับ – รายจ่าย</h1>
       <p>โหลดไฟล์ JSON เดิม หรือสร้างไฟล์ใหม่ จากนั้นจัดการรายรับ รายจ่าย ภาพรวมทั้งปี และยอดผ่อนในไฟล์เดียว</p>
-      <div class="welcome-actions">
+      <div class="action-tile auth-card">
+        <div>
+          <h3>Firebase Login</h3>
+          <p>Sign in ด้วย Email/Password เพื่อโหลดข้อมูลของ user นี้จาก Cloud Firestore</p>
+        </div>
+        <div class="form-grid auth-grid">
+          <div>
+            <label for="authEmail">Email</label>
+            <input type="email" id="authEmail" placeholder="you@example.com" autocomplete="email">
+          </div>
+          <div>
+            <label for="authPassword">Password</label>
+            <input type="password" id="authPassword" placeholder="Password" autocomplete="current-password">
+          </div>
+          <div class="full auth-actions">
+            <button id="loginBtn" class="btn-primary" type="button">Login</button>
+            <div id="authStatus" class="auth-status">รอตรวจสอบสถานะการ login...</div>
+          </div>
+        </div>
+        <div id="authError" class="hint auth-error hidden"></div>
+      </div>
+      <div id="welcomeActions" class="welcome-actions hidden">
         <div class="action-tile">
           <h3>📂 โหลด JSON เดิม</h3>
           <p>ถ้าเบราว์เซอร์รองรับ File System Access API ระบบจะจำไฟล์ไว้ และกด Save เพื่อเขียนทับไฟล์เดิมได้เลย</p>
@@ -996,6 +1028,10 @@
         </button>
       </div>
       <div class="header-right">
+        <div class="small-actions">
+          <div id="authUserBadge" class="file-status auth-user hidden"></div>
+          <button id="logoutBtn" class="btn-light btn-sm hidden" type="button">Logout</button>
+        </div>
         <div class="small-actions">
           <button id="saveJsonBtn" class="btn-ghost">💾 Export</button>
           <button id="loadAnotherBtn" class="btn-ghost">📂 Import</button>
@@ -1636,12 +1672,24 @@
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/th.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/index.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/11.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/11.7.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore-compat.js"></script>
   <script>
     const STORAGE_KEY = 'finance_tracker_simple_v4';
     const DB_NAME = 'finance_tracker_db';
     const DB_VERSION = 1;
     const DB_STORE_NAME = 'app_state';
     const DB_RECORD_KEY = 'primary';
+    // FIREBASE: replace TODO values with your Firebase Web App config.
+    const firebaseConfig = {
+        apiKey: "AIzaSyBRh2xp1ZkBBoThN1QuwkFqkTddxoCfk1Y",
+        authDomain: "finance-tracker-game-bf874.firebaseapp.com",
+        projectId: "finance-tracker-game-bf874",
+        storageBucket: "finance-tracker-game-bf874.firebasestorage.app",
+        messagingSenderId: "511411468474",
+        appId: "1:511411468474:web:bba303aba1ef0707752a83"
+    };
     const CATEGORY_OPTIONS = [
       'เงินเดือน','โบนัส','รายได้เสริม','ธุรกิจ','ฟรีแลนซ์','ดอกเบี้ย/ปันผล','ขายของออนไลน์','คืนเงิน',
       'บ้าน/เช่า','ค่าส่วนกลาง','ไฟฟ้า','น้ำประปา','อินเทอร์เน็ต','โทรศัพท์',
@@ -1701,11 +1749,25 @@
     let tripViewMode = 'list';
     let pendingViewNavigation = null;
     let navigationHistory = [];
+    let fileHandle = null;
+    let currentUser = null;
+    let firebaseAuth = null;
+    let firestoreDb = null;
+    let cloudSaveTimer = null;
+    let isApplyingCloudState = false;
+    let isAuthBusy = false;
 
     const $ = (id) => document.getElementById(id);
 
     const welcomeScreen = $('welcomeScreen');
     const appScreen = $('appScreen');
+    const authEmail = $('authEmail');
+    const authPassword = $('authPassword');
+    const loginBtn = $('loginBtn');
+    const logoutBtn = $('logoutBtn');
+    const authStatus = $('authStatus');
+    const authError = $('authError');
+    const authUserBadge = $('authUserBadge');
     const startupJsonFile = $('startupJsonFile');
     const openJsonWithHandleBtn = $('openJsonWithHandleBtn');
     const openJsonSimpleBtn = $('openJsonSimpleBtn');
@@ -1901,17 +1963,17 @@
       return databasePromise;
     }
 
-    async function readAppDataFromDb(){
+    async function readAppDataFromDb(recordKey = DB_RECORD_KEY){
       const db = await openAppDatabase();
       return await new Promise((resolve, reject) => {
         const tx = db.transaction(DB_STORE_NAME, 'readonly');
-        const request = tx.objectStore(DB_STORE_NAME).get(DB_RECORD_KEY);
+        const request = tx.objectStore(DB_STORE_NAME).get(recordKey);
         request.onsuccess = () => resolve(request.result || null);
         request.onerror = () => reject(request.error || new Error('IndexedDB read failed'));
       });
     }
 
-    async function writeAppDataToDb(data, meta = {}){
+    async function writeAppDataToDb(data, meta = {}, recordKey = getLocalCacheKey()){
       const db = await openAppDatabase();
       const payload = {
         data: normalizeData(data),
@@ -1925,7 +1987,7 @@
         const tx = db.transaction(DB_STORE_NAME, 'readwrite');
         tx.oncomplete = () => resolve();
         tx.onerror = () => reject(tx.error || new Error('IndexedDB write failed'));
-        tx.objectStore(DB_STORE_NAME).put(payload, DB_RECORD_KEY);
+        tx.objectStore(DB_STORE_NAME).put(payload, recordKey);
       });
       loadedFileName = payload.meta.loadedFileName || '';
       lastImportAt = payload.meta.lastImportAt || '';
@@ -1998,6 +2060,217 @@
           })) : []
         })) : []
       };
+    }
+
+    function getEmptyAppData(){
+      return normalizeData({ entries: [], installments: [], trips: [] });
+    }
+
+    function getLocalCacheKey(uid = currentUser?.uid){
+      return uid ? `${DB_RECORD_KEY}:${uid}` : DB_RECORD_KEY;
+    }
+
+    function isFirebaseConfigReady(){
+      return Object.values(firebaseConfig).every(value => String(value || '').trim() && !String(value).includes('TODO'));
+    }
+
+    function setAuthStatus(message = ''){
+      if(authStatus) authStatus.textContent = message;
+    }
+
+    function setAuthError(message = ''){
+      if(!authError) return;
+      authError.textContent = message;
+      authError.classList.toggle('hidden', !message);
+    }
+
+    function setAuthBusy(nextBusy, statusText = ''){
+      isAuthBusy = nextBusy;
+      if(loginBtn) loginBtn.disabled = nextBusy || !isFirebaseConfigReady();
+      if(logoutBtn) logoutBtn.disabled = nextBusy;
+      if(authEmail) authEmail.disabled = nextBusy;
+      if(authPassword) authPassword.disabled = nextBusy;
+      if(statusText) setAuthStatus(statusText);
+    }
+
+    function updateAuthUi(){
+      const isLoggedIn = !!currentUser;
+      if(authUserBadge){
+        authUserBadge.textContent = isLoggedIn ? (currentUser.email || currentUser.uid) : '';
+        authUserBadge.classList.toggle('hidden', !isLoggedIn);
+      }
+      if(logoutBtn) logoutBtn.classList.toggle('hidden', !isLoggedIn);
+      if(loginBtn) loginBtn.disabled = isAuthBusy || !isFirebaseConfigReady();
+    }
+
+    function showLoginScreen(){
+      welcomeScreen.classList.remove('hidden');
+      appScreen.classList.add('hidden');
+      updateAuthUi();
+    }
+
+    function getUserFinanceDocRef(uid){
+      return firestoreDb.collection('users').doc(uid).collection('finance').doc('main');
+    }
+
+    async function getBestLocalSeedState(uid){
+      const userCache = await readAppDataFromDb(getLocalCacheKey(uid));
+      if(userCache?.data) return userCache;
+      const migrated = await migrateLegacyLocalStorage();
+      if(migrated?.data) return migrated;
+      return await readAppDataFromDb(DB_RECORD_KEY);
+    }
+
+    function initializeFirebaseServices(){
+      if(typeof firebase === 'undefined'){
+        setAuthError('Firebase SDK โหลดไม่สำเร็จ');
+        setAuthStatus('ไม่สามารถเริ่ม Firebase ได้');
+        updateAuthUi();
+        return false;
+      }
+      if(!isFirebaseConfigReady()){
+        setAuthError('TODO: วางค่า firebaseConfig จริงก่อนใช้งาน');
+        setAuthStatus('รอ firebaseConfig');
+        updateAuthUi();
+        return false;
+      }
+      // FIREBASE: initialize Auth + Firestore for this single-file app.
+      const app = firebase.apps.length ? firebase.app() : firebase.initializeApp(firebaseConfig);
+      firebaseAuth = firebase.auth(app);
+      firestoreDb = firebase.firestore(app);
+      updateAuthUi();
+      return true;
+    }
+
+    async function createDefaultUserDocIfMissing(uid, seedData = getEmptyAppData()){
+      // FIREBASE: keep each user's finance document at users/{uid}/finance/main.
+      const docRef = getUserFinanceDocRef(uid);
+      const snapshot = await docRef.get();
+      if(snapshot.exists) return snapshot.data();
+      const safeData = normalizeData(seedData || getEmptyAppData());
+      await docRef.set({
+        ...safeData,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      return safeData;
+    }
+
+    async function loadUserDataFromCloud(uid){
+      // FIREBASE: Firestore becomes the primary source after login.
+      const snapshot = await getUserFinanceDocRef(uid).get();
+      const remoteData = snapshot.exists ? snapshot.data() : getEmptyAppData();
+      appData = normalizeData(remoteData || getEmptyAppData());
+      return appData;
+    }
+
+    async function saveUserDataToCloud(){
+      if(!currentUser || !firestoreDb) return;
+      // FIREBASE: save the existing appData shape back to Cloud Firestore.
+      await getUserFinanceDocRef(currentUser.uid).set({
+        ...normalizeData(appData),
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      }, { merge: true });
+    }
+
+    function scheduleCloudSave(){
+      if(!currentUser || !firestoreDb || isApplyingCloudState) return;
+      clearTimeout(cloudSaveTimer);
+      cloudSaveTimer = setTimeout(() => {
+        saveUserDataToCloud().catch(error => {
+          console.error(error);
+          setAuthError('บันทึก Cloud ไม่สำเร็จ ระบบยังเก็บแคชในเครื่องไว้');
+          setAuthStatus('Cloud sync มีปัญหาชั่วคราว');
+        });
+      }, 800);
+    }
+
+    function mapAuthError(error){
+      if(!error?.code) return 'Login ไม่สำเร็จ';
+      if(error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') return 'Email หรือ Password ไม่ถูกต้อง';
+      if(error.code === 'auth/invalid-email') return 'รูปแบบ Email ไม่ถูกต้อง';
+      if(error.code === 'auth/too-many-requests') return 'มีการลองเข้าสู่ระบบหลายครั้งเกินไป กรุณารอสักครู่';
+      return 'Login ไม่สำเร็จ';
+    }
+
+    async function handleLogin(){
+      if(!firebaseAuth || isAuthBusy) return;
+      const email = String(authEmail?.value || '').trim();
+      const password = String(authPassword?.value || '');
+      if(!email || !password){
+        setAuthError('กรอก Email และ Password ก่อน login');
+        setAuthStatus('รอข้อมูลสำหรับ login');
+        return;
+      }
+      setAuthError('');
+      setAuthBusy(true, 'กำลังเข้าสู่ระบบ...');
+      try{
+        await firebaseAuth.signInWithEmailAndPassword(email, password);
+        if(authPassword) authPassword.value = '';
+      }catch(error){
+        console.error(error);
+        setAuthError(mapAuthError(error));
+        setAuthStatus('เข้าสู่ระบบไม่สำเร็จ');
+      }finally{
+        setAuthBusy(false, currentUser ? 'เข้าสู่ระบบแล้ว' : 'พร้อมให้ login');
+        updateAuthUi();
+      }
+    }
+
+    async function handleLogout(){
+      if(!firebaseAuth || isAuthBusy) return;
+      setAuthBusy(true, 'กำลังออกจากระบบ...');
+      try{
+        clearTimeout(cloudSaveTimer);
+        await firebaseAuth.signOut();
+      }catch(error){
+        console.error(error);
+        setAuthError('ออกจากระบบไม่สำเร็จ');
+        setAuthStatus('ลองออกจากระบบอีกครั้ง');
+      }finally{
+        setAuthBusy(false, 'กรุณา login เพื่อใช้งาน');
+        updateAuthUi();
+      }
+    }
+
+    async function handleAuthenticatedUser(user){
+      currentUser = user;
+      updateAuthUi();
+      setAuthError('');
+      setAuthBusy(true, 'กำลังโหลดข้อมูลจาก Cloud Firestore...');
+      const localSeedState = await getBestLocalSeedState(user.uid);
+      try{
+        await createDefaultUserDocIfMissing(user.uid, localSeedState?.data || getEmptyAppData());
+        isApplyingCloudState = true;
+        await loadUserDataFromCloud(user.uid);
+        enterApp();
+        setAuthStatus('เข้าสู่ระบบแล้ว');
+      }catch(error){
+        console.error(error);
+        appData = normalizeData(localSeedState?.data || getEmptyAppData());
+        isApplyingCloudState = true;
+        enterApp();
+        setAuthError('โหลด Cloud ไม่สำเร็จ จึงใช้ข้อมูลแคชในเครื่องชั่วคราว');
+        setAuthStatus('ใช้ข้อมูลแคชชั่วคราว');
+      }finally{
+        isApplyingCloudState = false;
+        setAuthBusy(false, authStatus?.textContent || 'เข้าสู่ระบบแล้ว');
+        updateAuthUi();
+      }
+    }
+
+    async function handleAuthStateChanged(user){
+      clearTimeout(cloudSaveTimer);
+      if(user){
+        await handleAuthenticatedUser(user);
+        return;
+      }
+      currentUser = null;
+      appData = getEmptyAppData();
+      showLoginScreen();
+      setAuthError('');
+      setAuthStatus(isFirebaseConfigReady() ? 'กรุณา login เพื่อใช้งาน' : 'รอ firebaseConfig');
+      updateFileStatus();
+      updateAuthUi();
     }
 
     function updateFileStatus(){
@@ -4426,10 +4699,69 @@
       renderAll();
     };
 
+    function updateFileStatus(){
+      const cloudLabel = currentUser ? `Cloud: ${currentUser.email || currentUser.uid}` : 'Cloud: ยังไม่ได้ login';
+      if(loadedFileName && lastImportAt){
+        fileStatus.textContent = `${cloudLabel} · Last import: ${loadedFileName} · ${new Date(lastImportAt).toLocaleString('th-TH')}`;
+      }else if(loadedFileName){
+        fileStatus.textContent = `${cloudLabel} · Imported from: ${loadedFileName}`;
+      }else{
+        fileStatus.textContent = `${cloudLabel} · Browser cache is ready`;
+      }
+    }
+
+    function persistCurrentData(meta = {}){
+      writeAppDataToDb(appData, meta, getLocalCacheKey()).catch(error => {
+        console.error(error);
+        alert('Unable to save data to IndexedDB');
+      });
+      scheduleCloudSave();
+    }
+
+    async function boot(){
+      bindEvents();
+      syncResponsiveMenu();
+      initializeEnhancedSelects();
+      populateCategoryDropdowns();
+      const welcomeTitle = document.querySelector('#welcomeScreen .welcome-box p');
+      const welcomeHint = document.querySelector('#welcomeScreen .auth-card p');
+      if(welcomeTitle) welcomeTitle.textContent = 'Login ด้วย Firebase เพื่อโหลดข้อมูลรายรับ รายจ่าย และยอดผ่อนของบัญชีนี้จาก Cloud Firestore';
+      if(welcomeHint) welcomeHint.textContent = 'หลัง login แล้วระบบจะโหลด users/{uid}/finance/main มาใส่ appData เดิม และยังเก็บ cache ใน IndexedDB ของเครื่องนี้';
+
+      clearEntryForm();
+      clearLoanForm();
+      clearTripForm();
+      clearTripItemForm();
+      initializeCardCollapsibles();
+      initDatepickers();
+      showLoginScreen();
+      updateFileStatus();
+
+      const firebaseReady = initializeFirebaseServices();
+      if(!firebaseReady) return;
+
+      // FIREBASE: auth state decides whether we show login or the app.
+      firebaseAuth.onAuthStateChanged(user => {
+        handleAuthStateChanged(user).catch(error => {
+          console.error(error);
+          setAuthError('ไม่สามารถเริ่มต้น session ได้');
+          setAuthStatus('ลอง refresh หน้าอีกครั้ง');
+          showLoginScreen();
+        });
+      });
+    }
+
     function bindEvents(){
       createNewBtn.addEventListener('click', createNewData);
       openJsonWithHandleBtn.addEventListener('click', openJsonWithHandle);
       openJsonSimpleBtn.addEventListener('click', () => startupJsonFile.click());
+      loginBtn?.addEventListener('click', handleLogin);
+      logoutBtn?.addEventListener('click', handleLogout);
+      authPassword?.addEventListener('keydown', (e) => {
+        if(e.key !== 'Enter') return;
+        e.preventDefault();
+        handleLogin();
+      });
       startupJsonFile.addEventListener('change', (e) => {
         const file = e.target.files?.[0];
         if(file) loadJsonFile(file);
