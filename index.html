@@ -105,37 +105,129 @@
       border-color:#fecdd3;
       color:var(--red);
     }
-    .auth-user{max-width:min(42vw,320px); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+    .auth-user{
+      max-width:100%;
+      min-height:40px;
+      display:flex;
+      align-items:center;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis
+    }
     .main-header{
-      padding:16px 18px;
+      padding:16px 18px 14px;
       margin-bottom:14px;
       color:#fff;
-      background:
-        radial-gradient(circle at 18% 12%, rgba(255,255,255,.26), transparent 34%),
-        linear-gradient(135deg,#1e40af,#2563eb 58%,#60a5fa);
-      display:flex; justify-content:space-between; gap:18px; align-items:flex-start;
-      position:relative; overflow:hidden;
+      background:linear-gradient(135deg,#1e3a8a,#2563eb 65%,#3b82f6);
+      display:grid;
+      gap:12px;
+      position:relative;
+      overflow:hidden;
     }
-    .main-header:after{
-      content:""; position:absolute; right:-26px; bottom:-26px; width:120px; height:120px;
-      border-radius:50%;
-      background:radial-gradient(circle, rgba(255,255,255,.22), rgba(255,255,255,.02) 70%);
-      opacity:.9;
-    }
-    .main-header > *{position:relative; z-index:1}
     .header-bar{
       display:flex;
       justify-content:space-between;
-      align-items:flex-start;
-      gap:12px;
-      flex:1 1 auto;
+      align-items:center;
+      gap:14px;
       min-width:0;
     }
-    .header-title{min-width:0}
-    .header-title h1{margin:0 0 4px; font-size:23px; line-height:1.15}
-    .header-title p{margin:0; opacity:.92; font-size:14px}
-    .header-right{display:grid; gap:10px; justify-items:end}
-    .main-header .small-actions button{padding:8px 12px; font-size:13px}
+    .header-title{
+      min-width:0;
+    }
+    .header-title h1{
+      margin:0;
+      font-size:24px;
+      line-height:1.15;
+    }
+    .header-title p{
+      margin:4px 0 0;
+      opacity:.88;
+      font-size:13px;
+      line-height:1.45;
+    }
+    .header-right{
+      min-width:0;
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      align-items:center;
+      justify-content:flex-end;
+    }
+    .header-panel{
+      min-width:0;
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      align-items:center;
+    }
+    .header-panel-label{
+      font-size:11px;
+      font-weight:700;
+      letter-spacing:.05em;
+      text-transform:uppercase;
+      color:rgba(255,255,255,.78);
+    }
+    .main-header .small-actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      min-width:0;
+      align-items:center;
+    }
+    .main-header .small-actions > *{
+      min-width:0;
+      flex:0 1 auto;
+    }
+    .main-header .small-actions button{
+      padding:10px 14px;
+      font-size:13px;
+      line-height:1.35;
+      white-space:normal;
+      word-break:break-word;
+    }
+    .header-top{
+      display:grid;
+      grid-template-columns:minmax(0,1fr) auto;
+      gap:12px 16px;
+      align-items:center;
+    }
+    .header-mobile-bar{
+      display:none;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+    }
+    .header-mobile-title{
+      min-width:0;
+      font-size:18px;
+      font-weight:700;
+      line-height:1.2;
+    }
+    .header-menu{
+      display:grid;
+      gap:8px;
+      padding-top:12px;
+      border-top:1px solid rgba(255,255,255,.18);
+    }
+    .header-menu .menu-title{
+      margin-bottom:0;
+      color:rgba(255,255,255,.76);
+    }
+    .header-menu .menu{
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:8px;
+    }
+    .header-menu .menu button{
+      min-width:0;
+      border-color:rgba(255,255,255,.12);
+      color:#e2e8f0;
+      background:rgba(255,255,255,.08);
+    }
+    .header-menu .menu button.active{
+      background:#fff;
+      color:#1d4ed8;
+      border-color:transparent;
+    }
     .mobile-menu-toggle{
       display:none;
       width:46px;
@@ -178,8 +270,11 @@
       background:rgba(255,255,255,.18);
       border:1px solid rgba(255,255,255,.3);
       border-radius:999px;
-      padding:6px 11px;
-      font-size:11px
+      padding:8px 12px;
+      font-size:12px;
+      line-height:1.35;
+      white-space:normal;
+      overflow-wrap:anywhere
     }
     .save-status-badge{font-weight:800}
     .save-status-idle{
@@ -903,12 +998,17 @@
       .sidebar .menu button{justify-content:center; text-align:center}
     }
     @media (max-width:900px){
-      .main-header{gap:12px}
-      .header-title h1{font-size:21px}
+      .main-header{
+        padding:14px;
+        gap:14px
+      }
+      .header-top{grid-template-columns:1fr}
+      .header-title h1{font-size:22px}
       .header-title p{font-size:13px}
-      .main-header .small-actions button{width:100%}
-      .header-right{justify-items:stretch; width:100%}
-      .file-status{width:100%; text-align:center}
+      .header-right{width:100%; justify-content:flex-start}
+      .main-header .small-actions > *{flex:1 1 220px}
+      .file-status{text-align:center}
+      .header-menu .menu{grid-template-columns:repeat(2,minmax(0,1fr))}
       .table-card,.month-group{overflow-x:auto}
       table{min-width:680px}
       .month-group-stats{flex-wrap:nowrap; overflow:auto}
@@ -928,42 +1028,65 @@
       .trip-item-actions{justify-content:flex-start}
       .main-header{
         gap:10px;
-        padding:12px 14px;
-        flex-direction:column;
+        padding:12px;
       }
+      .header-mobile-bar{display:flex}
       .header-bar{
-        align-items:center;
+        align-items:flex-start;
         width:100%;
       }
-      .header-right{justify-items:start}
-      .header-title h1{font-size:19px}
-      .header-title p{font-size:12px}
-      .mobile-menu-toggle{display:inline-flex}
-      .menu-title{display:none}
-      .sidebar{
+      .header-bar .mobile-menu-toggle{display:none}
+      .header-top{
         max-height:0;
         opacity:0;
         overflow:hidden;
         pointer-events:none;
         transform:translateY(-8px);
-        margin-top:-10px;
-        padding:0 14px;
-        border-color:transparent;
-        box-shadow:none;
-        transition:max-height .25s ease, opacity .2s ease, transform .25s ease, margin-top .25s ease, padding .25s ease, border-color .2s ease, box-shadow .2s ease;
+        transition:max-height .25s ease, opacity .2s ease, transform .25s ease;
       }
-      .sidebar.is-open{
+      .header-top.is-open{
+        max-height:480px;
+        opacity:1;
+        pointer-events:auto;
+        transform:translateY(0);
+      }
+      .header-right{justify-content:flex-start}
+      .header-title h1{font-size:20px}
+      .header-title p{font-size:12px}
+      .header-panel{
+        width:100%;
+        flex-direction:column;
+        align-items:stretch;
+      }
+      .header-panel-label{width:100%}
+      .main-header .small-actions{display:grid; grid-template-columns:1fr; gap:8px}
+      .main-header .small-actions > *{width:100%}
+      .main-header .small-actions button{width:100%}
+      .auth-user,.file-status{text-align:left}
+      .mobile-menu-toggle{display:inline-flex}
+      .header-menu .menu-title{display:none}
+      .header-menu{
+        max-height:0;
+        opacity:0;
+        overflow:hidden;
+        pointer-events:none;
+        transform:translateY(-8px);
+        margin-top:-4px;
+        padding-top:0;
+        border-top:none;
+        transition:max-height .25s ease, opacity .2s ease, transform .25s ease, margin-top .25s ease, padding .25s ease, border-color .2s ease;
+      }
+      .header-menu.is-open{
         max-height:320px;
         opacity:1;
         pointer-events:auto;
         transform:translateY(0);
         margin-top:0;
-        padding:14px;
-        border-color:rgba(219,227,239,.95);
-        box-shadow:var(--shadow);
+        padding-top:10px;
+        border-top:1px solid rgba(255,255,255,.18);
       }
-      .sidebar .menu{grid-template-columns:1fr}
-      .sidebar .menu button{text-align:left; justify-content:flex-start}
+      .header-menu .menu{grid-template-columns:1fr}
+      .header-menu .menu button{text-align:left; justify-content:flex-start}
       .month-group-head,.section-header{align-items:flex-start}
       .app{padding:10px}
       .panel,.form-card,.table-card{padding:14px}
@@ -1012,8 +1135,8 @@
       <p>โหลดไฟล์ JSON เดิม หรือสร้างไฟล์ใหม่ จากนั้นจัดการรายรับ รายจ่าย ภาพรวมทั้งปี และยอดผ่อนในไฟล์เดียว</p>
       <div class="action-tile auth-card">
         <div>
-          <h3>Firebase Login</h3>
-          <p>Sign in ด้วย Email/Password เพื่อโหลดข้อมูลของ user นี้จาก Cloud Firestore</p>
+          <h3>เข้าสู่ระบบ</h3>
+          <p>ลงชื่อเข้าใช้ด้วย Email และ Password เพื่อใช้งานข้อมูลของคุณ</p>
         </div>
         <div class="form-grid auth-grid">
           <div>
@@ -1029,7 +1152,7 @@
               <button id="loginBtn" class="btn-primary" type="button">Login</button>
               <button id="resetPasswordBtn" class="auth-link-btn" type="button">ลืมรหัสผ่าน?</button>
             </div>
-            <div id="authStatus" class="auth-status">รอตรวจสอบสถานะการ login...</div>
+            <div id="authStatus" class="auth-status">กรุณาเข้าสู่ระบบเพื่อใช้งาน</div>
           </div>
         </div>
         <div id="authError" class="hint auth-error hidden"></div>
@@ -1041,30 +1164,41 @@
 
   <div id="appScreen" class="app hidden">
     <div class="main-header card">
-      <div class="header-bar">
-        <div class="header-title">
-          <h1>แดชบอร์ดการเงินส่วนตัว</h1>
-        </div>
+      <div class="header-mobile-bar">
+        <div class="header-mobile-title">แดชบอร์ดการเงินส่วนตัว</div>
         <button id="mobileMenuToggle" class="mobile-menu-toggle" type="button" aria-label="เปิดเมนูหลัก" aria-expanded="false" aria-controls="mainMenuPanel">
           <span class="hamburger-icon" aria-hidden="true"></span>
         </button>
       </div>
-      <div class="header-right">
-        <div class="small-actions">
-          <div id="authUserBadge" class="file-status auth-user hidden"></div>
-          <button id="logoutBtn" class="btn-light btn-sm hidden" type="button">Logout</button>
+      <div id="headerTop" class="header-top">
+        <div class="header-bar">
+          <div class="header-title">
+            <h1>แดชบอร์ดการเงินส่วนตัว</h1>
+            <p>จัดการรายรับ รายจ่าย และไฟล์ข้อมูลของคุณได้ในที่เดียว</p>
+          </div>
         </div>
-        <div class="small-actions">
-          <button id="saveJsonBtn" class="btn-ghost">💾 Export JSON</button>
-          <button id="loadAnotherBtn" class="btn-ghost">📂 Import</button>
-          <div id="saveStatusBadge" class="file-status save-status-badge save-status-idle">พร้อมใช้งาน</div>
-          <div id="fileStatus" class="file-status">ยังไม่ได้ผูกไฟล์สำหรับ Save ทับ</div>
+        <div class="header-right">
+          <div class="header-panel">
+            <div class="header-panel-label">บัญชี</div>
+            <div class="small-actions">
+              <div id="authUserBadge" class="file-status auth-user hidden"></div>
+              <button id="logoutBtn" class="btn-light btn-sm hidden" type="button">Logout</button>
+            </div>
+          </div>
+          <div class="header-panel">
+            <div class="header-panel-label">ไฟล์</div>
+            <div class="small-actions">
+              <button id="saveJsonBtn" class="btn-ghost">💾 Export JSON</button>
+              <button id="loadAnotherBtn" class="btn-ghost">📂 Import</button>
+            </div>
+            <div class="small-actions">
+              <div id="saveStatusBadge" class="file-status save-status-badge save-status-idle">พร้อมใช้งาน</div>
+              <div id="fileStatus" class="file-status">ยังไม่ได้ผูกไฟล์สำหรับ Save ทับ</div>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-
-    <div class="layout">
-      <aside id="mainMenuPanel" class="sidebar card" aria-hidden="false">
+      <div id="mainMenuPanel" class="header-menu" aria-hidden="false">
         <div class="menu-title">เมนูหลัก</div>
         <div class="menu">
           <button class="menu-btn" data-view="monthly">🗓️ รายเดือน</button>
@@ -1072,8 +1206,10 @@
           <button class="menu-btn" data-view="trips">✈️ ทริป</button>
           <button class="menu-btn" data-view="installments">💳 ยอดผ่อน</button>
         </div>
-      </aside>
+      </div>
+    </div>
 
+    <div class="layout">
       <main class="content">
 
         <section id="view-monthly" class="view hidden">
@@ -1802,6 +1938,7 @@
     const saveStatusBadge = $('saveStatusBadge');
     const fileStatus = $('fileStatus');
     const mobileMenuToggle = $('mobileMenuToggle');
+    const headerTop = $('headerTop');
     const mainMenuPanel = $('mainMenuPanel');
 
     const rangeStartMonth = $('rangeStartMonth');
@@ -1946,6 +2083,15 @@
     const tripShell = document.querySelector('.trip-shell');
     const tripListViewBtn = $('tripListViewBtn');
     const tripCalendarViewBtn = $('tripCalendarViewBtn');
+    const DEFAULT_ENTRY_FORM_TITLE = entryFormTitle?.textContent || '';
+    const DEFAULT_SAVE_ENTRY_TEXT = saveEntryBtn?.textContent || '';
+    const DEFAULT_LOAN_FORM_TITLE = loanFormTitle?.textContent || '';
+    const DEFAULT_SAVE_LOAN_TEXT = saveLoanBtn?.textContent || '';
+    const DEFAULT_TRIP_FORM_TITLE = tripFormTitle?.textContent || '';
+    const DEFAULT_SAVE_TRIP_TEXT = saveTripBtn?.textContent || '';
+    const DEFAULT_TRIP_ITEM_FORM_TITLE = tripItemFormTitle?.textContent || '';
+    const DEFAULT_SAVE_TRIP_ITEM_TEXT = saveTripItemBtn?.textContent || '';
+    const DEFAULT_AUTH_STATUS = authStatus?.textContent || '';
     const enhancedSelectRegistry = new Map();
     const QUICK_ADD_INCOME_KEYWORDS = [
       'income','salary','bonus','commission','refund','allowance','payday',
@@ -2100,7 +2246,6 @@
       return Object.values(firebaseConfig).every(value => String(value || '').trim() && !String(value).includes('TODO'));
     }
 
-    // FIREBASE SAVE STATUS
     function setSaveStatus(nextStatus = 'idle', errorMessage = ''){
       saveStatus = nextStatus || 'idle';
       lastSaveError = saveStatus === 'error' ? String(errorMessage || '').trim() : '';
@@ -2178,22 +2323,21 @@
 
     function initializeFirebaseServices() {
       if (typeof firebase === 'undefined') {
-        setAuthError('Firebase SDK โหลดไม่สำเร็จ');
-        setAuthStatus('ไม่สามารถเริ่ม Firebase ได้');
+        setAuthError('โหลดระบบเข้าสู่ระบบไม่สำเร็จ');
+        setAuthStatus('ยังไม่สามารถเริ่มระบบได้');
         updateAuthUi();
         return false;
       }
 
       if (!isFirebaseConfigReady()) {
-        setAuthError('TODO: วางค่า firebaseConfig จริงก่อนใช้งาน');
-        setAuthStatus('รอ firebaseConfig');
+        setAuthError('ระบบยังตั้งค่าไม่ครบ');
+        setAuthStatus('ระบบยังไม่พร้อมใช้งาน');
         updateAuthUi();
         return false;
       }
 
       const app = firebase.apps.length ? firebase.app() : firebase.initializeApp(firebaseConfig);
 
-      // FIREBASE APP CHECK
       if (typeof firebase.appCheck === 'function') {
         firebase.appCheck(app).activate(
           "6LcnXa0sAAAAAF8at2tcxe2WFjxQ0ocjq3xX_8m1",
@@ -2208,7 +2352,6 @@
     }
 
     async function createDefaultUserDocIfMissing(uid, seedData = getEmptyAppData()){
-      // FIREBASE: keep each user's finance document at users/{uid}/finance/main.
       const docRef = getUserFinanceDocRef(uid);
       const snapshot = await docRef.get();
       if(snapshot.exists) return snapshot.data();
@@ -2221,7 +2364,6 @@
     }
 
     async function loadUserDataFromCloud(uid){
-      // FIREBASE: Firestore becomes the primary source after login.
       const snapshot = await getUserFinanceDocRef(uid).get();
       const remoteData = snapshot.exists ? snapshot.data() : getEmptyAppData();
       appData = normalizeData(remoteData || getEmptyAppData());
@@ -2230,7 +2372,6 @@
 
     async function saveUserDataToCloud(saveSequence = cloudSaveSequence){
       if(!currentUser || !firestoreDb) return;
-      // FIREBASE: save the existing appData shape back to Cloud Firestore.
       await getUserFinanceDocRef(currentUser.uid).set({
         ...normalizeData(appData),
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -2251,8 +2392,8 @@
           if(saveSequence === cloudSaveSequence){
             setSaveStatus('error', error?.message || '');
           }
-          setAuthError('บันทึก Cloud ไม่สำเร็จ ระบบยังเก็บแคชในเครื่องไว้');
-          setAuthStatus('Cloud sync มีปัญหาชั่วคราว');
+          setAuthError('บันทึกข้อมูลไม่สำเร็จ แต่ข้อมูลล่าสุดยังอยู่ในอุปกรณ์นี้');
+          setAuthStatus('ซิงก์ข้อมูลชั่วคราวมีปัญหา');
         });
       }, 800);
     }
@@ -2265,7 +2406,6 @@
       return 'Login ไม่สำเร็จ';
     }
 
-    // FIREBASE RESET PASSWORD
     function mapResetPasswordError(error){
       if(!error?.code) return 'ส่งลิงก์รีเซ็ตรหัสผ่านไม่สำเร็จ';
       if(error.code === 'auth/invalid-email') return 'รูปแบบอีเมลไม่ถูกต้อง';
@@ -2293,7 +2433,7 @@
         setAuthError(mapResetPasswordError(error));
         setAuthStatus('ส่งลิงก์รีเซ็ตรหัสผ่านไม่สำเร็จ');
       }finally{
-        setAuthBusy(false, currentUser ? 'เข้าสู่ระบบแล้ว' : (authStatus?.textContent || 'พร้อมให้ login'));
+        setAuthBusy(false, currentUser ? 'เข้าสู่ระบบแล้ว' : (authStatus?.textContent || DEFAULT_AUTH_STATUS));
         updateAuthUi();
       }
     }
@@ -2317,7 +2457,7 @@
         setAuthError(mapAuthError(error));
         setAuthStatus('เข้าสู่ระบบไม่สำเร็จ');
       }finally{
-        setAuthBusy(false, currentUser ? 'เข้าสู่ระบบแล้ว' : 'พร้อมให้ login');
+        setAuthBusy(false, currentUser ? 'เข้าสู่ระบบแล้ว' : DEFAULT_AUTH_STATUS);
         updateAuthUi();
       }
     }
@@ -2335,7 +2475,7 @@
         setAuthError('ออกจากระบบไม่สำเร็จ');
         setAuthStatus('ลองออกจากระบบอีกครั้ง');
       }finally{
-        setAuthBusy(false, 'กรุณา login เพื่อใช้งาน');
+        setAuthBusy(false, DEFAULT_AUTH_STATUS);
         updateAuthUi();
       }
     }
@@ -2345,7 +2485,7 @@
       updateAuthUi();
       setAuthError('');
       setSaveStatus('idle');
-      setAuthBusy(true, 'กำลังโหลดข้อมูลจาก Cloud Firestore...');
+      setAuthBusy(true, 'กำลังโหลดข้อมูล...');
       const localSeedState = await getBestLocalSeedState(user.uid);
       try{
         await createDefaultUserDocIfMissing(user.uid, localSeedState?.data || getEmptyAppData());
@@ -2360,8 +2500,8 @@
         isApplyingCloudState = true;
         enterApp();
         setSaveStatus('idle');
-        setAuthError('โหลด Cloud ไม่สำเร็จ จึงใช้ข้อมูลแคชในเครื่องชั่วคราว');
-        setAuthStatus('ใช้ข้อมูลแคชชั่วคราว');
+        setAuthError('โหลดข้อมูลล่าสุดไม่สำเร็จ จึงใช้ข้อมูลบนอุปกรณ์นี้ชั่วคราว');
+        setAuthStatus('ใช้ข้อมูลบนอุปกรณ์นี้ชั่วคราว');
       }finally{
         isApplyingCloudState = false;
         setAuthBusy(false, authStatus?.textContent || 'เข้าสู่ระบบแล้ว');
@@ -2381,21 +2521,20 @@
       setSaveStatus('idle');
       showLoginScreen();
       setAuthError('');
-      setAuthStatus(isFirebaseConfigReady() ? 'กรุณา login เพื่อใช้งาน' : 'รอ firebaseConfig');
+      setAuthStatus(isFirebaseConfigReady() ? DEFAULT_AUTH_STATUS : 'ระบบยังไม่พร้อมใช้งาน');
       updateFileStatus();
       updateAuthUi();
     }
     function updateFileStatus(){
-      // REFACTOR: keep one status formatter for cloud/login + local file/export state.
-      const cloudLabel = currentUser ? `Cloud: ${currentUser.email || currentUser.uid}` : 'Cloud: ยังไม่ได้ login';
+      const cloudLabel = currentUser ? `บัญชี: ${currentUser.email || currentUser.uid}` : 'บัญชี: ยังไม่ได้เข้าสู่ระบบ';
       if(fileHandle && loadedFileName){
-        fileStatus.textContent = `${cloudLabel} · ผูกไฟล์แล้ว: ${loadedFileName} · Save จะพยายามเขียนทับไฟล์เดิม`;
+        fileStatus.textContent = `${cloudLabel} · เชื่อมไฟล์แล้ว: ${loadedFileName}`;
       }else if(loadedFileName && lastImportAt){
-        fileStatus.textContent = `${cloudLabel} · Last import: ${loadedFileName} · ${new Date(lastImportAt).toLocaleString('th-TH')}`;
+        fileStatus.textContent = `${cloudLabel} · นำเข้าล่าสุด: ${loadedFileName} · ${new Date(lastImportAt).toLocaleString('th-TH')}`;
       }else if(loadedFileName){
-        fileStatus.textContent = `${cloudLabel} · Imported from: ${loadedFileName}`;
+        fileStatus.textContent = `${cloudLabel} · นำเข้าจาก: ${loadedFileName}`;
       }else{
-        fileStatus.textContent = `${cloudLabel} · Browser cache is ready`;
+        fileStatus.textContent = `${cloudLabel} · พร้อมใช้งานบนอุปกรณ์นี้`;
       }
     }
 
@@ -3915,8 +4054,6 @@
       `;
     }
 
-    // REMOVED DEAD CODE: legacy renderAll was overridden by the cloud-aware flow below.
-
     function updateView(){
       document.querySelectorAll('.view').forEach(el => el.classList.add('hidden'));
       document.getElementById(`view-${currentView}`).classList.remove('hidden');
@@ -3931,6 +4068,7 @@
     function setMobileMenu(open){
       if(!mobileMenuToggle || !mainMenuPanel) return;
       const shouldOpen = isMobileMenuLayout() ? Boolean(open) : true;
+      if(headerTop) headerTop.classList.toggle('is-open', shouldOpen && isMobileMenuLayout());
       mainMenuPanel.classList.toggle('is-open', shouldOpen && isMobileMenuLayout());
       mainMenuPanel.setAttribute('aria-hidden', shouldOpen ? 'false' : 'true');
       mobileMenuToggle.classList.toggle('is-active', shouldOpen && isMobileMenuLayout());
@@ -3941,10 +4079,12 @@
       if(!mobileMenuToggle || !mainMenuPanel) return;
       if(isMobileMenuLayout()){
         const isOpen = mainMenuPanel.classList.contains('is-open');
+        if(headerTop) headerTop.classList.toggle('is-open', isOpen);
         mainMenuPanel.setAttribute('aria-hidden', isOpen ? 'false' : 'true');
         mobileMenuToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
         return;
       }
+      if(headerTop) headerTop.classList.remove('is-open');
       mainMenuPanel.classList.remove('is-open');
       mainMenuPanel.setAttribute('aria-hidden', 'false');
       mobileMenuToggle.classList.remove('is-active');
@@ -4127,9 +4267,9 @@
 
     function clearEntryForm(){
       editingEntryId = null;
-      entryFormTitle.textContent = '➕ เพิ่มรายรับ / รายจ่าย';
+      entryFormTitle.textContent = DEFAULT_ENTRY_FORM_TITLE;
       entryEditBadge.classList.add('hidden');
-      saveEntryBtn.textContent = '💾 บันทึกรายการ';
+      saveEntryBtn.textContent = DEFAULT_SAVE_ENTRY_TEXT;
       entryType.value = 'expense';
       entryDate.value = currentDate();
       entryCategory.value = 'อื่นๆ';
@@ -4169,9 +4309,9 @@
 
     function clearLoanForm(){
       editingLoanId = null;
-      loanFormTitle.textContent = '➕ เพิ่มยอดผ่อน';
+      loanFormTitle.textContent = DEFAULT_LOAN_FORM_TITLE;
       loanEditBadge.classList.add('hidden');
-      saveLoanBtn.textContent = '💾 บันทึกรายการผ่อน';
+      saveLoanBtn.textContent = DEFAULT_SAVE_LOAN_TEXT;
       loanName.value = '';
       loanCategory.value = 'ผ่อนสินค้า';
       loanMonthlyAmount.value = '';
@@ -4190,9 +4330,9 @@
     }
     function clearTripForm(){
       editingTripId = null;
-      tripFormTitle.textContent = '➕ สร้างทริป';
+      tripFormTitle.textContent = DEFAULT_TRIP_FORM_TITLE;
       tripEditBadge.classList.add('hidden');
-      saveTripBtn.textContent = '💾 บันทึกทริป';
+      saveTripBtn.textContent = DEFAULT_SAVE_TRIP_TEXT;
       tripName.value = '';
       tripDestination.value = '';
       tripBudget.value = '';
@@ -4204,9 +4344,9 @@
     }
     function clearTripItemForm(){
       editingTripItemId = null;
-      tripItemFormTitle.textContent = '➕ เพิ่มรายการในทริป';
+      tripItemFormTitle.textContent = DEFAULT_TRIP_ITEM_FORM_TITLE;
       tripItemEditBadge.classList.add('hidden');
-      saveTripItemBtn.textContent = '💾 บันทึกรายการ';
+      saveTripItemBtn.textContent = DEFAULT_SAVE_TRIP_ITEM_TEXT;
       tripItemTripId.value = activeTripId || appData.trips[0]?.id || '';
       tripItemDate.value = currentDate();
       tripItemCategory.value = 'ท่องเที่ยว';
@@ -4699,7 +4839,7 @@
     function persistCurrentData(meta = {}){
       writeAppDataToDb(appData, meta, getLocalCacheKey()).catch(error => {
         console.error(error);
-        alert('Unable to save data to IndexedDB');
+        alert('บันทึกข้อมูลในอุปกรณ์นี้ไม่สำเร็จ');
       });
       scheduleCloudSave();
     }
@@ -4709,10 +4849,6 @@
       syncResponsiveMenu();
       initializeEnhancedSelects();
       populateCategoryDropdowns();
-      const welcomeTitle = document.querySelector('#welcomeScreen .welcome-box p');
-      const welcomeHint = document.querySelector('#welcomeScreen .auth-card p');
-      if(welcomeTitle) welcomeTitle.textContent = 'Login ด้วย Firebase เพื่อโหลดข้อมูลรายรับ รายจ่าย และยอดผ่อนของบัญชีนี้จาก Cloud Firestore';
-      if(welcomeHint) welcomeHint.textContent = 'หลัง login แล้วระบบจะโหลด users/{uid}/finance/main มาใส่ appData เดิม และยังเก็บ cache ใน IndexedDB ของเครื่องนี้';
 
       clearEntryForm();
       clearLoanForm();
@@ -4727,7 +4863,6 @@
       const firebaseReady = initializeFirebaseServices();
       if(!firebaseReady) return;
 
-      // FIREBASE: auth state decides whether we show login or the app.
       firebaseAuth.onAuthStateChanged(user => {
         handleAuthStateChanged(user).catch(error => {
           console.error(error);
@@ -4913,7 +5048,7 @@
 
     boot().catch(error => {
       console.error(error);
-      alert('Unable to initialize IndexedDB');
+      alert('เริ่มระบบจัดเก็บข้อมูลในอุปกรณ์นี้ไม่สำเร็จ');
     });
   </script>
 </body>
