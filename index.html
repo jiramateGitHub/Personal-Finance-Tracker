@@ -99,10 +99,57 @@
       opacity:.9;
     }
     .main-header > *{position:relative; z-index:1}
+    .header-bar{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:12px;
+      flex:1 1 auto;
+      min-width:0;
+    }
+    .header-title{min-width:0}
     .header-title h1{margin:0 0 4px; font-size:23px; line-height:1.15}
     .header-title p{margin:0; opacity:.92; font-size:14px}
     .header-right{display:grid; gap:10px; justify-items:end}
     .main-header .small-actions button{padding:8px 12px; font-size:13px}
+    .mobile-menu-toggle{
+      display:none;
+      width:46px;
+      height:46px;
+      padding:0;
+      border-radius:14px;
+      background:rgba(255,255,255,.14);
+      border:1px solid rgba(255,255,255,.28);
+      color:#fff;
+      align-items:center;
+      justify-content:center;
+      flex:none;
+      box-shadow:0 10px 24px rgba(15,23,42,.14);
+    }
+    .mobile-menu-toggle:hover{background:rgba(255,255,255,.2)}
+    .hamburger-icon{
+      position:relative;
+      width:18px;
+      height:2px;
+      border-radius:999px;
+      background:currentColor;
+      transition:background .2s ease;
+    }
+    .hamburger-icon:before,.hamburger-icon:after{
+      content:"";
+      position:absolute;
+      left:0;
+      width:18px;
+      height:2px;
+      border-radius:999px;
+      background:currentColor;
+      transition:transform .2s ease, top .2s ease, opacity .2s ease;
+    }
+    .hamburger-icon:before{top:-6px}
+    .hamburger-icon:after{top:6px}
+    .mobile-menu-toggle.is-active .hamburger-icon{background:transparent}
+    .mobile-menu-toggle.is-active .hamburger-icon:before{top:0; transform:rotate(45deg)}
+    .mobile-menu-toggle.is-active .hamburger-icon:after{top:0; transform:rotate(-45deg)}
     .file-status{
       background:rgba(255,255,255,.18);
       border:1px solid rgba(255,255,255,.3);
@@ -110,12 +157,12 @@
       padding:6px 11px;
       font-size:11px
     }
-    .layout{display:grid; grid-template-columns:230px 1fr; gap:18px}
-    .sidebar{padding:16px; height:fit-content; position:sticky; top:18px}
+    .layout{display:grid; grid-template-columns:1fr; gap:18px}
+    .sidebar{padding:14px 16px; height:fit-content; position:static}
     .menu-title{font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); font-weight:800; margin-bottom:10px}
-    .menu{display:grid; gap:6px}
+    .menu{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px}
     .menu button{
-      width:100%; text-align:left; display:flex; align-items:center; gap:10px;
+      width:100%; text-align:center; justify-content:center; display:flex; align-items:center; gap:10px;
       background:transparent; border:1px solid transparent; color:#334155
     }
     .menu button.active{background:var(--primary-soft); color:var(--primary); border-color:#bfd5ff}
@@ -149,13 +196,33 @@
     }
     .summary-grid-5{display:flex}
     .summary-card{
+      position:relative;
       border-radius:16px; padding:16px 18px; min-height:112px; border:1px solid transparent;
       display:flex; flex-direction:column; gap:7px;
       min-width:210px;
       flex:1 1 0;
+      overflow:hidden;
     }
-    .summary-card .name{font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:.05em; opacity:.78}
-    .summary-card .value{font-size:25px; font-weight:800}
+    .summary-card:before{
+      content:attr(data-icon);
+      position:absolute;
+      right:14px;
+      top:12px;
+      width:40px;
+      height:40px;
+      border-radius:14px;
+      display:grid;
+      place-items:center;
+      background:rgba(255,255,255,.58);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.45);
+      font-size:20px;
+      opacity:.95;
+    }
+    .summary-card .name{
+      font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:.05em; opacity:.78;
+      padding-right:52px;
+    }
+    .summary-card .value{font-size:25px; font-weight:800; padding-right:52px}
     .income{background:var(--green-soft); border-color:#bbf7d0}
     .income .name,.income .value{color:var(--green)}
     .expense{background:var(--red-soft); border-color:#fecdd3}
@@ -179,6 +246,8 @@
     .badge-income{background:var(--green-soft); color:var(--green); border-color:#bbf7d0}
     .badge-expense{background:var(--red-soft); color:var(--red); border-color:#fecdd3}
     .badge-installment{background:var(--primary-soft); color:var(--primary); border-color:#bfd5ff}
+    .badge-paid{background:var(--green-soft); color:var(--green); border-color:#bbf7d0}
+    .badge-unpaid{background:var(--red-soft); color:var(--red); border-color:#fecdd3}
     .bar-row{display:grid; grid-template-columns:52px 1fr auto; gap:8px; align-items:center; font-size:12px; color:var(--muted)}
     .bar{height:8px; background:#e5e7eb; border-radius:999px; overflow:hidden}
     .bar > div{height:100%; border-radius:inherit}
@@ -246,12 +315,202 @@
     }
     .checkbox-inline{display:flex; align-items:center; gap:10px; background:#f8fbff; border:1px solid var(--line); border-radius:12px; padding:10px 12px}
     .checkbox-inline input{width:auto; margin:0}
+    .payment-toggle{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background:#fff;
+      padding:7px 10px;
+      font:inherit;
+      font-size:12px;
+      font-weight:700;
+      color:var(--text);
+    }
+    .payment-toggle.is-paid{
+      background:var(--green-soft);
+      border-color:#bbf7d0;
+      color:var(--green);
+    }
+    .payment-toggle.is-unpaid{
+      background:var(--red-soft);
+      border-color:#fecdd3;
+      color:var(--red);
+    }
+    .payment-toggle input{
+      width:auto;
+      margin:0;
+      pointer-events:none;
+    }
     input,select,textarea,button{font-family:inherit}
     input[type="date"],input[type="month"],select{
       min-height:46px;
       background:linear-gradient(180deg,#ffffff,#f8fbff);
       border-color:#cfd9ea;
       box-shadow:inset 0 1px 0 rgba(255,255,255,.8), 0 1px 2px rgba(15,23,42,.03);
+    }
+    .native-select{
+      position:absolute !important;
+      width:1px !important;
+      height:1px !important;
+      padding:0 !important;
+      margin:-1px !important;
+      overflow:hidden !important;
+      clip:rect(0,0,0,0) !important;
+      white-space:nowrap !important;
+      border:0 !important;
+      opacity:0 !important;
+      pointer-events:none !important;
+    }
+    .select-enhanced{
+      position:relative;
+      width:100%;
+    }
+    .select-enhanced-trigger{
+      width:100%;
+      min-height:46px;
+      padding:11px 44px 11px 13px;
+      border-radius:12px;
+      border:1.5px solid #cfd9ea;
+      font:inherit;
+      color:var(--text);
+      background:
+        linear-gradient(180deg,#ffffff,#f8fbff);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.82), 0 1px 2px rgba(15,23,42,.03);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      text-align:left;
+      position:relative;
+    }
+    .select-enhanced-trigger:hover{
+      border-color:#9fb8e7;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.9), 0 10px 24px rgba(37,99,235,.08);
+      transform:none;
+    }
+    .select-enhanced.open .select-enhanced-trigger,
+    .select-enhanced-trigger:focus{
+      border-color:var(--primary);
+      box-shadow:0 0 0 3px rgba(37,99,235,.1), 0 14px 24px rgba(37,99,235,.08);
+      outline:none;
+    }
+    .select-enhanced-trigger:disabled{
+      cursor:not-allowed;
+      opacity:.7;
+      background:linear-gradient(180deg,#f8fafc,#f1f5f9);
+      box-shadow:none;
+    }
+    .select-enhanced-value{
+      flex:1;
+      min-width:0;
+      font-weight:600;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .select-enhanced-caret{
+      position:absolute;
+      right:14px;
+      top:50%;
+      transform:translateY(-50%);
+      width:12px;
+      height:12px;
+      border-right:2px solid #64748b;
+      border-bottom:2px solid #64748b;
+      rotate:45deg;
+      transition:transform .18s ease, margin-top .18s ease;
+      pointer-events:none;
+    }
+    .select-enhanced.open .select-enhanced-caret{
+      transform:translateY(-50%) rotate(180deg);
+      margin-top:2px;
+    }
+    .select-enhanced-panel{
+      position:absolute;
+      top:calc(100% + 8px);
+      left:0;
+      right:0;
+      z-index:1200;
+      background:#fff;
+      border:1px solid #d9e4f2;
+      border-radius:16px;
+      box-shadow:0 24px 48px rgba(15,23,42,.16), 0 6px 16px rgba(15,23,42,.08);
+      padding:12px;
+      display:none;
+      gap:10px;
+    }
+    .select-enhanced.open .select-enhanced-panel{display:grid}
+    .select-enhanced-search{
+      width:100%;
+      min-height:42px;
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid #d8e2ef;
+      background:#f8fbff;
+      font:inherit;
+      color:var(--text);
+      outline:none;
+    }
+    .select-enhanced-search:focus{
+      border-color:var(--primary);
+      box-shadow:0 0 0 3px rgba(37,99,235,.08);
+    }
+    .select-enhanced-list{
+      max-height:240px;
+      overflow:auto;
+      display:grid;
+      gap:6px;
+      padding-right:2px;
+    }
+    .select-enhanced-list::-webkit-scrollbar{width:10px}
+    .select-enhanced-list::-webkit-scrollbar-thumb{
+      background:#c7d7f2;
+      border-radius:999px;
+      border:2px solid #fff;
+    }
+    .select-enhanced-option{
+      width:100%;
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid transparent;
+      background:#fff;
+      color:#1e293b;
+      font:inherit;
+      font-weight:600;
+      text-align:left;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .select-enhanced-option:hover,
+    .select-enhanced-option.is-active{
+      transform:none;
+      background:#eef5ff;
+      border-color:#bfd5ff;
+      color:#1d4ed8;
+    }
+    .select-enhanced-option.is-selected{
+      background:linear-gradient(180deg,#eff6ff,#dbeafe);
+      border-color:#93c5fd;
+      color:#1d4ed8;
+    }
+    .select-enhanced-option.is-selected::after{
+      content:"✓";
+      font-size:13px;
+      font-weight:800;
+    }
+    .select-enhanced-empty{
+      padding:14px 12px;
+      border-radius:12px;
+      background:#f8fafc;
+      border:1px dashed #d8e2ef;
+      color:var(--muted);
+      text-align:center;
+      font-size:13px;
+      font-weight:600;
     }
     input[type="date"]::-webkit-calendar-picker-indicator,
     input[type="month"]::-webkit-calendar-picker-indicator{
@@ -262,10 +521,178 @@
     }
     .compact-filter-bar{display:grid; grid-template-columns:1.2fr 1fr 1fr 1fr auto; gap:10px; align-items:end}
     .compact-filter-row{display:grid; grid-template-columns:1.4fr .8fr .8fr auto; gap:10px; align-items:end}
+    .quick-add-bar{
+      display:grid;
+      grid-template-columns:minmax(0,1fr) auto;
+      gap:10px;
+      align-items:end;
+      padding:14px;
+      border-radius:16px;
+      background:
+        radial-gradient(circle at top right, rgba(37,99,235,.12), transparent 34%),
+        linear-gradient(180deg,#ffffff,#f8fbff);
+      border:1px solid #d7e7ff;
+    }
+    .quick-add-bar .meta{margin-top:6px}
+    .quick-add-input-wrap{display:grid; gap:8px}
+    .quick-add-status{
+      min-height:20px;
+      font-size:13px;
+      color:var(--muted);
+    }
+    .quick-add-status.success{color:var(--green)}
+    .quick-add-status.error{color:var(--red)}
+    .quick-add-submit{min-height:46px; white-space:nowrap}
+    .modal-section-divider{
+      margin:18px 0;
+      padding-top:18px;
+      border-top:1px solid var(--line);
+    }
     .compact-filter-actions{display:flex; gap:8px; align-items:center; justify-content:flex-end; flex-wrap:wrap}
     .quick-actions{display:flex; justify-content:space-between; gap:12px; align-items:center; flex-wrap:wrap}
     .quick-actions .small-actions{display:flex; gap:8px; flex-wrap:wrap}
     .year-nav{display:flex; gap:8px; flex-wrap:wrap; align-items:center}
+    .trip-shell{display:grid; grid-template-columns:1fr; gap:18px; align-items:start}
+    .trip-shell.trip-shell-list{
+      grid-template-columns:minmax(340px,.95fr) minmax(420px,1.35fr);
+      align-items:start;
+    }
+    .trip-shell.trip-shell-calendar{grid-template-columns:1fr}
+    .trip-list{display:grid; gap:14px}
+    .trip-list-panel,.trip-detail-panel{position:relative; overflow:hidden}
+    .trip-list-panel:before,.trip-detail-panel:before{
+      content:""; position:absolute; inset:0 0 auto 0; height:1px;
+      background:linear-gradient(90deg,rgba(37,99,235,.18),rgba(96,165,250,.03));
+    }
+    .trip-card{
+      border:1px solid #d7e5f5; border-radius:20px; padding:18px;
+      background:
+        radial-gradient(circle at top right, rgba(96,165,250,.14), transparent 32%),
+        linear-gradient(180deg,#ffffff,#f8fbff);
+      display:grid; gap:12px;
+      transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease
+    }
+    .trip-card:hover{transform:translateY(-2px); box-shadow:0 16px 34px rgba(15,23,42,.08)}
+    .trip-card.active{border-color:#60a5fa; box-shadow:0 16px 36px rgba(37,99,235,.14)}
+    .trip-card-head,.trip-item-head{display:flex; justify-content:space-between; gap:10px; align-items:flex-start; flex-wrap:wrap}
+    .trip-card h4,.trip-day-block h4{margin:0}
+    .trip-card-title{display:grid; gap:4px}
+    .trip-card-title .meta strong{color:var(--text)}
+    .trip-meta-line{display:flex; gap:8px; flex-wrap:wrap}
+    .trip-card-total{display:flex; justify-content:space-between; gap:12px; align-items:end; padding:14px 16px; border-radius:16px; background:#ffffff; border:1px solid #dbeafe}
+    .trip-card-total strong{font-size:22px; color:#1d4ed8}
+    .trip-card-footer{display:flex; justify-content:space-between; gap:10px; align-items:center; flex-wrap:wrap}
+    .trip-inline-filters{
+      display:grid;
+      grid-template-columns:minmax(200px,1.2fr) repeat(4,minmax(0,.82fr)) auto;
+      gap:10px;
+      align-items:end;
+      padding:14px;
+      border-radius:18px;
+      background:linear-gradient(180deg,#f8fbff,#ffffff);
+      border:1px solid #dbeafe;
+    }
+    .trip-detail{
+      display:grid;
+      gap:18px;
+      padding:4px;
+    }
+    .trip-detail-hero{
+      padding:20px;
+      border-radius:22px;
+      background:
+        radial-gradient(circle at top right, rgba(96,165,250,.18), transparent 35%),
+        linear-gradient(135deg,#eff6ff,#ffffff 70%);
+      border:1px solid #dbeafe;
+      display:grid;
+      gap:16px;
+    }
+    .trip-detail-top{display:flex; justify-content:space-between; gap:12px; align-items:flex-start; flex-wrap:wrap}
+    .trip-stat-grid{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px}
+    .trip-day-stack,.trip-category-stack,.trip-item-stack,.trip-section-stack{display:grid; gap:14px}
+    .trip-day-block,.trip-category-card,.trip-item-card{
+      border:1px solid #dbe3ef; border-radius:18px; padding:16px; background:#fff
+    }
+    .trip-day-block{background:linear-gradient(180deg,#ffffff,#fbfdff)}
+    .trip-section-title{display:flex; justify-content:space-between; gap:10px; align-items:center; flex-wrap:wrap}
+    .nav-highlight{
+      animation:navPulse 1.6s ease;
+      box-shadow:0 0 0 4px rgba(37,99,235,.18), var(--shadow);
+      border-color:#93c5fd !important;
+    }
+    @keyframes navPulse{
+      0%{transform:translateY(0); box-shadow:0 0 0 0 rgba(37,99,235,0), var(--shadow)}
+      20%{transform:translateY(-2px); box-shadow:0 0 0 6px rgba(37,99,235,.2), var(--shadow)}
+      100%{transform:translateY(0); box-shadow:0 0 0 0 rgba(37,99,235,0), var(--shadow)}
+    }
+    .trip-category-card{display:flex; justify-content:space-between; gap:10px; align-items:center}
+    .trip-item-card .meta{margin-top:4px}
+    .trip-chip-row{display:flex; gap:8px; flex-wrap:wrap}
+    .trip-highlight{
+      padding:12px 14px; border-radius:16px; background:#fff; border:1px solid #dbeafe;
+      display:grid; gap:4px
+    }
+    .trip-highlight strong{font-size:20px}
+    .trip-empty-state{min-height:240px; display:grid; place-items:center}
+    .trip-list-sticky{position:static; top:auto}
+    .trip-shell.trip-shell-list .trip-list-sticky,
+    .trip-shell.trip-shell-list .trip-detail-panel{
+      position:sticky;
+      top:18px;
+    }
+    .trip-shell.trip-shell-list .trip-list-panel,
+    .trip-shell.trip-shell-list .trip-detail-panel{
+      height:calc(100vh - 36px);
+      min-height:0;
+      overflow:auto;
+      scrollbar-gutter:stable;
+      overscroll-behavior:contain;
+    }
+    .trip-shell.trip-shell-list .trip-list-panel::-webkit-scrollbar,
+    .trip-shell.trip-shell-list .trip-detail-panel::-webkit-scrollbar{
+      width:10px;
+    }
+    .trip-shell.trip-shell-list .trip-list-panel::-webkit-scrollbar-thumb,
+    .trip-shell.trip-shell-list .trip-detail-panel::-webkit-scrollbar-thumb{
+      background:#c7d7f2;
+      border-radius:999px;
+      border:2px solid #fff;
+    }
+    .trip-detail-grid{display:grid; grid-template-columns:1fr; gap:16px}
+    .trip-note-box{padding:14px 16px; border-radius:16px; background:#fff; border:1px solid #dbeafe; color:#1e3a8a}
+    .trip-filter-summary{display:flex; gap:8px; flex-wrap:wrap}
+    .trip-view-switch{display:flex; gap:8px; justify-content:flex-end; margin-bottom:12px}
+    .trip-day-header{
+      display:flex; justify-content:space-between; gap:12px; align-items:center; flex-wrap:wrap;
+      padding-bottom:8px; border-bottom:1px dashed #dbe3ef; margin-bottom:10px
+    }
+    .trip-day-summary{display:flex; gap:8px; flex-wrap:wrap; align-items:center}
+    .trip-day-items{display:grid; gap:8px}
+    .trip-day-items.hidden{display:none}
+    .trip-day-toggle{margin-left:auto}
+    .trip-item-card{
+      display:grid;
+      grid-template-columns:minmax(0,1fr) auto auto;
+      gap:12px;
+      align-items:center;
+      padding:10px 12px;
+      border-radius:14px;
+    }
+    .trip-item-main{min-width:0}
+    .trip-item-title-row{display:flex; justify-content:space-between; gap:10px; align-items:flex-start}
+    .trip-item-title-row strong:first-child{word-break:break-word}
+    .trip-item-amount{white-space:nowrap}
+    .trip-item-actions{display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end}
+    .trip-item-meta{display:flex; gap:8px; flex-wrap:wrap}
+    .trip-empty-state{min-height:240px; display:grid; place-items:center}
+    .trip-calendar-summary{display:flex; justify-content:space-between; gap:8px; align-items:center; flex-wrap:wrap}
+    .trip-calendar-item{
+      display:grid; gap:6px;
+      border-top:1px dashed #dbe7ff; padding-top:7px;
+      background:#ffffffcc; border-radius:10px; padding:8px 10px
+    }
+    .trip-calendar-item:first-child{border-top:none}
+    .trip-calendar-item button{width:100%; text-align:left}
     .year-grid.year-grid-enhanced{grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px}
     .month-box.enhanced{padding:18px; gap:12px; background:linear-gradient(180deg,#ffffff,#fbfdff)}
     .month-balance-hero{display:flex; justify-content:space-between; gap:12px; align-items:end; padding:14px 16px; border-radius:16px; background:#f8fbff; border:1px solid #dbe7ff}
@@ -296,6 +723,7 @@
       stroke-linejoin:round;
     }
     .card-collapsed .card-toggle .chev{transform:rotate(-90deg)}
+    .card-toggle.is-collapsed .chev{transform:rotate(-90deg)}
     .collapsible-body{display:grid; gap:14px}
     .card-collapsed .collapsible-body{display:none}
     .section-header.has-toggle{align-items:center}
@@ -362,15 +790,71 @@
       border-color:#2563eb !important;
       color:#fff !important;
     }
+    #backFromMonthlyBtn,#backFromTripsBtn,#backFromInstallmentsBtn{display:none !important}
+    .floating-back-btn{
+      position:fixed;
+      right:24px;
+      bottom:24px;
+      width:62px;
+      height:62px;
+      border-radius:999px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:linear-gradient(135deg,#1d4ed8,#2563eb 60%,#60a5fa);
+      color:#fff;
+      box-shadow:0 18px 40px rgba(37,99,235,.28), 0 6px 14px rgba(15,23,42,.16);
+      border:1px solid rgba(255,255,255,.24);
+      z-index:1200;
+      font-size:26px;
+      font-weight:800;
+    }
+    .floating-back-btn:hover{
+      transform:translateY(-2px) scale(1.02);
+      box-shadow:0 22px 46px rgba(37,99,235,.34), 0 8px 18px rgba(15,23,42,.18);
+    }
+    .floating-back-btn .floating-back-label{
+      position:absolute;
+      right:74px;
+      white-space:nowrap;
+      background:rgba(15,23,42,.92);
+      color:#fff;
+      border-radius:999px;
+      padding:8px 12px;
+      font-size:13px;
+      font-weight:700;
+      opacity:0;
+      transform:translateX(8px);
+      pointer-events:none;
+      transition:opacity .18s ease, transform .18s ease;
+    }
+    .floating-back-btn:hover .floating-back-label,
+    .floating-back-btn:focus-visible .floating-back-label{
+      opacity:1;
+      transform:translateX(0);
+    }
+    .floating-back-btn.hidden{display:none !important}
     @media (max-width:1180px){
       .app{padding:12px}
       .layout{grid-template-columns:1fr}
       .sidebar{position:static}
       .toolbar-inline,.year-grid,.form-grid,.welcome-actions,.year-grid.year-grid-enhanced{grid-template-columns:1fr 1fr}
-      .compact-filter-bar,.compact-filter-row{grid-template-columns:1fr 1fr}
+      .compact-filter-bar,.compact-filter-row,.trip-inline-filters,.trip-stat-grid{grid-template-columns:1fr 1fr}
+      .quick-add-bar{grid-template-columns:1fr}
       .installment-filters,.calendar-grid{grid-template-columns:1fr 1fr}
+      .trip-shell,.trip-shell.trip-shell-list,.trip-shell.trip-shell-calendar{grid-template-columns:1fr}
+      .trip-shell.trip-shell-list .trip-list-panel,
+      .trip-shell.trip-shell-list .trip-detail-panel{
+        height:auto;
+        max-height:none;
+        position:static;
+        top:auto;
+        overflow:visible;
+        scrollbar-gutter:auto;
+      }
+      .trip-shell.trip-shell-list .trip-list-sticky{position:static; top:auto}
       .form-grid .span-2,.form-grid .full{grid-column:auto}
-      .sidebar .menu{grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px}
+      .sidebar .menu{grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px}
       .sidebar .menu button{justify-content:center; text-align:center}
     }
     @media (max-width:900px){
@@ -379,7 +863,6 @@
       .header-title p{font-size:13px}
       .main-header .small-actions button{width:100%}
       .header-right{justify-items:stretch; width:100%}
-      .sidebar .menu{grid-template-columns:1fr}
       .file-status{width:100%; text-align:center}
       .table-card,.month-group{overflow-x:auto}
       table{min-width:680px}
@@ -387,9 +870,55 @@
       .month-group-stats .pill{white-space:nowrap}
     }
     @media (max-width:760px){
-      .toolbar-inline,.year-grid,.form-grid,.welcome-actions,.year-grid.year-grid-enhanced,.compact-filter-bar,.compact-filter-row,.installment-filters,.calendar-grid,.installment-kv{grid-template-columns:1fr}
-      .main-header{flex-direction:column}
+      .floating-back-btn{
+        right:16px;
+        bottom:16px;
+        width:58px;
+        height:58px;
+      }
+      .floating-back-btn .floating-back-label{display:none}
+      .toolbar-inline,.year-grid,.form-grid,.welcome-actions,.year-grid.year-grid-enhanced,.compact-filter-bar,.compact-filter-row,.installment-filters,.calendar-grid,.installment-kv,.trip-inline-filters,.trip-stat-grid,.trip-detail-grid,.quick-add-bar{grid-template-columns:1fr}
+      .trip-card-footer,.trip-detail-top,.trip-section-title{align-items:flex-start}
+      .trip-item-card{grid-template-columns:1fr}
+      .trip-item-actions{justify-content:flex-start}
+      .main-header{
+        gap:10px;
+        padding:12px 14px;
+        flex-direction:column;
+      }
+      .header-bar{
+        align-items:center;
+        width:100%;
+      }
       .header-right{justify-items:start}
+      .header-title h1{font-size:19px}
+      .header-title p{font-size:12px}
+      .mobile-menu-toggle{display:inline-flex}
+      .menu-title{display:none}
+      .sidebar{
+        max-height:0;
+        opacity:0;
+        overflow:hidden;
+        pointer-events:none;
+        transform:translateY(-8px);
+        margin-top:-10px;
+        padding:0 14px;
+        border-color:transparent;
+        box-shadow:none;
+        transition:max-height .25s ease, opacity .2s ease, transform .25s ease, margin-top .25s ease, padding .25s ease, border-color .2s ease, box-shadow .2s ease;
+      }
+      .sidebar.is-open{
+        max-height:320px;
+        opacity:1;
+        pointer-events:auto;
+        transform:translateY(0);
+        margin-top:0;
+        padding:14px;
+        border-color:rgba(219,227,239,.95);
+        box-shadow:var(--shadow);
+      }
+      .sidebar .menu{grid-template-columns:1fr}
+      .sidebar .menu button{text-align:left; justify-content:flex-start}
       .month-group-head,.section-header{align-items:flex-start}
       .app{padding:10px}
       .panel,.form-card,.table-card{padding:14px}
@@ -441,8 +970,8 @@
           <h3>📂 โหลด JSON เดิม</h3>
           <p>ถ้าเบราว์เซอร์รองรับ File System Access API ระบบจะจำไฟล์ไว้ และกด Save เพื่อเขียนทับไฟล์เดิมได้เลย</p>
           <div class="small-actions">
-            <button id="openJsonWithHandleBtn" class="btn-primary">📁 เปิดไฟล์แบบ Save ทับได้</button>
-            <button id="openJsonSimpleBtn" class="btn-light">โหลดแบบปกติ</button>
+            <button id="openJsonWithHandleBtn" class="btn-primary">📁 Import</button>
+            <button id="openJsonSimpleBtn" class="btn-light">Choose File</button>
           </div>
           <input type="file" id="startupJsonFile" accept="application/json" class="hidden">
           <div class="hint">ถ้าเบราว์เซอร์ไม่รองรับ ระบบจะโหลดแบบปกติ และการ Save จะเป็นการดาวน์โหลดไฟล์ใหม่แทน</div>
@@ -458,25 +987,30 @@
 
   <div id="appScreen" class="app hidden">
     <div class="main-header card">
-      <div class="header-title">
-        <h1>แดชบอร์ดการเงินส่วนตัว</h1>
-        <p>รายรับ · รายจ่าย · เมนูรายเดือน · ภาพรวมทั้งปี · ยอดผ่อน</p>
+      <div class="header-bar">
+        <div class="header-title">
+          <h1>แดชบอร์ดการเงินส่วนตัว</h1>
+        </div>
+        <button id="mobileMenuToggle" class="mobile-menu-toggle" type="button" aria-label="เปิดเมนูหลัก" aria-expanded="false" aria-controls="mainMenuPanel">
+          <span class="hamburger-icon" aria-hidden="true"></span>
+        </button>
       </div>
       <div class="header-right">
         <div class="small-actions">
-          <button id="saveJsonBtn" class="btn-ghost">💾 Save JSON</button>
-          <button id="loadAnotherBtn" class="btn-ghost">📂 Load JSON</button>
+          <button id="saveJsonBtn" class="btn-ghost">💾 Export</button>
+          <button id="loadAnotherBtn" class="btn-ghost">📂 Import</button>
+          <div id="fileStatus" class="file-status">ยังไม่ได้ผูกไฟล์สำหรับ Save ทับ</div>
         </div>
-        <div id="fileStatus" class="file-status">ยังไม่ได้ผูกไฟล์สำหรับ Save ทับ</div>
       </div>
     </div>
 
     <div class="layout">
-      <aside class="sidebar card">
+      <aside id="mainMenuPanel" class="sidebar card" aria-hidden="false">
         <div class="menu-title">เมนูหลัก</div>
         <div class="menu">
-          <button class="menu-btn" data-view="monthly">📅 รายเดือน</button>
-          <button class="menu-btn active" data-view="yearly">📆 ภาพรวมทั้งปี</button>
+          <button class="menu-btn" data-view="monthly">🗓️ รายเดือน</button>
+          <button class="menu-btn active" data-view="yearly">🌤️ ภาพรวมทั้งปี</button>
+          <button class="menu-btn" data-view="trips">✈️ ทริป</button>
           <button class="menu-btn" data-view="installments">💳 ยอดผ่อน</button>
         </div>
       </aside>
@@ -489,6 +1023,9 @@
               <div>
                 <h2>📅 เมนูรายเดือน</h2>
                 <div class="meta">จัดหน้าใหม่ให้แยกเป็นส่วน ๆ จากบนลงล่าง ใช้งานง่ายกว่าเดิม</div>
+              </div>
+              <div class="small-actions">
+                <button id="backFromMonthlyBtn" class="btn-light hidden"> ย้อนกลับ</button>
               </div>
             </div>
             <div class="stack-grid">
@@ -516,7 +1053,7 @@
                   </select>
                 </div>
                 <div class="compact-filter-actions">
-                  <button id="openEntryModalBtn" class="btn-primary">＋ เพิ่มรายการ</button>
+                  <button id="openEntryModalBtn" class="btn-primary">✨ เพิ่มรายการ</button>
                 </div>
               </div>
 
@@ -556,11 +1093,11 @@
               </div>
             </div>
             <div class="summary-grid summary-grid-5">
-              <div class="summary-card income"><div class="name">รายรับรวม</div><div class="value" id="monthlyIncomeTotal">฿0.00</div></div>
-              <div class="summary-card expense"><div class="name">รายจ่ายรวม</div><div class="value" id="monthlyExpenseTotal">฿0.00</div></div>
-              <div class="summary-card balance"><div class="name">คงเหลือสุทธิ</div><div class="value" id="monthlyBalanceTotal">฿0.00</div></div>
-              <div class="summary-card violet"><div class="name">จำนวนรายการ</div><div class="value" id="monthlyEntryCount">0</div></div>
-              <div class="summary-card due"><div class="name">ยอดผ่อนรวม</div><div class="value" id="monthlyInstallmentTotal">฿0.00</div></div>
+              <div class="summary-card income" data-icon="💵"><div class="name">รายรับรวม</div><div class="value" id="monthlyIncomeTotal">฿0.00</div></div>
+              <div class="summary-card expense" data-icon="💸"><div class="name">รายจ่ายรวม</div><div class="value" id="monthlyExpenseTotal">฿0.00</div></div>
+              <div class="summary-card balance" data-icon="🪙"><div class="name">คงเหลือสุทธิ</div><div class="value" id="monthlyBalanceTotal">฿0.00</div></div>
+              <div class="summary-card violet" data-icon="🧾"><div class="name">จำนวนรายการ</div><div class="value" id="monthlyEntryCount">0</div></div>
+              <div class="summary-card due" data-icon="📌"><div class="name">ยอด readonly รวม</div><div class="value" id="monthlyInstallmentTotal">฿0.00</div></div>
             </div>
             <div class="toolbar-inline" style="margin-top:14px">
               <div class="notice-box"><strong id="monthlyMonthCount">0 เดือน</strong><br><span class="meta">จำนวนเดือนที่แสดง</span></div>
@@ -577,9 +1114,9 @@
               </div>
             </div>
             <div class="quick-actions">
-              <div class="notice-box">กด <strong>เพิ่มรายการ</strong> เพื่อสร้างรายรับหรือรายจ่ายใหม่ และกด <strong>แก้ไข</strong> จากรายการด้านล่างเพื่อเปิด modal เดิมกลับมา</div>
+            <div class="notice-box">กด <strong>เพิ่มรายการ</strong> เพื่อสร้างรายรับหรือรายจ่ายใหม่ และกด <strong>แก้ไข</strong> หรือ <strong>คัดลอก</strong> จากรายการด้านล่างเพื่อเปิด modal เดิมกลับมาอย่างรวดเร็ว</div>
               <div class="small-actions">
-                <button id="openEntryModalBtnSecondary" class="btn-primary">＋ เพิ่มรายการใหม่</button>
+                <button id="openEntryModalBtnSecondary" class="btn-primary">🪄 เพิ่มรายการใหม่</button>
               </div>
             </div>
           </div>
@@ -591,7 +1128,7 @@
                 <div id="entryCountLabel" class="meta"></div>
               </div>
             </div>
-            <div class="notice-box" style="margin-bottom:14px">รายการที่มีป้าย <strong>ยอดผ่อน</strong> เป็นรายการอ่านอย่างเดียว ต้องไปแก้ไขในหน้ายอดผ่อน</div>
+            <div class="notice-box" style="margin-bottom:14px">รายการที่มีป้าย <strong>ยอดผ่อน</strong> หรือ <strong>ทริป</strong> เป็นรายการอ่านอย่างเดียว ต้องกลับไปแก้ไขที่หน้าต้นทาง</div>
             <div id="entriesContainer"></div>
           </div>
         </section>
@@ -605,7 +1142,7 @@
                 <div class="meta">รวม Dashboard เข้ามาไว้หน้าเดียว พร้อมดูรายเดือนและทั้งปีได้ในหน้าเดียว</div>
               </div>
             </div>
-            <div class="toolbar-inline">
+            <div class="compact-filter-row">
               <div>
                 <label for="yearlyYearPicker">เลือกปี</label>
                 <select id="yearlyYearPicker"></select>
@@ -629,11 +1166,11 @@
                 </div>
               </div>
               <div class="summary-grid summary-grid-5">
-                <div class="summary-card income"><div class="name">รายรับทั้งปี</div><div class="value" id="yearlyIncomeTotal">฿0.00</div></div>
-                <div class="summary-card expense"><div class="name">รายจ่ายทั้งปี</div><div class="value" id="yearlyExpenseTotal">฿0.00</div></div>
-                <div class="summary-card balance"><div class="name">คงเหลือทั้งปี</div><div class="value" id="yearlyBalanceTotal">฿0.00</div></div>
-                <div class="summary-card violet"><div class="name">จำนวนรายการ</div><div class="value" id="yearlyEntryCount">0</div></div>
-                <div class="summary-card due"><div class="name">ยอดผ่อนทั้งปี</div><div class="value" id="yearlyInstallmentTotal">฿0.00</div></div>
+              <div class="summary-card income" data-icon="🌱"><div class="name">รายรับทั้งปี</div><div class="value" id="yearlyIncomeTotal">฿0.00</div></div>
+              <div class="summary-card expense" data-icon="🔥"><div class="name">รายจ่ายทั้งปี</div><div class="value" id="yearlyExpenseTotal">฿0.00</div></div>
+              <div class="summary-card balance" data-icon="🏦"><div class="name">คงเหลือทั้งปี</div><div class="value" id="yearlyBalanceTotal">฿0.00</div></div>
+              <div class="summary-card violet" data-icon="📚"><div class="name">จำนวนรายการ</div><div class="value" id="yearlyEntryCount">0</div></div>
+              <div class="summary-card due" data-icon="🧩"><div class="name">ยอด readonly ทั้งปี</div><div class="value" id="yearlyInstallmentTotal">฿0.00</div></div>
               </div>
             </div>
 
@@ -650,6 +1187,113 @@
         </section>
 
 
+        <section id="view-trips" class="view hidden">
+          <div class="panel card">
+            <div class="section-header">
+              <div>
+                <h2>🧳 จัดการทริป</h2>
+                <div class="meta">สร้างทริป เก็บค่าใช้จ่ายแยกตามวันและหมวดหมู่ พร้อมสรุปรวมและเชื่อมเข้าหน้ารายเดือนอัตโนมัติ</div>
+              </div>
+              <div class="small-actions">
+                <button id="backFromTripsBtn" class="btn-light hidden">← ย้อนกลับ</button>
+                <button id="openTripModalBtn" class="btn-primary">＋ สร้างทริป</button>
+                <button id="openTripItemModalBtn" class="btn-light">＋ เพิ่มรายการในทริป</button>
+              </div>
+            </div>
+            <div class="trip-inline-filters">
+              <div>
+                <label for="tripSearchKeyword">ค้นหา</label>
+                <input type="text" id="tripSearchKeyword" placeholder="ชื่อทริป รายการ หมายเหตุ หรือประเทศ">
+              </div>
+              <div>
+                <label for="tripYearFilter">ปี</label>
+                <select id="tripYearFilter"><option value="">ทุกปี</option></select>
+              </div>
+              <div>
+                <label for="tripMonthFilter">เดือน</label>
+                <select id="tripMonthFilter">
+                  <option value="">ทุกเดือน</option>
+                  <option value="01">มกราคม</option>
+                  <option value="02">กุมภาพันธ์</option>
+                  <option value="03">มีนาคม</option>
+                  <option value="04">เมษายน</option>
+                  <option value="05">พฤษภาคม</option>
+                  <option value="06">มิถุนายน</option>
+                  <option value="07">กรกฎาคม</option>
+                  <option value="08">สิงหาคม</option>
+                  <option value="09">กันยายน</option>
+                  <option value="10">ตุลาคม</option>
+                  <option value="11">พฤศจิกายน</option>
+                  <option value="12">ธันวาคม</option>
+                </select>
+              </div>
+              <div>
+                <label for="tripCategoryFilter">หมวดหมู่</label>
+                <select id="tripCategoryFilter"><option value="">ทุกหมวดหมู่</option></select>
+              </div>
+              <div>
+                <label for="tripStatusFilter">สถานะทริป</label>
+                <select id="tripStatusFilter">
+                  <option value="">ทั้งหมด</option>
+                  <option value="upcoming">ยังไม่เริ่ม</option>
+                  <option value="ongoing">กำลังเดินทาง</option>
+                  <option value="completed">จบทริปแล้ว</option>
+                </select>
+              </div>
+              <div class="compact-filter-actions">
+                <button id="resetTripFiltersBtn" class="btn-light">↺ ล้างตัวกรอง</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel card">
+            <div class="section-header">
+              <div>
+                <h3>สรุปทริปที่เลือก</h3>
+                <div id="tripSummaryLabel" class="meta">ยังไม่ได้เลือกทริป</div>
+              </div>
+            </div>
+            <div class="summary-grid summary-grid-5">
+              <div class="summary-card violet" data-icon="🧳"><div class="name">จำนวนทริป</div><div class="value" id="tripTotalCount">0</div></div>
+              <div class="summary-card expense" data-icon="🍜"><div class="name">ค่าใช้จ่ายรวม</div><div class="value" id="tripExpenseTotal">฿0.00</div></div>
+              <div class="summary-card balance" data-icon="📍"><div class="name">จำนวนวัน</div><div class="value" id="tripDayCount">0</div></div>
+              <div class="summary-card due" data-icon="🗂️"><div class="name">จำนวนรายการ</div><div class="value" id="tripItemCount">0</div></div>
+              <div class="summary-card income" data-icon="🏷️"><div class="name">หมวดหลัก</div><div class="value" id="tripTopCategory">-</div></div>
+            </div>
+          </div>
+
+          <div class="trip-shell">
+            <div class="panel card trip-list-panel trip-list-sticky">
+              <div class="section-header">
+                <div>
+                  <h3>รายการทริป</h3>
+                  <div id="tripFilterResultLabel" class="meta">กำลังแสดงทั้งหมด</div>
+                </div>
+              </div>
+              <div class="trip-view-switch">
+                <button id="tripListViewBtn" class="btn-primary btn-sm">มุมมองรายการ</button>
+                <button id="tripCalendarViewBtn" class="btn-light btn-sm">มุมมองปฏิทิน</button>
+              </div>
+              <div id="tripFilterSummary" class="trip-filter-summary" style="margin-bottom:12px"></div>
+              <div id="tripListContainer" class="trip-list"></div>
+              <div id="tripCalendarContainer" class="calendar-grid hidden"></div>
+            </div>
+
+            <div id="tripDetailPanel" class="panel card trip-detail-panel">
+              <div class="section-header">
+                <div>
+                  <h3>รายละเอียดทริป</h3>
+                  <div class="meta">รายการจากส่วนนี้จะไปรวมกับหน้ารายเดือนและรายปีแบบอ่านอย่างเดียว</div>
+                </div>
+              </div>
+              <div id="tripDetailContainer" class="trip-empty-state">
+                <div class="empty">ยังไม่มีทริป หรือยังไม่ได้เลือกทริป</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+
         <section id="view-installments" class="view hidden">
           <div class="panel card">
             <div class="section-header">
@@ -658,6 +1302,7 @@
                 <div class="meta">ใช้ modal สำหรับเพิ่มหรือแก้ไขรายการผ่อน คล้ายเมนูรายเดือน</div>
               </div>
               <div class="small-actions">
+                <button id="backFromInstallmentsBtn" class="btn-light hidden">← ย้อนกลับ</button>
                 <button id="openLoanModalBtn" class="btn-primary">＋ เพิ่มยอดผ่อน</button>
               </div>
             </div>
@@ -672,10 +1317,10 @@
               </div>
             </div>
             <div class="summary-grid">
-              <div class="summary-card due"><div class="name">รายการผ่อนทั้งหมด</div><div class="value" id="loanTotalCount">0</div></div>
-              <div class="summary-card expense"><div class="name">ยอดคงเหลือรวม</div><div class="value" id="loanRemainingAmount">฿0.00</div></div>
-              <div class="summary-card balance"><div class="name">เดือนที่ยังเหลือรวม</div><div class="value" id="loanRemainingMonths">0</div></div>
-              <div class="summary-card violet"><div class="name">ยอดจ่ายต่อเดือนรวม</div><div class="value" id="loanMonthlyTotal">฿0.00</div></div>
+              <div class="summary-card due" data-icon="💳"><div class="name">รายการผ่อนทั้งหมด</div><div class="value" id="loanTotalCount">0</div></div>
+              <div class="summary-card expense" data-icon="📉"><div class="name">ยอดคงเหลือรวม</div><div class="value" id="loanRemainingAmount">฿0.00</div></div>
+              <div class="summary-card balance" data-icon="🗓️"><div class="name">เดือนที่ยังเหลือรวม</div><div class="value" id="loanRemainingMonths">0</div></div>
+              <div class="summary-card violet" data-icon="💰"><div class="name">ยอดจ่ายต่อเดือนรวม</div><div class="value" id="loanMonthlyTotal">฿0.00</div></div>
             </div>
           </div>
 
@@ -720,6 +1365,10 @@
           </div>
         </section>
       </main>
+      <button id="floatingBackBtn" class="floating-back-btn hidden" type="button" aria-label="ย้อนกลับ">
+        <span aria-hidden="true">⬅</span>
+        <span class="floating-back-label">ย้อนกลับ</span>
+      </button>
     </div>
   </div>
 
@@ -736,6 +1385,21 @@
         </div>
       </div>
       <div class="modal-body">
+        <div class="quick-add-bar">
+          <div class="quick-add-input-wrap">
+            <div>
+              <label for="quickAddInput">⚡ Quick Add</label>
+              <input type="text" id="quickAddInput" placeholder="+ ข้าว 80, + taxi 120, + เงินเดือน 30000" autocomplete="off" inputmode="decimal">
+              <div class="meta">พิมพ์ชื่อรายการกับจำนวนเงินในช่องเดียว แล้วกด Enter เพื่อบันทึกทันที รายการที่มีคำว่า เงินเดือน, โบนัส, income จะถูกมองเป็นรายรับอัตโนมัติ</div>
+            </div>
+            <div id="quickAddStatus" class="quick-add-status" aria-live="polite"></div>
+          </div>
+          <button id="quickAddSubmitBtn" class="btn-primary quick-add-submit">บันทึกเร็ว</button>
+        </div>
+
+        <div class="modal-section-divider">
+          <div class="meta" style="margin-bottom:12px">หรือกรอกแบบละเอียดด้านล่าง ถ้าต้องการระบุหมวดหมู่ หมายเหตุ สถานะจ่ายแล้ว หรือสร้างรายการซ้ำหลายเดือน</div>
+        </div>
         <div class="form-grid">
           <div>
             <label for="entryType">ประเภท</label>
@@ -763,6 +1427,12 @@
           <div class="span-2">
             <label for="entryNote">หมายเหตุ</label>
             <textarea id="entryNote" placeholder="รายละเอียดเพิ่มเติม..."></textarea>
+          </div>
+          <div class="full" id="entryPaidWrapper">
+            <div class="checkbox-inline">
+              <input type="checkbox" id="entryIsPaid">
+              <label for="entryIsPaid" style="margin:0; text-transform:none; letter-spacing:0; font-size:14px; color:var(--text); font-weight:700;">จ่ายแล้ว</label>
+            </div>
           </div>
           <div class="full checkbox-inline">
             <input type="checkbox" id="repeatEnabled">
@@ -862,6 +1532,107 @@
     </div>
   </div>
 
+  <div id="tripModal" class="modal-backdrop hidden" aria-hidden="true">
+    <div class="modal-dialog card" role="dialog" aria-modal="true" aria-labelledby="tripFormTitle">
+      <div class="modal-header">
+        <div>
+          <h3 id="tripFormTitle" style="margin:0">➕ สร้างทริป</h3>
+          <div class="meta">กำหนดชื่อทริป ช่วงวันที่ และรายละเอียดหลักของทริป</div>
+        </div>
+        <div class="small-actions">
+          <div id="tripEditBadge" class="badge hidden">✏️ กำลังแก้ไข</div>
+          <button id="closeTripModalBtn" class="btn-light modal-close">✕ ปิด</button>
+        </div>
+      </div>
+      <div class="modal-body">
+        <div class="form-grid">
+          <div class="span-2">
+            <label for="tripName">ชื่อทริป</label>
+            <input type="text" id="tripName" placeholder="เช่น เที่ยวประเทศจีน">
+          </div>
+          <div>
+            <label for="tripDestination">ปลายทาง</label>
+            <input type="text" id="tripDestination" placeholder="เช่น จีน / เซี่ยงไฮ้">
+          </div>
+          <div>
+            <label for="tripBudget">งบประมาณ (ถ้ามี)</label>
+            <input type="number" id="tripBudget" min="0" step="0.01" placeholder="0.00">
+          </div>
+          <div>
+            <label for="tripStartDate">วันเริ่ม</label>
+            <input type="date" id="tripStartDate">
+          </div>
+          <div>
+            <label for="tripEndDate">วันจบ</label>
+            <input type="date" id="tripEndDate">
+          </div>
+          <div class="span-2">
+            <label for="tripNote">หมายเหตุ</label>
+            <textarea id="tripNote" placeholder="เช่น ทริปครอบครัว / ทริปงาน / ใช้บันทึกเงื่อนไขการเดินทาง"></textarea>
+          </div>
+          <div class="full small-actions">
+            <button id="saveTripBtn" class="btn-primary">💾 บันทึกทริป</button>
+            <button id="clearTripBtn" class="btn-light">✕ ล้างฟอร์ม</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="tripItemModal" class="modal-backdrop hidden" aria-hidden="true">
+    <div class="modal-dialog card" role="dialog" aria-modal="true" aria-labelledby="tripItemFormTitle">
+      <div class="modal-header">
+        <div>
+          <h3 id="tripItemFormTitle" style="margin:0">➕ เพิ่มรายการในทริป</h3>
+          <div class="meta">รายการในทริปจะถูกนำไปรวมในหน้ารายเดือน/รายปี แต่ต้องกลับมาแก้ไขที่หน้านี้เท่านั้น</div>
+        </div>
+        <div class="small-actions">
+          <div id="tripItemEditBadge" class="badge hidden">✏️ กำลังแก้ไข</div>
+          <button id="closeTripItemModalBtn" class="btn-light modal-close">✕ ปิด</button>
+        </div>
+      </div>
+      <div class="modal-body">
+        <div class="form-grid">
+          <div class="span-2">
+            <label for="tripItemTripId">ทริป</label>
+            <select id="tripItemTripId"><option value="">เลือกทริป</option></select>
+          </div>
+          <div>
+            <label for="tripItemDate">วันที่</label>
+            <input type="date" id="tripItemDate">
+          </div>
+          <div>
+            <label for="tripItemCategory">หมวดหมู่</label>
+            <select id="tripItemCategory"></select>
+          </div>
+          <div class="span-2">
+            <label for="tripItemTitle">รายการ</label>
+            <input type="text" id="tripItemTitle" placeholder="เช่น โรงแรมคืนแรก / ค่าอาหาร / รถไฟสนามบิน">
+          </div>
+          <div>
+            <label for="tripItemAmount">จำนวนเงิน</label>
+            <input type="number" id="tripItemAmount" min="0" step="0.01" placeholder="0.00">
+          </div>
+          <div class="span-2">
+            <label for="tripItemInstallmentId">ลิงก์กับยอดผ่อน</label>
+            <select id="tripItemInstallmentId"><option value="">ไม่ลิงก์</option></select>
+          </div>
+          <div class="span-2 notice-box">
+            ถ้าลิงก์กับยอดผ่อน รายการนี้จะยังอยู่ในหน้าทริปเพื่อสรุปรวมของทริป แต่หน้ารายเดือนจะนับเฉพาะยอดผ่อนจริง เพื่อไม่ให้รายจ่ายซ้ำกัน
+          </div>
+          <div class="span-2">
+            <label for="tripItemNote">หมายเหตุ</label>
+            <textarea id="tripItemNote" placeholder="รายละเอียดเพิ่มเติมของรายการนี้"></textarea>
+          </div>
+          <div class="full small-actions">
+            <button id="saveTripItemBtn" class="btn-primary">💾 บันทึกรายการ</button>
+            <button id="clearTripItemBtn" class="btn-light">✕ ล้างฟอร์ม</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/th.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/index.js"></script>
@@ -872,20 +1643,64 @@
     const DB_STORE_NAME = 'app_state';
     const DB_RECORD_KEY = 'primary';
     const CATEGORY_OPTIONS = [
-      'เงินเดือน','โบนัส','รายได้เสริม','ธุรกิจ','ดอกเบี้ย/ปันผล',
-      'รถยนต์','บ้าน/เช่า','ไฟฟ้า','น้ำประปา','อินเทอร์เน็ต','โทรศัพท์',
-      'ของกิน','ค่าน้ำมัน','เดินทาง','ช้อปปิ้ง','สุขภาพ','ประกัน',
-      'การศึกษา','บัตรเครดิต','ผ่อนสินค้า','เงินให้ครอบครัว','ท่องเที่ยว','อื่นๆ'
+      'เงินเดือน','โบนัส','รายได้เสริม','ธุรกิจ','ฟรีแลนซ์','ดอกเบี้ย/ปันผล','ขายของออนไลน์','คืนเงิน',
+      'บ้าน/เช่า','ค่าส่วนกลาง','ไฟฟ้า','น้ำประปา','อินเทอร์เน็ต','โทรศัพท์',
+      'ของกิน','กาแฟ/ขนม','ค่าน้ำมัน','เดินทาง','รถยนต์','ช้อปปิ้ง','สัตว์เลี้ยง',
+      'สุขภาพ','ยา/รักษา','ประกัน','การศึกษา','บันเทิง','สมาชิก/Subscription',
+      'บัตรเครดิต','ผ่อนสินค้า','เงินให้ครอบครัว','ของขวัญ/งานสังคม','ท่องเที่ยว','ออมเงิน/ลงทุน','ภาษี/ค่าธรรมเนียม','อื่นๆ'
     ];
+    const CATEGORY_ICONS = {
+      'เงินเดือน':'💼',
+      'โบนัส':'🎉',
+      'รายได้เสริม':'✨',
+      'ธุรกิจ':'🏢',
+      'ฟรีแลนซ์':'🧑‍💻',
+      'ดอกเบี้ย/ปันผล':'📈',
+      'ขายของออนไลน์':'🛍️',
+      'คืนเงิน':'↩️',
+      'บ้าน/เช่า':'🏠',
+      'ค่าส่วนกลาง':'🧱',
+      'ไฟฟ้า':'💡',
+      'น้ำประปา':'🚰',
+      'อินเทอร์เน็ต':'🌐',
+      'โทรศัพท์':'📱',
+      'ของกิน':'🍱',
+      'กาแฟ/ขนม':'☕',
+      'ค่าน้ำมัน':'⛽',
+      'เดินทาง':'🚗',
+      'รถยนต์':'🚘',
+      'ช้อปปิ้ง':'🛒',
+      'สัตว์เลี้ยง':'🐾',
+      'สุขภาพ':'🩺',
+      'ยา/รักษา':'💊',
+      'ประกัน':'🛡️',
+      'การศึกษา':'📚',
+      'บันเทิง':'🎬',
+      'สมาชิก/Subscription':'📦',
+      'บัตรเครดิต':'💳',
+      'ผ่อนสินค้า':'🧾',
+      'เงินให้ครอบครัว':'👨‍👩‍👧‍👦',
+      'ของขวัญ/งานสังคม':'🎁',
+      'ท่องเที่ยว':'✈️',
+      'ออมเงิน/ลงทุน':'🏦',
+      'ภาษี/ค่าธรรมเนียม':'🏛️',
+      'อื่นๆ':'🗂️'
+    };
 
-    let appData = { entries: [], installments: [] };
+    let appData = { entries: [], installments: [], trips: [] };
     let currentView = 'yearly';
     let databasePromise = null;
     let loadedFileName = '';
     let lastImportAt = '';
     let editingEntryId = null;
     let editingLoanId = null;
+    let editingTripId = null;
+    let editingTripItemId = null;
+    let activeTripId = null;
     let installmentViewMode = 'list';
+    let tripViewMode = 'list';
+    let pendingViewNavigation = null;
+    let navigationHistory = [];
 
     const $ = (id) => document.getElementById(id);
 
@@ -898,9 +1713,14 @@
     const loadAnotherBtn = $('loadAnotherBtn');
     const saveJsonBtn = $('saveJsonBtn');
     const fileStatus = $('fileStatus');
+    const mobileMenuToggle = $('mobileMenuToggle');
+    const mainMenuPanel = $('mainMenuPanel');
 
     const rangeStartMonth = $('rangeStartMonth');
     const rangeEndMonth = $('rangeEndMonth');
+    const quickAddInput = $('quickAddInput');
+    const quickAddSubmitBtn = $('quickAddSubmitBtn');
+    const quickAddStatus = $('quickAddStatus');
     const monthlyKeyword = $('monthlyKeyword');
     const monthlyTypeFilter = $('monthlyTypeFilter');
     const monthlyCategoryFilter = $('monthlyCategoryFilter');
@@ -920,6 +1740,8 @@
     const monthlyActiveFilterLabel = $('monthlyActiveFilterLabel');
     const entryCountLabel = $('entryCountLabel');
     const entriesContainer = $('entriesContainer');
+    const floatingBackBtn = $('floatingBackBtn');
+    const backFromMonthlyBtn = $('backFromMonthlyBtn');
 
     const openEntryModalBtn = $('openEntryModalBtn');
     const openEntryModalBtnSecondary = $('openEntryModalBtnSecondary');
@@ -939,6 +1761,8 @@
     const entryAmount = $('entryAmount');
     const entryTitle = $('entryTitle');
     const entryNote = $('entryNote');
+    const entryPaidWrapper = $('entryPaidWrapper');
+    const entryIsPaid = $('entryIsPaid');
     const repeatEnabled = $('repeatEnabled');
     const repeatCount = $('repeatCount');
     const saveEntryBtn = $('saveEntryBtn');
@@ -984,6 +1808,61 @@
     const loanRemainingAmount = $('loanRemainingAmount');
     const loanRemainingMonths = $('loanRemainingMonths');
     const loanMonthlyTotal = $('loanMonthlyTotal');
+    const backFromInstallmentsBtn = $('backFromInstallmentsBtn');
+    const tripModal = $('tripModal');
+    const tripItemModal = $('tripItemModal');
+    const openTripModalBtn = $('openTripModalBtn');
+    const openTripItemModalBtn = $('openTripItemModalBtn');
+    const closeTripModalBtn = $('closeTripModalBtn');
+    const closeTripItemModalBtn = $('closeTripItemModalBtn');
+    const tripFormTitle = $('tripFormTitle');
+    const tripEditBadge = $('tripEditBadge');
+    const tripName = $('tripName');
+    const tripDestination = $('tripDestination');
+    const tripBudget = $('tripBudget');
+    const tripStartDate = $('tripStartDate');
+    const tripEndDate = $('tripEndDate');
+    const tripNote = $('tripNote');
+    const saveTripBtn = $('saveTripBtn');
+    const clearTripBtn = $('clearTripBtn');
+    const tripItemFormTitle = $('tripItemFormTitle');
+    const tripItemEditBadge = $('tripItemEditBadge');
+    const tripItemTripId = $('tripItemTripId');
+    const tripItemDate = $('tripItemDate');
+    const tripItemCategory = $('tripItemCategory');
+    const tripItemTitle = $('tripItemTitle');
+    const tripItemAmount = $('tripItemAmount');
+    const tripItemInstallmentId = $('tripItemInstallmentId');
+    const tripItemNote = $('tripItemNote');
+    const saveTripItemBtn = $('saveTripItemBtn');
+    const clearTripItemBtn = $('clearTripItemBtn');
+    const tripSearchKeyword = $('tripSearchKeyword');
+    const tripYearFilter = $('tripYearFilter');
+    const tripMonthFilter = $('tripMonthFilter');
+    const tripCategoryFilter = $('tripCategoryFilter');
+    const tripStatusFilter = $('tripStatusFilter');
+    const resetTripFiltersBtn = $('resetTripFiltersBtn');
+    const tripSummaryLabel = $('tripSummaryLabel');
+    const tripTotalCount = $('tripTotalCount');
+    const tripExpenseTotal = $('tripExpenseTotal');
+    const tripDayCount = $('tripDayCount');
+    const tripItemCount = $('tripItemCount');
+    const tripTopCategory = $('tripTopCategory');
+    const tripFilterResultLabel = $('tripFilterResultLabel');
+    const tripFilterSummary = $('tripFilterSummary');
+    const tripListContainer = $('tripListContainer');
+    const tripCalendarContainer = $('tripCalendarContainer');
+    const tripDetailPanel = $('tripDetailPanel');
+    const tripDetailContainer = $('tripDetailContainer');
+    const backFromTripsBtn = $('backFromTripsBtn');
+    const tripShell = document.querySelector('.trip-shell');
+    const tripListViewBtn = $('tripListViewBtn');
+    const tripCalendarViewBtn = $('tripCalendarViewBtn');
+    const enhancedSelectRegistry = new Map();
+    const QUICK_ADD_INCOME_KEYWORDS = [
+      'income','salary','bonus','commission','refund','allowance','payday',
+      'เงินเดือน','โบนัส','รายรับ','รายได้','คืนเงิน','ค่าคอม','คอมมิชชั่น','เบี้ยเลี้ยง'
+    ];
 
     function formatMoney(value){
       return new Intl.NumberFormat('th-TH',{style:'currency',currency:'THB',maximumFractionDigits:2}).format(Number(value||0));
@@ -998,6 +1877,13 @@
       return String(text ?? '')
         .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
         .replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+    }
+    function getCategoryIcon(category){
+      return CATEGORY_ICONS[String(category || 'อื่นๆ').trim()] || '🏷️';
+    }
+    function formatCategoryLabel(category){
+      const name = String(category || 'อื่นๆ').trim() || 'อื่นๆ';
+      return `${getCategoryIcon(name)} ${name}`;
     }
     function openAppDatabase(){
       if(databasePromise) return databasePromise;
@@ -1069,7 +1955,8 @@
           category: x.category || 'อื่นๆ',
           title: x.title || '',
           amount: Number(x.amount || 0),
-          note: x.note || ''
+          note: x.note || '',
+          isPaid: x.isPaid == null ? true : !!x.isPaid
         })) : [],
         installments: Array.isArray(parsed.installments) ? parsed.installments.map(x => ({
           id: x.id || crypto.randomUUID(),
@@ -1084,7 +1971,31 @@
           dueDay: x.dueDay === '' || x.dueDay == null ? '' : Number(x.dueDay),
           interestType: x.interestType || 'none',
           interestRate: x.interestRate === '' || x.interestRate == null ? '' : Number(x.interestRate),
-          interestNote: x.interestNote || ''
+          interestNote: x.interestNote || '',
+          paidMonthKeys: Array.isArray(x.paidMonthKeys)
+            ? Array.from(new Set(x.paidMonthKeys.filter(Boolean).map(String))).sort()
+            : (x.startMonth && Number(x.paidMonths || 0) > 0
+              ? Array.from({length: Math.min(Number(x.paidMonths || 0), Number(x.totalMonths || 0))}, (_, index) => addMonths(x.startMonth, index))
+              : [])
+        })) : [],
+        trips: Array.isArray(parsed.trips) ? parsed.trips.map(x => ({
+          id: x.id || crypto.randomUUID(),
+          name: x.name || '',
+          destination: x.destination || '',
+          startDate: x.startDate || '',
+          endDate: x.endDate || '',
+          budget: x.budget === '' || x.budget == null ? '' : Number(x.budget),
+          note: x.note || '',
+          items: Array.isArray(x.items) ? x.items.map(item => ({
+            id: item.id || crypto.randomUUID(),
+            date: item.date || '',
+            category: item.category || 'ท่องเที่ยว',
+            title: item.title || '',
+            amount: Number(item.amount || 0),
+            note: item.note || '',
+            installmentId: item.installmentId || '',
+            isPaid: item.isPaid == null ? true : !!item.isPaid
+          })) : []
         })) : []
       };
     }
@@ -1098,11 +2009,229 @@
         fileStatus.textContent = 'ยังไม่ได้ผูกไฟล์สำหรับ Save ทับ';
       }
     }
+    function closeAllEnhancedSelects(exceptSelect = null){
+      enhancedSelectRegistry.forEach(instance => {
+        if(instance.select !== exceptSelect) instance.close();
+      });
+    }
+    function getSelectDisplayText(select){
+      const selectedOption = select.options[select.selectedIndex];
+      if(selectedOption) return selectedOption.textContent.trim();
+      const firstOption = select.options[0];
+      return firstOption ? firstOption.textContent.trim() : 'เลือกข้อมูล';
+    }
+    function refreshEnhancedSelect(select){
+      const instance = enhancedSelectRegistry.get(select);
+      if(!instance) return;
+
+      const keyword = (instance.searchInput.value || '').trim().toLowerCase();
+      const options = Array.from(select.options)
+        .map(option => ({
+          value: option.value,
+          text: option.textContent.trim(),
+          selected: select.value === option.value,
+          disabled: option.disabled,
+          hidden: option.hidden
+        }))
+        .filter(option => !option.hidden);
+      const filtered = keyword ? options.filter(option => option.text.toLowerCase().includes(keyword)) : options;
+
+      instance.valueNode.textContent = getSelectDisplayText(select);
+      instance.trigger.disabled = !!select.disabled;
+      instance.list.innerHTML = '';
+
+      if(!filtered.length){
+        const empty = document.createElement('div');
+        empty.className = 'select-enhanced-empty';
+        empty.textContent = 'ไม่พบรายการที่ค้นหา';
+        instance.list.appendChild(empty);
+        return;
+      }
+
+      filtered.forEach(option => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'select-enhanced-option';
+        button.textContent = option.text || ' ';
+        button.dataset.value = option.value;
+        if(option.selected) button.classList.add('is-selected');
+        button.disabled = option.disabled;
+        button.addEventListener('click', () => {
+          if(option.disabled) return;
+          const previousValue = select.value;
+          select.value = option.value;
+          refreshEnhancedSelect(select);
+          instance.close();
+          instance.trigger.focus();
+          if(previousValue !== option.value){
+            select.dispatchEvent(new Event('change', { bubbles:true }));
+            select.dispatchEvent(new Event('input', { bubbles:true }));
+          }
+        });
+        instance.list.appendChild(button);
+      });
+    }
+    function enhanceSelect(select){
+      if(enhancedSelectRegistry.has(select)){
+        refreshEnhancedSelect(select);
+        return;
+      }
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'select-enhanced';
+
+      const trigger = document.createElement('button');
+      trigger.type = 'button';
+      trigger.className = 'select-enhanced-trigger';
+
+      const valueNode = document.createElement('span');
+      valueNode.className = 'select-enhanced-value';
+      trigger.appendChild(valueNode);
+
+      const caret = document.createElement('span');
+      caret.className = 'select-enhanced-caret';
+      trigger.appendChild(caret);
+
+      const panel = document.createElement('div');
+      panel.className = 'select-enhanced-panel';
+
+      const searchInput = document.createElement('input');
+      searchInput.type = 'text';
+      searchInput.className = 'select-enhanced-search';
+      searchInput.placeholder = 'ค้นหารายการ...';
+
+      const list = document.createElement('div');
+      list.className = 'select-enhanced-list';
+
+      panel.append(searchInput, list);
+      wrapper.append(trigger, panel);
+      select.parentNode.insertBefore(wrapper, select);
+      wrapper.appendChild(select);
+      select.classList.add('native-select');
+
+      const instance = {
+        select,
+        wrapper,
+        trigger,
+        valueNode,
+        searchInput,
+        list,
+        open(){
+          if(select.disabled) return;
+          closeAllEnhancedSelects(select);
+          wrapper.classList.add('open');
+          searchInput.value = '';
+          refreshEnhancedSelect(select);
+          searchInput.focus();
+        },
+        close(){
+          wrapper.classList.remove('open');
+          searchInput.value = '';
+          refreshEnhancedSelect(select);
+        }
+      };
+      enhancedSelectRegistry.set(select, instance);
+
+      trigger.addEventListener('click', () => {
+        if(wrapper.classList.contains('open')) instance.close();
+        else instance.open();
+      });
+      trigger.addEventListener('keydown', (e) => {
+        if(e.key === 'ArrowDown' || e.key === 'Enter' || e.key === ' '){
+          e.preventDefault();
+          instance.open();
+        }
+      });
+      searchInput.addEventListener('input', () => refreshEnhancedSelect(select));
+      select.addEventListener('change', () => refreshEnhancedSelect(select));
+      select.addEventListener('input', () => refreshEnhancedSelect(select));
+
+      const observer = new MutationObserver(() => refreshEnhancedSelect(select));
+      observer.observe(select, { childList:true, subtree:true, attributes:true, attributeFilter:['disabled','label'] });
+
+      refreshEnhancedSelect(select);
+    }
+    function initializeEnhancedSelects(){
+      document.querySelectorAll('select').forEach(enhanceSelect);
+    }
+    function refreshAllEnhancedSelects(){
+      enhancedSelectRegistry.forEach((instance, select) => {
+        if(instance.wrapper.classList.contains('open')) return;
+        refreshEnhancedSelect(select);
+      });
+    }
     function populateCategoryDropdowns(){
-      const options = CATEGORY_OPTIONS.map(x => `<option value="${x}">${x}</option>`).join('');
+      const options = CATEGORY_OPTIONS.map(x => `<option value="${x}">${escapeHtml(formatCategoryLabel(x))}</option>`).join('');
       entryCategory.innerHTML = options;
       loanCategory.innerHTML = options;
+      tripItemCategory.innerHTML = options;
       monthlyCategoryFilter.innerHTML = '<option value="">ทุกหมวดหมู่</option>' + options;
+      tripCategoryFilter.innerHTML = '<option value="">ทุกหมวดหมู่</option>' + options;
+      [entryCategory, loanCategory, tripItemCategory, monthlyCategoryFilter, tripCategoryFilter, tripYearFilter, tripMonthFilter].forEach(refreshEnhancedSelect);
+      refreshTripOptions();
+    }
+    function refreshTripOptions(){
+      const options = appData.trips
+        .slice()
+        .sort((a,b) => String(a.startDate || '').localeCompare(String(b.startDate || '')) || String(a.name || '').localeCompare(String(b.name || ''),'th'))
+        .map(trip => `<option value="${trip.id}">${escapeHtml(trip.name)}${trip.destination ? ` · ${escapeHtml(trip.destination)}` : ''}</option>`)
+        .join('');
+      tripItemTripId.innerHTML = '<option value="">เลือกทริป</option>' + options;
+      refreshEnhancedSelect(tripItemTripId);
+      const installmentOptions = appData.installments
+        .slice()
+        .sort((a,b) => String(a.name || '').localeCompare(String(b.name || ''),'th'))
+        .map(item => `<option value="${item.id}">${escapeHtml(item.name)} · ${formatMoney(item.principal || (Number(item.monthlyAmount || 0) * Number(item.totalMonths || 0)))}</option>`)
+        .join('');
+      tripItemInstallmentId.innerHTML = '<option value="">ไม่ลิงก์</option>' + installmentOptions;
+      refreshEnhancedSelect(tripItemInstallmentId);
+    }
+    function getInstallmentDisplayTotal(item){
+      return Number(item?.principal || 0) > 0 ? Number(item.principal || 0) : Number(item?.monthlyAmount || 0) * Number(item?.totalMonths || 0);
+    }
+    function getLinkedTripRefsByInstallment(installmentId){
+      if(!installmentId) return [];
+      return appData.trips.flatMap(trip => (trip.items || [])
+        .filter(item => item.installmentId === installmentId)
+        .map(item => ({
+          tripId: trip.id,
+          tripName: trip.name || '',
+          itemId: item.id,
+          itemTitle: item.title || ''
+        })));
+    }
+    function getInstallmentLinkForTripItem(item){
+      if(!item?.installmentId) return null;
+      return appData.installments.find(installment => installment.id === item.installmentId) || null;
+    }
+    function getTripItemPaymentState(item){
+      const linkedInstallment = getInstallmentLinkForTripItem(item);
+      if(linkedInstallment){
+        const calc = calcLoanRemaining(linkedInstallment);
+        return {
+          isPaid: calc.remainingMonths === 0,
+          isManagedByInstallment: true,
+          linkedInstallment
+        };
+      }
+      return {
+        isPaid: !!item?.isPaid,
+        isManagedByInstallment: false,
+        linkedInstallment: null
+      };
+    }
+    function toggleTripItemPaid(tripId, itemId){
+      const trip = appData.trips.find(x => x.id === tripId);
+      const item = trip?.items?.find(x => x.id === itemId);
+      if(!trip || !item) return;
+      const state = getTripItemPaymentState(item);
+      if(state.isManagedByInstallment){
+        applyInstallmentNavigation(state.linkedInstallment.id, { focusDate:item.date || '' });
+        return;
+      }
+      item.isPaid = !item.isPaid;
+      activeTripId = tripId;
+      renderAll();
     }
 
     function currentMonth(){
@@ -1111,12 +2240,59 @@
     function currentDate(){
       return new Date().toISOString().slice(0,10);
     }
+    function setQuickAddStatus(message, tone = ''){
+      if(!quickAddStatus) return;
+      quickAddStatus.textContent = message || '';
+      quickAddStatus.className = `quick-add-status${tone ? ` ${tone}` : ''}`;
+    }
+    function detectQuickAddType(title){
+      const normalizedTitle = String(title || '').trim().toLowerCase();
+      return QUICK_ADD_INCOME_KEYWORDS.some(keyword => normalizedTitle.includes(keyword)) ? 'income' : 'expense';
+    }
+    function getQuickAddEntryDate(){
+      const start = rangeStartMonth.value || currentMonth();
+      const end = rangeEndMonth.value || start;
+      const fixedStart = start <= end ? start : end;
+      const fixedEnd = start <= end ? end : start;
+      const todayMonth = currentMonth();
+      const targetMonth = todayMonth >= fixedStart && todayMonth <= fixedEnd ? todayMonth : fixedEnd;
+      const todayDay = Number(currentDate().slice(8,10));
+      return safeDateFromMonth(targetMonth, todayDay);
+    }
+    function parseQuickAddInput(rawText){
+      const compact = String(rawText || '').trim().replace(/^\+\s*/, '');
+      if(!compact) return { ok:false, message:'พิมพ์อย่างน้อยชื่อรายการและจำนวนเงิน เช่น + ข้าว 80' };
+      const amountMatch = compact.match(/(-?\d[\d,]*(?:\.\d{1,2})?)\s*$/);
+      if(!amountMatch) return { ok:false, message:'ยังหาเลขท้ายบรรทัดไม่เจอ ลองรูปแบบเช่น + taxi 120' };
+
+      const amount = Number(amountMatch[1].replace(/,/g, ''));
+      const title = compact.slice(0, amountMatch.index).trim().replace(/\s{2,}/g, ' ');
+      if(!title) return { ok:false, message:'ยังไม่มีชื่อรายการก่อนจำนวนเงิน' };
+      if(!Number.isFinite(amount) || amount <= 0) return { ok:false, message:'จำนวนเงินต้องมากกว่า 0' };
+
+      return {
+        ok: true,
+        entry: {
+          id: crypto.randomUUID(),
+          type: detectQuickAddType(title),
+          date: getQuickAddEntryDate(),
+          category: 'อื่นๆ',
+          title,
+          amount,
+          note: '',
+          isPaid: true
+        }
+      };
+    }
     function initPickers(){
       const cm = currentMonth();
       rangeStartMonth.value = rangeStartMonth.value || cm;
       rangeEndMonth.value = rangeEndMonth.value || cm;
       entryDate.value = entryDate.value || currentDate();
       loanStartMonth.value = loanStartMonth.value || cm;
+      tripStartDate.value = tripStartDate.value || currentDate();
+      tripEndDate.value = tripEndDate.value || currentDate();
+      tripItemDate.value = tripItemDate.value || currentDate();
       if(loanFilterStartMonth && !loanFilterStartMonth.value) loanFilterStartMonth.value = cm;
       if(loanFilterEndMonth && !loanFilterEndMonth.value) loanFilterEndMonth.value = addMonths(cm, 5);
 
@@ -1129,11 +2305,22 @@
           years.add(end.slice(0,4));
         }
       });
+      appData.trips.forEach(trip => {
+        [trip.startDate, trip.endDate].forEach(date => {
+          if(date) years.add(String(new Date(date).getFullYear()));
+        });
+        (trip.items || []).forEach(item => {
+          if(item.date) years.add(String(new Date(item.date).getFullYear()));
+        });
+      });
 
+      const currentYear = String(new Date().getFullYear());
       const sorted = Array.from(years).sort();
-      const options = sorted.map(y => `<option value="${y}">${y}</option>`).join('');
+      const options = sorted.map(y => `<option value="${y}" ${y === currentYear ? 'selected' : ''}>${y}</option>`).join('');
       yearlyYearPicker.innerHTML = options;
-      if(!yearlyYearPicker.value || !sorted.includes(yearlyYearPicker.value)) yearlyYearPicker.value = String(new Date().getFullYear());
+      yearlyYearPicker.value = currentYear;
+      if(!yearlyYearPicker.value || !sorted.includes(yearlyYearPicker.value)) yearlyYearPicker.value = currentYear;
+      refreshEnhancedSelect(yearlyYearPicker);
     }
 
     function monthRangeList(startMonth, endMonth){
@@ -1161,6 +2348,197 @@
       const safeDay = Math.min(Math.max(1, Number(day||1)), lastDay);
       return `${monthKey}-${String(safeDay).padStart(2,'0')}`;
     }
+    function getPaymentStatusBadge(isPaid){
+      return `<span class="badge ${isPaid ? 'badge-paid' : 'badge-unpaid'}">${isPaid ? '🟢 จ่ายแล้ว' : '🔴 ยังไม่จ่าย'}</span>`;
+    }
+    function focusElementById(elementId){
+      if(!elementId) return false;
+      const target = document.getElementById(elementId);
+      if(!target) return false;
+      target.setAttribute('tabindex', '-1');
+      target.classList.remove('nav-highlight');
+      target.scrollIntoView({ behavior:'smooth', block:'center' });
+      requestAnimationFrame(() => {
+        target.focus({ preventScroll:true });
+        target.classList.add('nav-highlight');
+        window.setTimeout(() => target.classList.remove('nav-highlight'), 1800);
+      });
+      return true;
+    }
+    function refreshLoanFiltersUi(){
+      syncPickerValue(loanFilterStartMonth);
+      syncPickerValue(loanFilterEndMonth);
+      refreshAllEnhancedSelects();
+    }
+    function refreshTripFiltersUi(){
+      refreshAllEnhancedSelects();
+    }
+    function applyInstallmentNavigation(targetId, options = {}){
+      const item = appData.installments.find(x => x.id === targetId);
+      if(!item) return;
+      if(options.rememberCurrent !== false) pushNavigationHistory();
+      const endMonth = getLoanEndMonth(item);
+      const requestedMonth = options.monthKey || options.focusDate?.slice(0,7) || '';
+      const validRequestedMonth = requestedMonth && item.startMonth && endMonth && requestedMonth >= item.startMonth && requestedMonth <= endMonth;
+      installmentViewMode = 'list';
+      currentView = 'installments';
+      loanSearchKeyword.value = item.name || '';
+      loanFilterStatus.value = calcLoanRemaining(item).remainingMonths > 0 ? 'active' : 'paid';
+      loanFilterStartMonth.value = validRequestedMonth ? requestedMonth : (item.startMonth || currentMonth());
+      loanFilterEndMonth.value = validRequestedMonth ? requestedMonth : (endMonth || item.startMonth || currentMonth());
+      refreshLoanFiltersUi();
+      pendingViewNavigation = { view:'installments', targetId:`loan-card-${targetId}` };
+      renderInstallments();
+      updateView();
+      applyPendingViewNavigation();
+    }
+    function applyTripNavigation(targetId, options = {}){
+      const trip = appData.trips.find(x => x.id === targetId);
+      if(!trip) return;
+      if(options.rememberCurrent !== false) pushNavigationHistory();
+      const focusDate = options.focusDate || getTripRelevantDates(trip)[0] || '';
+      const focusMonth = getMonthKeyFromDate(focusDate);
+      activeTripId = targetId;
+      tripViewMode = 'list';
+      currentView = 'trips';
+      tripSearchKeyword.value = trip.name || '';
+      tripYearFilter.value = focusMonth ? focusMonth.slice(0,4) : '';
+      tripMonthFilter.value = focusMonth ? focusMonth.slice(5,7) : '';
+      tripCategoryFilter.value = '';
+      tripStatusFilter.value = '';
+      refreshTripFiltersUi();
+      pendingViewNavigation = {
+        view:'trips',
+        targetId: options.itemId ? `trip-item-${targetId}-${options.itemId}` : null,
+        fallbackId: `trip-card-${targetId}`
+      };
+      renderTrips();
+      updateView();
+      applyPendingViewNavigation();
+    }
+    function applyPendingViewNavigation(){
+      if(!pendingViewNavigation || pendingViewNavigation.view !== currentView) return;
+      const navigation = pendingViewNavigation;
+      pendingViewNavigation = null;
+      requestAnimationFrame(() => {
+        const focused = navigation.targetId ? focusElementById(navigation.targetId) : false;
+        if(!focused && navigation.fallbackId) focusElementById(navigation.fallbackId);
+      });
+    }
+    function captureCurrentViewState(){
+      return {
+        view: currentView,
+        monthly: {
+          rangeStartMonth: rangeStartMonth.value,
+          rangeEndMonth: rangeEndMonth.value,
+          keyword: monthlyKeyword.value,
+          type: monthlyTypeFilter.value,
+          category: monthlyCategoryFilter.value,
+          minAmount: monthlyMinAmount.value,
+          maxAmount: monthlyMaxAmount.value,
+          sort: monthlySort.value
+        },
+        yearly: {
+          year: yearlyYearPicker.value
+        },
+        trips: {
+          keyword: tripSearchKeyword.value,
+          year: tripYearFilter.value,
+          month: tripMonthFilter.value,
+          category: tripCategoryFilter.value,
+          status: tripStatusFilter.value,
+          activeTripId,
+          tripViewMode
+        },
+        installments: {
+          keyword: loanSearchKeyword.value,
+          status: loanFilterStatus.value,
+          startMonth: loanFilterStartMonth.value,
+          endMonth: loanFilterEndMonth.value,
+          installmentViewMode
+        }
+      };
+    }
+    function pushNavigationHistory(){
+      navigationHistory.push(captureCurrentViewState());
+      if(navigationHistory.length > 30) navigationHistory = navigationHistory.slice(-30);
+      updateBackButtons();
+    }
+    function updateBackButtons(){
+      const hasHistory = navigationHistory.length > 0;
+      [backFromMonthlyBtn, backFromTripsBtn, backFromInstallmentsBtn, floatingBackBtn].forEach(btn => {
+        if(!btn) return;
+        btn.classList.toggle('hidden', !hasHistory);
+      });
+    }
+    function restoreViewState(snapshot){
+      if(!snapshot) return;
+      currentView = snapshot.view || 'yearly';
+
+      rangeStartMonth.value = snapshot.monthly?.rangeStartMonth || currentMonth();
+      rangeEndMonth.value = snapshot.monthly?.rangeEndMonth || rangeStartMonth.value;
+      monthlyKeyword.value = snapshot.monthly?.keyword || '';
+      monthlyTypeFilter.value = snapshot.monthly?.type || '';
+      monthlyCategoryFilter.value = snapshot.monthly?.category || '';
+      monthlyMinAmount.value = snapshot.monthly?.minAmount || '';
+      monthlyMaxAmount.value = snapshot.monthly?.maxAmount || '';
+      monthlySort.value = snapshot.monthly?.sort || 'date-asc';
+
+      if(snapshot.yearly?.year){
+        const year = String(snapshot.yearly.year);
+        if(!Array.from(yearlyYearPicker.options).some(opt => opt.value === year)){
+          yearlyYearPicker.add(new Option(year, year));
+        }
+        yearlyYearPicker.value = year;
+      }
+
+      tripSearchKeyword.value = snapshot.trips?.keyword || '';
+      tripYearFilter.value = snapshot.trips?.year || '';
+      tripMonthFilter.value = snapshot.trips?.month || '';
+      tripCategoryFilter.value = snapshot.trips?.category || '';
+      tripStatusFilter.value = snapshot.trips?.status || '';
+      activeTripId = snapshot.trips?.activeTripId || null;
+      tripViewMode = snapshot.trips?.tripViewMode || 'list';
+
+      loanSearchKeyword.value = snapshot.installments?.keyword || '';
+      loanFilterStatus.value = snapshot.installments?.status || '';
+      loanFilterStartMonth.value = snapshot.installments?.startMonth || currentMonth();
+      loanFilterEndMonth.value = snapshot.installments?.endMonth || addMonths(currentMonth(), 5);
+      installmentViewMode = snapshot.installments?.installmentViewMode || 'list';
+
+      renderAll();
+      window.scrollTo({ top: 0, behavior:'smooth' });
+    }
+    function goBackToPreviousView(){
+      const snapshot = navigationHistory.pop();
+      updateBackButtons();
+      if(!snapshot) return;
+      restoreViewState(snapshot);
+    }
+    function getInstallmentScheduleMonths(item){
+      if(!item?.startMonth || !Number(item?.totalMonths || 0)) return [];
+      return Array.from({length:Number(item.totalMonths || 0)}, (_, index) => addMonths(item.startMonth, index));
+    }
+    function syncInstallmentPaidMonths(item){
+      if(!item) return;
+      const schedule = getInstallmentScheduleMonths(item);
+      const paidKeys = new Set((item.paidMonthKeys || []).filter(monthKey => schedule.includes(monthKey)));
+      item.paidMonthKeys = schedule.filter(monthKey => paidKeys.has(monthKey));
+      item.paidMonths = item.paidMonthKeys.length;
+    }
+    function isInstallmentMonthPaid(item, monthKey){
+      if(!item || !monthKey) return false;
+      const paidMonthKeys = Array.isArray(item.paidMonthKeys) ? item.paidMonthKeys : [];
+      if(paidMonthKeys.length) return paidMonthKeys.includes(monthKey);
+      const schedule = getInstallmentScheduleMonths(item);
+      const index = schedule.indexOf(monthKey);
+      return index > -1 && index < Number(item.paidMonths || 0);
+    }
+    function updateEntryPaidVisibility(){
+      const isExpense = entryType.value === 'expense';
+      entryPaidWrapper.classList.toggle('hidden', !isExpense);
+      if(!isExpense) entryIsPaid.checked = true;
+    }
 
     function getInstallmentVirtualEntries(monthKey){
       return appData.installments
@@ -1173,18 +2551,45 @@
           category: x.category || 'ผ่อนสินค้า',
           title: `ยอดผ่อน: ${x.name}`,
           amount: Number(x.monthlyAmount || 0),
-          note: x.interestNote || '',
+          note: (() => {
+            const links = getLinkedTripRefsByInstallment(x.id);
+            const linkedText = links.length ? `ลิงก์กับทริป: ${links.map(link => `${link.tripName} / ${link.itemTitle}`).join(', ')}` : '';
+            return [x.interestNote || '', linkedText].filter(Boolean).join(' | ');
+          })(),
           sourceType: 'installment',
           sourceId: x.id,
+          linkedTripCount: getLinkedTripRefsByInstallment(x.id).length,
+          isPaid: isInstallmentMonthPaid(x, monthKey),
+          paymentMonthKey: monthKey,
           readonly: true
         }));
+    }
+    function getTripVirtualEntries(monthKey){
+      return appData.trips.flatMap(trip => (trip.items || [])
+        .filter(item => getMonthKeyFromDate(item.date) === monthKey)
+        .filter(item => !item.installmentId)
+        .map(item => ({
+          id: `trip-${trip.id}-${item.id}`,
+          type: 'expense',
+          date: item.date || '',
+          category: item.category || 'ท่องเที่ยว',
+          title: `${trip.name || 'ทริป'}: ${item.title || '-'}`,
+          amount: Number(item.amount || 0),
+          note: item.note || trip.note || '',
+          sourceType: 'trip',
+          sourceId: trip.id,
+          tripItemId: item.id,
+          tripName: trip.name || '',
+          isPaid: !!item.isPaid,
+          readonly: true
+        })));
     }
 
     function getCombinedMonthItems(monthKey){
       const entryItems = appData.entries
         .filter(x => getMonthKeyFromDate(x.date) === monthKey)
         .map(x => ({...x, sourceType:'entry', sourceId:x.id, readonly:false}));
-      return [...entryItems, ...getInstallmentVirtualEntries(monthKey)];
+      return [...entryItems, ...getInstallmentVirtualEntries(monthKey), ...getTripVirtualEntries(monthKey)];
     }
 
     function summarizeEntries(items){
@@ -1201,6 +2606,11 @@
     function getInstallmentTotalFromItems(items){
       return items
         .filter(x => x.sourceType === 'installment')
+        .reduce((sum, x) => sum + Number(x.amount || 0), 0);
+    }
+    function getTripTotalFromItems(items){
+      return items
+        .filter(x => x.sourceType === 'trip')
         .reduce((sum, x) => sum + Number(x.amount || 0), 0);
     }
 
@@ -1322,6 +2732,7 @@
       const allItems = groups.flatMap(g => g.items);
       const sum = summarizeEntries(allItems);
       const installmentTotal = getInstallmentTotalFromItems(allItems);
+      const tripTotal = getTripTotalFromItems(allItems);
       const categoryMap = new Map();
       allItems.forEach(item => categoryMap.set(item.category || 'อื่นๆ', (categoryMap.get(item.category || 'อื่นๆ') || 0) + 1));
       const topCategory = Array.from(categoryMap.entries()).sort((a,b) => b[1] - a[1])[0];
@@ -1333,9 +2744,9 @@
       monthlyExpenseTotal.textContent = formatMoney(sum.expense);
       monthlyBalanceTotal.textContent = formatMoney(sum.balance);
       monthlyEntryCount.textContent = `${sum.count} รายการ`;
-      monthlyInstallmentTotal.textContent = formatMoney(installmentTotal);
+      monthlyInstallmentTotal.textContent = formatMoney(installmentTotal + tripTotal);
       monthlyMonthCount.textContent = `${months.length} เดือน`;
-      monthlyTopCategory.textContent = topCategory ? `${topCategory[0]} (${topCategory[1]})` : '-';
+      monthlyTopCategory.textContent = topCategory ? `${formatCategoryLabel(topCategory[0])} (${topCategory[1]})` : '-';
       monthlyAverageExpense.textContent = formatMoney(avgExpense);
       monthlyActiveFilterLabel.textContent = getActiveMonthlyFilterText();
       entryCountLabel.textContent = `ทั้งหมด ${sum.count} รายการ ใน ${months.length} เดือน`;
@@ -1358,7 +2769,7 @@
                   <span class="pill">รายรับ ${formatMoney(group.summary.income)}</span>
                   <span class="pill">รายจ่าย ${formatMoney(group.summary.expense)}</span>
                   <span class="pill">คงเหลือ ${formatMoney(group.summary.balance)}</span>
-                  <span class="pill">ยอดผ่อน ${formatMoney(getInstallmentTotalFromItems(group.items))}</span>
+                  <span class="pill">ยอด readonly ${formatMoney(getInstallmentTotalFromItems(group.items) + getTripTotalFromItems(group.items))}</span>
                 </div>
               </div>
               ${group.items.length ? `
@@ -1367,6 +2778,7 @@
                     <tr>
                       <th>วันที่</th>
                       <th>ประเภท</th>
+                      <th>สถานะ</th>
                       <th>รายการ</th>
                       <th>จำนวนเงิน</th>
                       <th>จัดการ</th>
@@ -1377,24 +2789,45 @@
                       <tr>
                         <td>${escapeHtml(item.date || '-')}</td>
                         <td>
-                          <span class="badge ${item.sourceType === 'installment' ? 'badge-installment' : (item.type === 'income' ? 'badge-income' : 'badge-expense')}">
-                            ${item.sourceType === 'installment' ? 'ยอดผ่อน' : (item.type === 'income' ? 'รายรับ' : 'รายจ่าย')}
+                          <span class="badge ${item.sourceType === 'installment' || item.sourceType === 'trip' ? 'badge-installment' : (item.type === 'income' ? 'badge-income' : 'badge-expense')}">
+                            ${item.sourceType === 'installment' ? 'ยอดผ่อน' : (item.sourceType === 'trip' ? 'ทริป' : (item.type === 'income' ? 'รายรับ' : 'รายจ่าย'))}
                           </span>
                         </td>
+                        <td>${item.type === 'expense' ? getPaymentStatusBadge(!!item.isPaid) : '<span class="meta">-</span>'}</td>
                         <td>
                           <div><strong>${escapeHtml(item.title)}</strong></div>
-                          <div class="meta">${escapeHtml(item.category || '-')}</div>
+                          <div class="meta">${escapeHtml(formatCategoryLabel(item.category || 'อื่นๆ'))}</div>
                           ${item.note ? `<div class="meta">${escapeHtml(item.note)}</div>` : ''}
                           ${item.sourceType === 'installment' ? '<div class="readonly-note">แก้ไขได้เฉพาะในหน้ายอดผ่อน</div>' : ''}
+                          ${item.sourceType === 'trip' ? `<div class="readonly-note">มาจากทริป ${escapeHtml(item.tripName || '')} · แก้ไขได้เฉพาะในหน้าทริป</div>` : ''}
                         </td>
                         <td class="${item.type === 'income' ? 'amount-income' : 'amount-expense'}">${formatMoney(item.amount)}</td>
                         <td>
                           ${item.sourceType === 'installment' ? `
                             <div class="small-actions">
-                              <button class="btn-light btn-sm" onclick="goToInstallments('${item.sourceId}')">ไปหน้ายอดผ่อน</button>
+                              <button class="payment-toggle ${item.isPaid ? 'is-paid' : 'is-unpaid'}" onclick="toggleInstallmentMonthPaid('${item.sourceId}','${group.monthKey}')">
+                                <input type="checkbox" ${item.isPaid ? 'checked' : ''}>
+                                <span>${item.isPaid ? 'จ่ายแล้ว' : 'ยังไม่จ่าย'}</span>
+                              </button>
+                              <button class="btn-light btn-sm" onclick="goToInstallments('${item.sourceId}','${group.monthKey}')">ไปหน้ายอดผ่อน</button>
+                            </div>
+                          ` : item.sourceType === 'trip' ? `
+                            <div class="small-actions">
+                              <button class="payment-toggle ${item.isPaid ? 'is-paid' : 'is-unpaid'}" onclick="toggleTripItemPaid('${item.sourceId}','${item.tripItemId}')">
+                                <input type="checkbox" ${item.isPaid ? 'checked' : ''}>
+                                <span>${item.isPaid ? 'จ่ายแล้ว' : 'ยังไม่จ่าย'}</span>
+                              </button>
+                              <button class="btn-light btn-sm" onclick="goToTrip('${item.sourceId}','${item.tripItemId}','${item.date || ''}')">ไปหน้าทริป</button>
                             </div>
                           ` : `
                             <div class="small-actions">
+                              ${item.type === 'expense' ? `
+                                <button class="payment-toggle ${item.isPaid ? 'is-paid' : 'is-unpaid'}" onclick="toggleEntryPaid('${item.id}')">
+                                  <input type="checkbox" ${item.isPaid ? 'checked' : ''}>
+                                  <span>${item.isPaid ? 'จ่ายแล้ว' : 'ยังไม่จ่าย'}</span>
+                                </button>
+                              ` : ''}
+                              <button class="btn-light btn-sm" onclick="duplicateEntry('${item.id}')">📄 คัดลอก</button>
                               <button class="btn-light btn-sm" onclick="editEntry('${item.id}')">แก้ไข</button>
                               <button class="btn-danger btn-sm" onclick="deleteEntry('${item.id}')">ลบ</button>
                             </div>
@@ -1417,12 +2850,13 @@
       const items = Array.from({length:12}, (_,i) => `${year}-${String(i+1).padStart(2,'0')}`).flatMap(getCombinedMonthItems);
       const sum = summarizeEntries(items);
       const installmentTotal = getInstallmentTotalFromItems(items);
+      const tripTotal = getTripTotalFromItems(items);
       yearlyScreenLabel.textContent = `ปี ${year}`;
       yearlyIncomeTotal.textContent = formatMoney(sum.income);
       yearlyExpenseTotal.textContent = formatMoney(sum.expense);
       yearlyBalanceTotal.textContent = formatMoney(sum.balance);
       yearlyEntryCount.textContent = `${sum.count} รายการ`;
-      yearlyInstallmentTotal.textContent = formatMoney(installmentTotal);
+      yearlyInstallmentTotal.textContent = formatMoney(installmentTotal + tripTotal);
       yearlyGrid.className = 'year-grid';
       yearlyGrid.innerHTML = buildYearMonthCards(year);
       bindYearMonthCards();
@@ -1680,14 +3114,18 @@
         const percent = Math.min(100, Math.max(0, (Number(item.paidMonths||0) / Math.max(1, Number(item.totalMonths||1))) * 100));
         const endMonth = getLoanEndMonth(item);
         const loanStatus = calc.remainingMonths > 0 ? `เหลือ ${calc.remainingMonths} เดือน` : 'จ่ายครบแล้ว';
+        const linkedTrips = getLinkedTripRefsByInstallment(item.id);
         return `
           <div class="installment-item" id="loan-card-${item.id}">
             <div class="installment-headline">
               <div>
                 <div class="installment-name">${escapeHtml(item.name)}</div>
-                <div class="meta">หมวด: ${escapeHtml(item.category || '-')}</div>
+                <div class="meta">หมวด: ${escapeHtml(formatCategoryLabel(item.category || 'ผ่อนสินค้า'))}</div>
               </div>
-              <span class="badge badge-installment">${loanStatus}</span>
+              <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center">
+                ${getPaymentStatusBadge(calc.remainingMonths === 0)}
+                <span class="badge badge-installment">${loanStatus}</span>
+              </div>
             </div>
             <div class="installment-kv">
               <div class="notice-box"><strong>เริ่มผ่อน</strong><br>${escapeHtml(item.startMonth || '-')}</div>
@@ -1698,6 +3136,7 @@
               <div class="notice-box"><strong>ดอกเบี้ย</strong><br>${Number(item.interestRate || 0) > 0 ? `${item.interestRate}%/ปี (${item.interestType === 'flat' ? 'Flat' : 'ลดต้นลดดอก'})` : '-'}</div>
             </div>
             <div class="meta" style="margin-top:8px">ยอดตั้งต้น: ${item.principal ? formatMoney(item.principal) : '-'} · วันครบกำหนด: ${item.dueDay || '-'} · หมายเหตุ: ${escapeHtml(item.interestNote || '-')}</div>
+            ${linkedTrips.length ? `<div class="readonly-note" style="margin-top:8px">ลิงก์กับทริป: ${escapeHtml(linkedTrips.map(link => `${link.tripName} / ${link.itemTitle}`).join(', '))}</div>` : ''}
             <div class="progress"><div style="width:${percent}%"></div></div>
             <div class="small-actions">
               <button class="btn-light btn-sm" onclick="editLoan('${item.id}')">แก้ไข</button>
@@ -1740,9 +3179,347 @@
       loanCalendarViewBtn.classList.toggle('btn-light', installmentViewMode !== 'calendar');
     }
 
+    function getTripStatus(trip){
+      const today = currentDate();
+      if(trip.startDate && today < trip.startDate) return 'upcoming';
+      if(trip.endDate && today > trip.endDate) return 'completed';
+      return 'ongoing';
+    }
+    function getTripDateRangeLabel(trip){
+      if(trip.startDate && trip.endDate) return `${trip.startDate} - ${trip.endDate}`;
+      return trip.startDate || trip.endDate || '-';
+    }
+    function getTripTotal(trip){
+      return (trip.items || []).reduce((sum, item) => sum + Number(item.amount || 0), 0);
+    }
+    function getTripDays(trip){
+      return Array.from(new Set((trip.items || []).map(item => item.date).filter(Boolean))).sort();
+    }
+    function getTripRelevantDates(trip){
+      const itemDates = (trip.items || []).map(item => item.date).filter(Boolean);
+      return [trip.startDate, trip.endDate, ...itemDates].filter(Boolean);
+    }
+    function getTripCalendarMonths(trips){
+      const f = tripFilterState();
+      const monthSet = new Set();
+      trips.forEach(trip => {
+        getTripRelevantDates(trip).forEach(date => {
+          const monthKey = getMonthKeyFromDate(date);
+          if(monthKey) monthSet.add(monthKey);
+        });
+      });
+      const months = Array.from(monthSet).sort();
+      if(f.year && f.month) return [`${f.year}-${f.month}`];
+      if(f.year && !f.month){
+        const filtered = months.filter(monthKey => monthKey.startsWith(`${f.year}-`));
+        return filtered.length ? filtered : Array.from({length:12}, (_,i) => `${f.year}-${String(i + 1).padStart(2,'0')}`);
+      }
+      return months.length ? months : [currentMonth()];
+    }
+    function updateTripTimeFilterOptions(){
+      const years = new Set();
+      appData.trips.forEach(trip => getTripRelevantDates(trip).forEach(date => years.add(String(date).slice(0,4))));
+      const sortedYears = Array.from(years).filter(Boolean).sort();
+      const currentYear = String(new Date().getFullYear());
+      const currentValue = tripYearFilter.value;
+      tripYearFilter.innerHTML = '<option value="">ทุกปี</option>' + sortedYears.map(year => `<option value="${year}">${year}</option>`).join('');
+      if(currentValue && sortedYears.includes(currentValue)) tripYearFilter.value = currentValue;
+      else if(sortedYears.includes(currentYear)) tripYearFilter.value = currentYear;
+      else tripYearFilter.value = '';
+      refreshEnhancedSelect(tripYearFilter);
+      refreshEnhancedSelect(tripMonthFilter);
+    }
+    function tripFilterState(){
+      return {
+        keyword: (tripSearchKeyword.value || '').trim().toLowerCase(),
+        year: tripYearFilter.value || '',
+        month: tripMonthFilter.value || '',
+        category: tripCategoryFilter.value || '',
+        status: tripStatusFilter.value || ''
+      };
+    }
+    function tripMatchesPeriod(trip, year, month){
+      if(!year && !month) return true;
+      return getTripRelevantDates(trip).some(date => {
+        if(!date) return false;
+        const y = String(date).slice(0,4);
+        const m = String(date).slice(5,7);
+        if(year && y !== year) return false;
+        if(month && m !== month) return false;
+        return true;
+      });
+    }
+    function getActiveTripFilterText(){
+      const f = tripFilterState();
+      const parts = [];
+      if(f.keyword) parts.push(`ค้นหา: ${f.keyword}`);
+      if(f.year) parts.push(`ปี ${f.year}`);
+      if(f.month) parts.push(`เดือน ${Number(f.month)}`);
+      if(f.category) parts.push(`หมวด ${f.category}`);
+      if(f.status === 'upcoming') parts.push('ยังไม่เริ่ม');
+      if(f.status === 'ongoing') parts.push('กำลังเดินทาง');
+      if(f.status === 'completed') parts.push('จบทริปแล้ว');
+      return parts;
+    }
+    function tripMatchesFilter(trip){
+      const f = tripFilterState();
+      const haystack = `${trip.name || ''} ${trip.destination || ''} ${trip.note || ''} ${(trip.items || []).map(item => `${item.title || ''} ${item.note || ''}`).join(' ')}`.toLowerCase();
+      if(f.keyword && !haystack.includes(f.keyword)) return false;
+      if(!tripMatchesPeriod(trip, f.year, f.month)) return false;
+      if(f.category && !(trip.items || []).some(item => item.category === f.category)) return false;
+      if(f.status && getTripStatus(trip) !== f.status) return false;
+      return true;
+    }
+    function ensureActiveTrip(filteredTrips){
+      if(filteredTrips.some(trip => trip.id === activeTripId)) return;
+      activeTripId = filteredTrips[0]?.id || null;
+    }
+    function scrollToTripDetail(){
+      if(!tripDetailPanel) return;
+      const shouldScroll = tripViewMode === 'calendar' || window.innerWidth <= 1180;
+      if(!shouldScroll) return;
+      requestAnimationFrame(() => {
+        tripDetailPanel.scrollIntoView({ behavior:'smooth', block:'start' });
+      });
+    }
+    function renderTrips(){
+      updateTripTimeFilterOptions();
+      if(tripShell){
+        tripShell.classList.toggle('trip-shell-list', tripViewMode === 'list');
+        tripShell.classList.toggle('trip-shell-calendar', tripViewMode === 'calendar');
+      }
+      const trips = appData.trips.slice().sort((a,b) => String(a.startDate || '').localeCompare(String(b.startDate || '')) || String(a.name || '').localeCompare(String(b.name || ''),'th'));
+      const filteredTrips = trips.filter(tripMatchesFilter);
+      ensureActiveTrip(filteredTrips);
+      tripFilterResultLabel.textContent = `แสดง ${filteredTrips.length} จากทั้งหมด ${trips.length} ทริป`;
+      tripFilterSummary.innerHTML = getActiveTripFilterText().length
+        ? getActiveTripFilterText().map(text => `<span class="pill">${escapeHtml(text)}</span>`).join('')
+        : '<span class="pill">ยังไม่ได้ใช้ตัวกรองเพิ่มเติม</span>';
+      tripTotalCount.textContent = String(filteredTrips.length);
+
+      if(!filteredTrips.length){
+        tripSummaryLabel.textContent = 'ไม่พบทริปตามตัวกรอง';
+        tripExpenseTotal.textContent = formatMoney(0);
+        tripDayCount.textContent = '0';
+        tripItemCount.textContent = '0';
+        tripTopCategory.textContent = '-';
+        tripListContainer.innerHTML = '<div class="empty">ยังไม่มีทริปที่ตรงกับตัวกรอง</div>';
+        tripCalendarContainer.innerHTML = '<div class="empty">ยังไม่มีทริปที่ตรงกับตัวกรอง</div>';
+        tripListContainer.classList.toggle('hidden', tripViewMode === 'calendar');
+        tripCalendarContainer.classList.toggle('hidden', tripViewMode !== 'calendar');
+        tripListViewBtn.classList.toggle('btn-primary', tripViewMode === 'list');
+        tripListViewBtn.classList.toggle('btn-light', tripViewMode !== 'list');
+        tripCalendarViewBtn.classList.toggle('btn-primary', tripViewMode === 'calendar');
+        tripCalendarViewBtn.classList.toggle('btn-light', tripViewMode !== 'calendar');
+        tripDetailContainer.innerHTML = '<div class="empty">สร้างทริปใหม่ หรือปรับตัวกรองเพื่อดูข้อมูล</div>';
+        return;
+      }
+
+      tripListContainer.innerHTML = filteredTrips.map(trip => {
+        const status = getTripStatus(trip);
+        const statusLabel = status === 'upcoming' ? 'ยังไม่เริ่ม' : (status === 'completed' ? 'จบทริปแล้ว' : 'กำลังเดินทาง');
+        const progressText = trip.budget !== '' && Number(trip.budget || 0) > 0
+          ? `${Math.round((getTripTotal(trip) / Number(trip.budget || 1)) * 100)}% ของงบ`
+          : 'ยังไม่ได้ตั้งงบ';
+        return `
+          <div class="trip-card ${trip.id === activeTripId ? 'active' : ''}" id="trip-card-${trip.id}">
+            <div class="trip-card-head">
+              <div class="trip-card-title">
+                <h4>${escapeHtml(trip.name)}</h4>
+                <div class="meta"><strong>${escapeHtml(trip.destination || 'ไม่ระบุปลายทาง')}</strong></div>
+                <div class="meta">${escapeHtml(getTripDateRangeLabel(trip))}</div>
+              </div>
+              <span class="badge">${statusLabel}</span>
+            </div>
+            <div class="trip-meta-line">
+              <span class="pill">${(trip.items || []).length} รายการ</span>
+              <span class="pill">${getTripDays(trip).length} วัน</span>
+              <span class="pill">${(trip.items || []).filter(item => item.installmentId).length} ลิงก์ยอดผ่อน</span>
+            </div>
+            <div class="trip-card-total">
+              <div>
+                <div class="meta">ค่าใช้จ่ายรวม</div>
+                <strong>${formatMoney(getTripTotal(trip))}</strong>
+              </div>
+              <div style="text-align:right">
+                <div class="meta">งบ ${trip.budget === '' ? '-' : formatMoney(trip.budget)}</div>
+                <div class="meta">${escapeHtml(progressText)}</div>
+              </div>
+            </div>
+            <div class="trip-card-footer">
+              <div class="trip-chip-row">
+                ${trip.note ? `<span class="pill">มีหมายเหตุ</span>` : ''}
+              </div>
+              <div class="small-actions">
+                <button class="btn-light btn-sm" onclick="selectTrip('${trip.id}')">ดูรายละเอียด</button>
+                <button class="btn-light btn-sm" onclick="editTrip('${trip.id}')">แก้ไข</button>
+                <button class="btn-danger btn-sm" onclick="deleteTrip('${trip.id}')">ลบ</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+      const tripCalendarMonths = getTripCalendarMonths(filteredTrips);
+      tripCalendarContainer.innerHTML = tripCalendarMonths.map(monthKey => {
+        const monthTrips = filteredTrips.filter(trip => getTripRelevantDates(trip).some(date => getMonthKeyFromDate(date) === monthKey));
+        const monthTotal = monthTrips.reduce((sum, trip) => sum + getTripTotal(trip), 0);
+        const monthItemCount = monthTrips.reduce((sum, trip) => sum + (trip.items || []).length, 0);
+        return `
+          <div class="calendar-month">
+            <div class="calendar-month-head">
+              <h4 style="margin:0">${formatMonthThai(monthKey)}</h4>
+              <span class="pill">${monthTrips.length} ทริป</span>
+            </div>
+            <div class="trip-calendar-summary">
+              <div class="meta">ค่าใช้จ่ายรวม ${formatMoney(monthTotal)}</div>
+              <div class="meta">${monthItemCount} รายการ</div>
+            </div>
+            <div class="calendar-list">
+              ${monthTrips.length ? monthTrips.map(trip => `
+                <div class="trip-calendar-item">
+                  <button class="btn-light btn-sm" onclick="selectTrip('${trip.id}')">${escapeHtml(trip.name)}</button>
+                  <div class="meta">${escapeHtml(trip.destination || 'ไม่ระบุปลายทาง')} · ${escapeHtml(getTripDateRangeLabel(trip))}</div>
+                  <div style="display:flex; justify-content:space-between; gap:8px; flex-wrap:wrap">
+                    <span class="pill">${(trip.items || []).length} รายการ</span>
+                    <strong>${formatMoney(getTripTotal(trip))}</strong>
+                  </div>
+                </div>
+              `).join('') : '<div class="meta">ไม่มีทริปในเดือนนี้</div>'}
+            </div>
+          </div>
+        `;
+      }).join('');
+      tripListContainer.classList.toggle('hidden', tripViewMode === 'calendar');
+      tripCalendarContainer.classList.toggle('hidden', tripViewMode !== 'calendar');
+      tripListViewBtn.classList.toggle('btn-primary', tripViewMode === 'list');
+      tripListViewBtn.classList.toggle('btn-light', tripViewMode !== 'list');
+      tripCalendarViewBtn.classList.toggle('btn-primary', tripViewMode === 'calendar');
+      tripCalendarViewBtn.classList.toggle('btn-light', tripViewMode !== 'calendar');
+
+      const trip = filteredTrips.find(item => item.id === activeTripId) || filteredTrips[0];
+      const items = (trip.items || []).slice().sort((a,b) => String(a.date || '').localeCompare(String(b.date || '')) || Number(b.amount || 0) - Number(a.amount || 0));
+      const dayList = getTripDays(trip);
+      const categoryTotals = new Map();
+      items.forEach(item => categoryTotals.set(item.category || 'ท่องเที่ยว', (categoryTotals.get(item.category || 'ท่องเที่ยว') || 0) + Number(item.amount || 0)));
+      const topCategoryEntry = Array.from(categoryTotals.entries()).sort((a,b) => b[1] - a[1])[0];
+      const linkedItems = items.filter(item => item.installmentId);
+      const linkedTotal = linkedItems.reduce((sum, item) => sum + Number(item.amount || 0), 0);
+      tripSummaryLabel.textContent = `${trip.name} · ${trip.destination || 'ไม่ระบุปลายทาง'}`;
+      tripExpenseTotal.textContent = formatMoney(getTripTotal(trip));
+      tripDayCount.textContent = String(dayList.length);
+      tripItemCount.textContent = String(items.length);
+      tripTopCategory.textContent = topCategoryEntry ? formatCategoryLabel(topCategoryEntry[0]) : '-';
+
+      tripDetailContainer.innerHTML = `
+        <div class="trip-detail">
+          <div class="trip-detail-hero">
+            <div class="trip-detail-top">
+              <div>
+                <h3 style="margin:0">${escapeHtml(trip.name)}</h3>
+                <div class="meta">${escapeHtml(trip.destination || 'ไม่ระบุปลายทาง')} · ${escapeHtml(getTripDateRangeLabel(trip))}</div>
+              </div>
+              <div class="small-actions">
+                <button class="btn-primary btn-sm" onclick="createTripItemForTrip('${trip.id}')">＋ เพิ่มรายการ</button>
+                <button class="btn-light btn-sm" onclick="editTrip('${trip.id}')">แก้ไขทริป</button>
+              </div>
+            </div>
+            <div class="trip-stat-grid">
+              <div class="trip-highlight"><span class="meta">ค่าใช้จ่ายรวม</span><strong>${formatMoney(getTripTotal(trip))}</strong></div>
+              <div class="trip-highlight"><span class="meta">งบประมาณ</span><strong>${trip.budget === '' ? '-' : formatMoney(trip.budget)}</strong></div>
+              <div class="trip-highlight"><span class="meta">วันที่มีรายการ</span><strong>${dayList.length}</strong></div>
+              <div class="trip-highlight"><span class="meta">รายการทั้งหมด</span><strong>${items.length}</strong></div>
+            </div>
+            <div class="trip-chip-row">
+              <span class="pill">${escapeHtml(getTripDateRangeLabel(trip))}</span>
+              <span class="pill">${escapeHtml(getTripStatus(trip) === 'upcoming' ? 'ยังไม่เริ่ม' : getTripStatus(trip) === 'completed' ? 'จบทริปแล้ว' : 'กำลังเดินทาง')}</span>
+              <span class="pill">${linkedItems.length} รายการลิงก์ยอดผ่อน</span>
+            </div>
+            ${trip.note ? `<div class="trip-note-box">${escapeHtml(trip.note)}</div>` : ''}
+          </div>
+          ${linkedItems.length ? `<div class="notice-box"><strong>${formatMoney(linkedTotal)}</strong><br><span class="meta">มูลค่ารายการที่ลิงก์กับยอดผ่อน ${linkedItems.length} รายการ หน้ารายเดือนจะนับจากยอดผ่อนเท่านั้น</span></div>` : ''}
+          <div class="trip-detail-grid">
+            <div class="trip-category-stack">
+              <div class="trip-section-title">
+                <h4 style="margin:0">สรุปตามหมวด</h4>
+                <div class="trip-chip-row">
+                  <span class="pill">${categoryTotals.size} หมวด</span>
+                  <span class="pill">หมวดสูงสุด ${topCategoryEntry ? escapeHtml(formatCategoryLabel(topCategoryEntry[0])) : '-'}</span>
+                  <span class="pill">วันแรก ${dayList[0] ? escapeHtml(dayList[0]) : '-'}</span>
+                  <span class="pill">วันล่าสุด ${dayList[dayList.length - 1] ? escapeHtml(dayList[dayList.length - 1]) : '-'}</span>
+                </div>
+              </div>
+              ${categoryTotals.size ? Array.from(categoryTotals.entries()).sort((a,b) => b[1] - a[1]).map(([category, amount]) => `
+                <div class="trip-category-card">
+                  <span>${escapeHtml(formatCategoryLabel(category))}</span>
+                  <strong>${formatMoney(amount)}</strong>
+                </div>
+              `).join('') : '<div class="empty">ยังไม่มีรายการในทริปนี้</div>'}
+            </div>
+          </div>
+          <div class="trip-day-stack">
+            <div class="trip-section-title">
+              <h4 style="margin:0">รายการแยกตามวัน</h4>
+              <span class="pill">${dayList.length} วัน</span>
+            </div>
+            ${dayList.length ? dayList.map(day => {
+              const dayItems = items.filter(item => item.date === day);
+              const dayTotal = dayItems.reduce((sum, item) => sum + Number(item.amount || 0), 0);
+              const collapseId = `trip-day-items-${trip.id}-${day.replace(/[^0-9]/g,'')}`;
+              return `
+                <div class="trip-day-block">
+                  <div class="trip-day-header">
+                    <div class="trip-day-summary">
+                      <h4>${escapeHtml(day)}</h4>
+                      <span class="pill">${dayItems.length} รายการ</span>
+                      <span class="pill">รวม ${formatMoney(dayTotal)}</span>
+                    </div>
+                    <button type="button" class="card-toggle btn-sm trip-day-toggle" onclick="toggleTripDay('${collapseId}', this)">
+                      <span class="chev" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M5 7.5 10 12.5 15 7.5"></path></svg></span>
+                    </button>
+                  </div>
+                  <div id="${collapseId}" class="trip-day-items">
+                    ${dayItems.map(item => {
+                      const linkedInstallment = getInstallmentLinkForTripItem(item);
+                      const paymentState = getTripItemPaymentState(item);
+                      return `
+                      <div class="trip-item-card" id="trip-item-${trip.id}-${item.id}">
+                        <div class="trip-item-main">
+                          <div class="trip-item-title-row">
+                            <strong>${escapeHtml(item.title)}</strong>
+                            <strong class="amount-expense trip-item-amount">${formatMoney(item.amount)}</strong>
+                          </div>
+                          <div class="trip-item-meta">
+                            <span class="meta">${escapeHtml(formatCategoryLabel(item.category || 'ท่องเที่ยว'))}</span>
+                            ${getPaymentStatusBadge(paymentState.isPaid)}
+                            ${item.note ? `<span class="meta">${escapeHtml(item.note)}</span>` : ''}
+                          </div>
+                          ${linkedInstallment ? `<div class="readonly-note">ลิงก์กับยอดผ่อน: ${escapeHtml(linkedInstallment.name)} · จ่ายรายเดือน ${formatMoney(linkedInstallment.monthlyAmount || 0)} · สถานะจะอ้างอิงจากยอดผ่อน</div>` : ''}
+                        </div>
+                        <div class="trip-item-actions">
+                          <button class="payment-toggle ${paymentState.isPaid ? 'is-paid' : 'is-unpaid'}" onclick="toggleTripItemPaid('${trip.id}','${item.id}')">
+                            <input type="checkbox" ${paymentState.isPaid ? 'checked' : ''}>
+                            <span>${linkedInstallment ? 'ไปปรับที่ยอดผ่อน' : (paymentState.isPaid ? 'จ่ายแล้ว' : 'ยังไม่จ่าย')}</span>
+                          </button>
+                          <button class="btn-light btn-sm" onclick="editTripItem('${trip.id}','${item.id}')">แก้ไข</button>
+                          ${linkedInstallment ? `<button class="btn-light btn-sm" onclick="goToInstallments('${linkedInstallment.id}','${getMonthKeyFromDate(item.date) || ''}')">ไปยอดผ่อน</button>` : ''}
+                          <button class="btn-danger btn-sm" onclick="deleteTripItem('${trip.id}','${item.id}')">ลบ</button>
+                        </div>
+                      </div>
+                    `;
+                    }).join('')}
+                  </div>
+                </div>
+              `;
+            }).join('') : '<div class="empty">ยังไม่มีรายการในทริปนี้</div>'}
+          </div>
+        </div>
+      `;
+    }
+
     function renderAll(){
       initPickers();
       syncAllPickerValues();
+      refreshAllEnhancedSelects();
       updateFileStatus();
       renderMonthly();
       renderYearly();
@@ -1755,12 +3532,41 @@
       document.querySelectorAll('.view').forEach(el => el.classList.add('hidden'));
       document.getElementById(`view-${currentView}`).classList.remove('hidden');
       document.querySelectorAll('.menu-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.view === currentView));
+      updateBackButtons();
+    }
+
+    function isMobileMenuLayout(){
+      return window.innerWidth <= 760;
+    }
+
+    function setMobileMenu(open){
+      if(!mobileMenuToggle || !mainMenuPanel) return;
+      const shouldOpen = isMobileMenuLayout() ? Boolean(open) : true;
+      mainMenuPanel.classList.toggle('is-open', shouldOpen && isMobileMenuLayout());
+      mainMenuPanel.setAttribute('aria-hidden', shouldOpen ? 'false' : 'true');
+      mobileMenuToggle.classList.toggle('is-active', shouldOpen && isMobileMenuLayout());
+      mobileMenuToggle.setAttribute('aria-expanded', shouldOpen && isMobileMenuLayout() ? 'true' : 'false');
+    }
+
+    function syncResponsiveMenu(){
+      if(!mobileMenuToggle || !mainMenuPanel) return;
+      if(isMobileMenuLayout()){
+        const isOpen = mainMenuPanel.classList.contains('is-open');
+        mainMenuPanel.setAttribute('aria-hidden', isOpen ? 'false' : 'true');
+        mobileMenuToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        return;
+      }
+      mainMenuPanel.classList.remove('is-open');
+      mainMenuPanel.setAttribute('aria-hidden', 'false');
+      mobileMenuToggle.classList.remove('is-active');
+      mobileMenuToggle.setAttribute('aria-expanded', 'false');
     }
 
     function openEntryModal(){
       entryModal.classList.remove('hidden');
       entryModal.setAttribute('aria-hidden','false');
       document.body.style.overflow = 'hidden';
+      setQuickAddStatus('');
     }
 
     function closeEntryModal(){
@@ -1780,10 +3586,35 @@
       loanModal.setAttribute('aria-hidden','true');
       document.body.style.overflow = '';
     }
+    function openTripModal(){
+      tripModal.classList.remove('hidden');
+      tripModal.setAttribute('aria-hidden','false');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeTripModal(){
+      tripModal.classList.add('hidden');
+      tripModal.setAttribute('aria-hidden','true');
+      document.body.style.overflow = '';
+    }
+    function openTripItemModal(){
+      if(!appData.trips.length){
+        alert('กรุณาสร้างทริปก่อน');
+        return;
+      }
+      tripItemModal.classList.remove('hidden');
+      tripItemModal.setAttribute('aria-hidden','false');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeTripItemModal(){
+      tripItemModal.classList.add('hidden');
+      tripItemModal.setAttribute('aria-hidden','true');
+      document.body.style.overflow = '';
+    }
 
 
     function openMonthFromYearly(monthKey){
       if(!monthKey) return;
+      pushNavigationHistory();
       rangeStartMonth.value = monthKey;
       rangeEndMonth.value = monthKey;
       syncPickerValue(rangeStartMonth);
@@ -1859,7 +3690,7 @@
     }
 
     function syncAllPickerValues(){
-      [entryDate, rangeStartMonth, rangeEndMonth, loanStartMonth, loanFilterStartMonth, loanFilterEndMonth]
+      [entryDate, rangeStartMonth, rangeEndMonth, loanStartMonth, loanFilterStartMonth, loanFilterEndMonth, tripStartDate, tripEndDate, tripItemDate]
         .forEach(syncPickerValue);
     }
 
@@ -1871,6 +3702,9 @@
       createPicker(loanStartMonth, 'month');
       createPicker(loanFilterStartMonth, 'month');
       createPicker(loanFilterEndMonth, 'month');
+      createPicker(tripStartDate, 'date');
+      createPicker(tripEndDate, 'date');
+      createPicker(tripItemDate, 'date');
     }
 
     function shiftYear(delta){
@@ -1919,10 +3753,35 @@
       entryAmount.value = '';
       entryTitle.value = '';
       entryNote.value = '';
+      entryIsPaid.checked = false;
       repeatEnabled.checked = false;
       repeatCount.value = 1;
       repeatCount.disabled = true;
+      updateEntryPaidVisibility();
       syncPickerValue(entryDate);
+      setQuickAddStatus('');
+      refreshAllEnhancedSelects();
+    }
+
+    function fillEntryForm(item, options = {}){
+      const { duplicate = false } = options;
+      editingEntryId = duplicate ? null : item.id;
+      entryFormTitle.textContent = duplicate ? '📄 คัดลอกรายการเดิม' : '✏️ แก้ไขรายรับ / รายจ่าย';
+      entryEditBadge.classList.toggle('hidden', duplicate);
+      saveEntryBtn.textContent = duplicate ? '💾 บันทึกรายการใหม่' : '💾 บันทึกการแก้ไข';
+      entryType.value = item.type;
+      entryDate.value = duplicate ? currentDate() : item.date;
+      entryCategory.value = item.category || 'อื่นๆ';
+      entryAmount.value = item.amount;
+      entryTitle.value = item.title;
+      entryNote.value = item.note || '';
+      entryIsPaid.checked = !!item.isPaid;
+      repeatEnabled.checked = false;
+      repeatCount.value = 1;
+      repeatCount.disabled = true;
+      updateEntryPaidVisibility();
+      syncPickerValue(entryDate);
+      refreshAllEnhancedSelects();
     }
 
     function clearLoanForm(){
@@ -1944,6 +3803,36 @@
       loanInterestNote.value = '';
       syncPickerValue(loanStartMonth);
       updateLoanSmartHint();
+      refreshAllEnhancedSelects();
+    }
+    function clearTripForm(){
+      editingTripId = null;
+      tripFormTitle.textContent = '➕ สร้างทริป';
+      tripEditBadge.classList.add('hidden');
+      saveTripBtn.textContent = '💾 บันทึกทริป';
+      tripName.value = '';
+      tripDestination.value = '';
+      tripBudget.value = '';
+      tripStartDate.value = currentDate();
+      tripEndDate.value = currentDate();
+      tripNote.value = '';
+      syncPickerValue(tripStartDate);
+      syncPickerValue(tripEndDate);
+    }
+    function clearTripItemForm(){
+      editingTripItemId = null;
+      tripItemFormTitle.textContent = '➕ เพิ่มรายการในทริป';
+      tripItemEditBadge.classList.add('hidden');
+      saveTripItemBtn.textContent = '💾 บันทึกรายการ';
+      tripItemTripId.value = activeTripId || appData.trips[0]?.id || '';
+      tripItemDate.value = currentDate();
+      tripItemCategory.value = 'ท่องเที่ยว';
+      tripItemTitle.value = '';
+      tripItemAmount.value = '';
+      tripItemInstallmentId.value = '';
+      tripItemNote.value = '';
+      syncPickerValue(tripItemDate);
+      refreshAllEnhancedSelects();
     }
 
     function addOrUpdateEntry(){
@@ -1958,7 +3847,8 @@
         category: entryCategory.value,
         title: entryTitle.value.trim(),
         amount: Number(entryAmount.value),
-        note: entryNote.value.trim()
+        note: entryNote.value.trim(),
+        isPaid: entryType.value === 'expense' ? entryIsPaid.checked : true
       };
 
       if(editingEntryId){
@@ -1986,6 +3876,28 @@
       clearEntryForm();
       closeEntryModal();
       renderAll();
+    }
+
+    function submitQuickAdd(){
+      const parsed = parseQuickAddInput(quickAddInput.value);
+      if(!parsed.ok){
+        setQuickAddStatus(parsed.message, 'error');
+        quickAddInput.focus();
+        return;
+      }
+
+      const entry = parsed.entry;
+      appData.entries.push(entry);
+      yearlyYearPicker.value = String(new Date(entry.date).getFullYear());
+      if(rangeStartMonth.value === rangeEndMonth.value){
+        rangeStartMonth.value = getMonthKeyFromDate(entry.date);
+        rangeEndMonth.value = getMonthKeyFromDate(entry.date);
+      }
+
+      quickAddInput.value = '';
+      setQuickAddStatus(`บันทึก ${entry.type === 'income' ? 'รายรับ' : 'รายจ่าย'}: ${entry.title} ${formatMoney(entry.amount)}`, 'success');
+      renderAll();
+      quickAddInput.focus();
     }
 
     function addOrUpdateInstallment(){
@@ -2019,8 +3931,15 @@
         dueDay: loanDueDay.value === '' ? '' : Math.min(31, Math.max(1, Number(loanDueDay.value))),
         interestType: draft.interestType,
         interestRate: draft.interestRate,
-        interestNote: loanInterestNote.value.trim()
+        interestNote: loanInterestNote.value.trim(),
+        paidMonthKeys: editingLoanId
+          ? (appData.installments.find(x => x.id === editingLoanId)?.paidMonthKeys || []).filter(monthKey => getInstallmentScheduleMonths({
+            startMonth: loanStartMonth.value || '',
+            totalMonths: draft.totalMonths
+          }).includes(monthKey))
+          : Array.from({length:draft.paidMonths}, (_, index) => addMonths(loanStartMonth.value || '', index)).filter(Boolean)
       };
+      syncInstallmentPaidMonths(payload);
 
       if(editingLoanId){
         appData.installments = appData.installments.map(x => x.id === editingLoanId ? payload : x);
@@ -2030,6 +3949,77 @@
 
       clearLoanForm();
       closeLoanModal();
+      renderAll();
+    }
+    function addOrUpdateTrip(){
+      if(!tripName.value.trim() || !tripStartDate.value || !tripEndDate.value){
+        alert('กรุณากรอกชื่อทริป วันเริ่ม และวันจบ');
+        return;
+      }
+      if(tripEndDate.value < tripStartDate.value){
+        alert('วันจบต้องไม่ก่อนวันเริ่ม');
+        return;
+      }
+      const existingItems = editingTripId ? (appData.trips.find(trip => trip.id === editingTripId)?.items || []) : [];
+      const payload = {
+        id: editingTripId || crypto.randomUUID(),
+        name: tripName.value.trim(),
+        destination: tripDestination.value.trim(),
+        startDate: tripStartDate.value,
+        endDate: tripEndDate.value,
+        budget: tripBudget.value === '' ? '' : Number(tripBudget.value),
+        note: tripNote.value.trim(),
+        items: existingItems
+      };
+      if(editingTripId){
+        appData.trips = appData.trips.map(trip => trip.id === editingTripId ? payload : trip);
+      }else{
+        appData.trips.push(payload);
+      }
+      activeTripId = payload.id;
+      clearTripForm();
+      closeTripModal();
+      renderAll();
+    }
+    function addOrUpdateTripItem(){
+      if(!tripItemTripId.value || !tripItemDate.value || !tripItemTitle.value.trim()){
+        alert('กรุณาเลือกทริป วันที่ และรายการ');
+        return;
+      }
+      const trip = appData.trips.find(item => item.id === tripItemTripId.value);
+      if(!trip){
+        alert('ไม่พบทริปที่เลือก');
+        return;
+      }
+      const linkedInstallment = tripItemInstallmentId.value ? appData.installments.find(item => item.id === tripItemInstallmentId.value) : null;
+      const fallbackAmount = linkedInstallment ? getInstallmentDisplayTotal(linkedInstallment) : null;
+      const finalAmount = tripItemAmount.value === '' ? fallbackAmount : Number(tripItemAmount.value);
+      if(finalAmount == null || !Number.isFinite(finalAmount) || finalAmount <= 0){
+        alert('กรุณากรอกจำนวนเงิน หรือเลือกลิงก์ยอดผ่อนเพื่อให้ระบบเติมยอดให้อัตโนมัติ');
+        return;
+      }
+      const payload = {
+        id: editingTripItemId || crypto.randomUUID(),
+        date: tripItemDate.value,
+        category: tripItemCategory.value || 'ท่องเที่ยว',
+        title: tripItemTitle.value.trim(),
+        amount: Number(finalAmount),
+        note: tripItemNote.value.trim(),
+        installmentId: linkedInstallment?.id || '',
+        isPaid: editingTripItemId
+          ? !!(trip.items.find(item => item.id === editingTripItemId)?.isPaid)
+          : true
+      };
+      trip.items = (trip.items || []).slice();
+      if(editingTripItemId){
+        trip.items = trip.items.map(item => item.id === editingTripItemId ? payload : item);
+      }else{
+        trip.items.push(payload);
+      }
+      trip.items.sort((a,b) => String(a.date || '').localeCompare(String(b.date || '')) || String(a.title || '').localeCompare(String(b.title || ''),'th'));
+      activeTripId = trip.id;
+      clearTripItemForm();
+      closeTripItemModal();
       renderAll();
     }
 
@@ -2109,11 +4099,11 @@
 
     function updateFileStatus(){
       if(loadedFileName && lastImportAt){
-        fileStatus.textContent = `IndexedDB active · Last import: ${loadedFileName} · ${new Date(lastImportAt).toLocaleString('th-TH')}`;
+        fileStatus.textContent = `active · Last import: ${loadedFileName} · ${new Date(lastImportAt).toLocaleString('th-TH')}`;
       }else if(loadedFileName){
-        fileStatus.textContent = `IndexedDB active · Imported from: ${loadedFileName}`;
+        fileStatus.textContent = `active · Imported from: ${loadedFileName}`;
       }else{
-        fileStatus.textContent = 'IndexedDB active · Data is stored automatically in this browser';
+        fileStatus.textContent = 'active · Data is stored automatically in this browser';
       }
     }
 
@@ -2127,11 +4117,15 @@
     function renderAll(){
       initPickers();
       syncAllPickerValues();
+      refreshTripOptions();
+      refreshAllEnhancedSelects();
       updateFileStatus();
       renderMonthly();
       renderYearly();
+      renderTrips();
       renderInstallments();
       updateView();
+      applyPendingViewNavigation();
       persistCurrentData();
     }
 
@@ -2194,7 +4188,8 @@
     }
 
     function createNewData(){
-      appData = { entries: [], installments: [] };
+      appData = { entries: [], installments: [], trips: [] };
+      activeTripId = null;
       loadedFileName = '';
       lastImportAt = '';
       persistCurrentData({ loadedFileName: '', lastImportAt: '' });
@@ -2202,12 +4197,10 @@
     }
 
     async function boot(){
-      populateCategoryDropdowns();
       bindEvents();
-      saveJsonBtn.textContent = 'Export JSON';
-      loadAnotherBtn.textContent = 'Import JSON';
-      openJsonWithHandleBtn.textContent = 'Import JSON';
-      openJsonSimpleBtn.textContent = 'Choose JSON File';
+      syncResponsiveMenu();
+      initializeEnhancedSelects();
+      populateCategoryDropdowns();
       const welcomeTitle = document.querySelector('#welcomeScreen .welcome-box p');
       const importDescription = document.querySelector('#welcomeScreen .action-tile:first-child p');
       const importHint = document.querySelector('#welcomeScreen .hint');
@@ -2226,6 +4219,8 @@
 
       clearEntryForm();
       clearLoanForm();
+      clearTripForm();
+      clearTripItemForm();
       updateFileStatus();
       initializeCardCollapsibles();
       initDatepickers();
@@ -2242,6 +4237,7 @@
       monthlyMinAmount.value = '';
       monthlyMaxAmount.value = '';
       monthlySort.value = 'date-asc';
+      refreshAllEnhancedSelects();
       renderMonthly();
     }
 
@@ -2250,20 +4246,16 @@
       if(!item) return;
       currentView = 'monthly';
       updateView();
-      editingEntryId = id;
-      entryFormTitle.textContent = '✏️ แก้ไขรายรับ / รายจ่าย';
-      entryEditBadge.classList.remove('hidden');
-      saveEntryBtn.textContent = '💾 บันทึกการแก้ไข';
-      entryType.value = item.type;
-      entryDate.value = item.date;
-      entryCategory.value = item.category || 'อื่นๆ';
-      entryAmount.value = item.amount;
-      entryTitle.value = item.title;
-      entryNote.value = item.note || '';
-      repeatEnabled.checked = false;
-      repeatCount.value = 1;
-      repeatCount.disabled = true;
-      syncPickerValue(entryDate);
+      fillEntryForm(item);
+      openEntryModal();
+    };
+
+    window.duplicateEntry = function(id){
+      const item = appData.entries.find(x => x.id === id);
+      if(!item) return;
+      currentView = 'monthly';
+      updateView();
+      fillEntryForm(item, { duplicate:true });
       openEntryModal();
     };
 
@@ -2274,11 +4266,89 @@
       renderAll();
     };
 
-    window.goToInstallments = function(id){
-      currentView = 'installments';
+    window.goToInstallments = function(id, monthKey = ''){
+      applyInstallmentNavigation(id, { monthKey });
+    };
+    window.selectTrip = function(id){
+      activeTripId = id;
+      currentView = 'trips';
+      renderTrips();
       updateView();
-      const target = document.getElementById(`loan-card-${id}`);
-      if(target) target.scrollIntoView({ behavior:'smooth', block:'center' });
+      scrollToTripDetail();
+    };
+    window.goToTrip = function(id, itemId = '', focusDate = ''){
+      applyTripNavigation(id, { itemId, focusDate });
+    };
+    window.createTripItemForTrip = function(id){
+      activeTripId = id;
+      clearTripItemForm();
+      tripItemTripId.value = id;
+      refreshAllEnhancedSelects();
+      openTripItemModal();
+    };
+    window.editTrip = function(id){
+      const trip = appData.trips.find(x => x.id === id);
+      if(!trip) return;
+      activeTripId = id;
+      currentView = 'trips';
+      updateView();
+      editingTripId = id;
+      tripFormTitle.textContent = '✏️ แก้ไขทริป';
+      tripEditBadge.classList.remove('hidden');
+      saveTripBtn.textContent = '💾 บันทึกการแก้ไข';
+      tripName.value = trip.name;
+      tripDestination.value = trip.destination || '';
+      tripBudget.value = trip.budget === '' ? '' : trip.budget;
+      tripStartDate.value = trip.startDate || currentDate();
+      tripEndDate.value = trip.endDate || tripStartDate.value || currentDate();
+      tripNote.value = trip.note || '';
+      syncPickerValue(tripStartDate);
+      syncPickerValue(tripEndDate);
+      openTripModal();
+    };
+    window.deleteTrip = function(id){
+      if(!confirm('ลบทริปนี้พร้อมรายการทั้งหมดใช่ไหม?')) return;
+      appData.trips = appData.trips.filter(x => x.id !== id);
+      if(activeTripId === id) activeTripId = appData.trips[0]?.id || null;
+      if(editingTripId === id) clearTripForm();
+      renderAll();
+    };
+    window.editTripItem = function(tripId, itemId){
+      const trip = appData.trips.find(x => x.id === tripId);
+      const item = trip?.items?.find(x => x.id === itemId);
+      if(!trip || !item) return;
+      activeTripId = tripId;
+      currentView = 'trips';
+      updateView();
+      editingTripItemId = itemId;
+      tripItemFormTitle.textContent = '✏️ แก้ไขรายการในทริป';
+      tripItemEditBadge.classList.remove('hidden');
+      saveTripItemBtn.textContent = '💾 บันทึกการแก้ไข';
+      tripItemTripId.value = tripId;
+      tripItemDate.value = item.date || currentDate();
+      tripItemCategory.value = item.category || 'ท่องเที่ยว';
+      tripItemTitle.value = item.title || '';
+      tripItemAmount.value = item.amount;
+      tripItemInstallmentId.value = item.installmentId || '';
+      tripItemNote.value = item.note || '';
+      syncPickerValue(tripItemDate);
+      refreshAllEnhancedSelects();
+      openTripItemModal();
+    };
+    window.deleteTripItem = function(tripId, itemId){
+      if(!confirm('ลบรายการนี้ออกจากทริปใช่ไหม?')) return;
+      const trip = appData.trips.find(x => x.id === tripId);
+      if(!trip) return;
+      trip.items = (trip.items || []).filter(x => x.id !== itemId);
+      if(editingTripItemId === itemId) clearTripItemForm();
+      activeTripId = tripId;
+      renderAll();
+    };
+    window.toggleTripDay = function(id, btn){
+      const container = document.getElementById(id);
+      if(!container) return;
+      container.classList.toggle('hidden');
+      btn?.classList.toggle('is-collapsed', container.classList.contains('hidden'));
     };
 
     window.editLoan = function(id){
@@ -2304,6 +4374,7 @@
       loanInterestNote.value = item.interestNote || '';
       syncPickerValue(loanStartMonth);
       updateLoanSmartHint();
+      refreshAllEnhancedSelects();
       openLoanModal();
       window.scrollTo({ top: 0, behavior:'smooth' });
     };
@@ -2322,9 +4393,35 @@
         alert('รายการนี้จ่ายครบแล้ว');
         return;
       }
-      item.paidMonths += 1;
+      const nextMonthKey = getInstallmentScheduleMonths(item).find(monthKey => !isInstallmentMonthPaid(item, monthKey));
+      item.paidMonthKeys = Array.isArray(item.paidMonthKeys) ? item.paidMonthKeys.slice() : [];
+      if(nextMonthKey && !item.paidMonthKeys.includes(nextMonthKey)) item.paidMonthKeys.push(nextMonthKey);
+      syncInstallmentPaidMonths(item);
       if(item.remainingOverride !== '' && item.remainingOverride != null){
         item.remainingOverride = Math.max(0, Number(item.remainingOverride) - Number(item.monthlyAmount || 0));
+      }
+      renderAll();
+    };
+
+    window.toggleEntryPaid = function(id){
+      const item = appData.entries.find(x => x.id === id);
+      if(!item || item.type !== 'expense') return;
+      item.isPaid = !item.isPaid;
+      renderAll();
+    };
+
+    window.toggleInstallmentMonthPaid = function(id, monthKey){
+      const item = appData.installments.find(x => x.id === id);
+      if(!item || !monthKey) return;
+      item.paidMonthKeys = Array.isArray(item.paidMonthKeys) ? item.paidMonthKeys.slice() : [];
+      if(item.paidMonthKeys.includes(monthKey)){
+        item.paidMonthKeys = item.paidMonthKeys.filter(value => value !== monthKey);
+      }else{
+        item.paidMonthKeys.push(monthKey);
+      }
+      syncInstallmentPaidMonths(item);
+      if(item.remainingOverride !== '' && item.remainingOverride != null){
+        item.remainingOverride = round2(Math.max(0, (Number(item.totalMonths || 0) - item.paidMonthKeys.length) * Number(item.monthlyAmount || 0)));
       }
       renderAll();
     };
@@ -2343,6 +4440,9 @@
         else startupJsonFile.click();
       });
       saveJsonBtn.addEventListener('click', saveJsonFile);
+      mobileMenuToggle?.addEventListener('click', () => {
+        setMobileMenu(!mainMenuPanel.classList.contains('is-open'));
+      });
 
       rangeStartMonth.addEventListener('change', renderMonthly);
       rangeEndMonth.addEventListener('change', renderMonthly);
@@ -2352,7 +4452,18 @@
       monthlyMinAmount.addEventListener('input', renderMonthly);
       monthlyMaxAmount.addEventListener('input', renderMonthly);
       monthlySort.addEventListener('change', renderMonthly);
+      quickAddInput.addEventListener('input', () => setQuickAddStatus(''));
+      quickAddInput.addEventListener('keydown', (e) => {
+        if(e.key !== 'Enter') return;
+        e.preventDefault();
+        submitQuickAdd();
+      });
+      quickAddSubmitBtn.addEventListener('click', submitQuickAdd);
       resetMonthlyFiltersBtn.addEventListener('click', resetMonthlyFilters);
+      backFromMonthlyBtn?.addEventListener('click', goBackToPreviousView);
+      backFromTripsBtn?.addEventListener('click', goBackToPreviousView);
+      backFromInstallmentsBtn?.addEventListener('click', goBackToPreviousView);
+      floatingBackBtn?.addEventListener('click', goBackToPreviousView);
       openEntryModalBtn.addEventListener('click', () => { clearEntryForm(); openEntryModal(); });
       openEntryModalBtnSecondary.addEventListener('click', () => { clearEntryForm(); openEntryModal(); });
       closeEntryModalBtn.addEventListener('click', closeEntryModal);
@@ -2360,6 +4471,12 @@
       openLoanModalBtn.addEventListener('click', () => { clearLoanForm(); openLoanModal(); });
       closeLoanModalBtn.addEventListener('click', closeLoanModal);
       loanModal.addEventListener('click', (e) => { if(e.target === loanModal) closeLoanModal(); });
+      openTripModalBtn.addEventListener('click', () => { clearTripForm(); openTripModal(); });
+      openTripItemModalBtn.addEventListener('click', () => { clearTripItemForm(); openTripItemModal(); });
+      closeTripModalBtn.addEventListener('click', closeTripModal);
+      closeTripItemModalBtn.addEventListener('click', closeTripItemModal);
+      tripModal.addEventListener('click', (e) => { if(e.target === tripModal) closeTripModal(); });
+      tripItemModal.addEventListener('click', (e) => { if(e.target === tripItemModal) closeTripItemModal(); });
       prevYearBtn.addEventListener('click', () => shiftYear(-1));
       nextYearBtn.addEventListener('click', () => shiftYear(1));
 
@@ -2367,14 +4484,31 @@
         repeatCount.disabled = !repeatEnabled.checked;
         if(!repeatEnabled.checked) repeatCount.value = 1;
       });
+      entryType.addEventListener('change', updateEntryPaidVisibility);
 
       saveEntryBtn.addEventListener('click', addOrUpdateEntry);
       clearEntryBtn.addEventListener('click', clearEntryForm);
       saveLoanBtn.addEventListener('click', addOrUpdateInstallment);
       clearLoanBtn.addEventListener('click', clearLoanForm);
+      saveTripBtn.addEventListener('click', addOrUpdateTrip);
+      clearTripBtn.addEventListener('click', clearTripForm);
+      saveTripItemBtn.addEventListener('click', addOrUpdateTripItem);
+      clearTripItemBtn.addEventListener('click', clearTripItemForm);
+      tripItemInstallmentId.addEventListener('change', () => {
+        const linkedInstallment = tripItemInstallmentId.value ? appData.installments.find(item => item.id === tripItemInstallmentId.value) : null;
+        if(!linkedInstallment) return;
+        if(!tripItemAmount.value) tripItemAmount.value = String(round2(getInstallmentDisplayTotal(linkedInstallment)));
+        if(!tripItemTitle.value.trim()) tripItemTitle.value = linkedInstallment.name || '';
+        if(tripItemCategory.value === 'ท่องเที่ยว' || !tripItemCategory.value) tripItemCategory.value = linkedInstallment.category || 'ผ่อนสินค้า';
+        refreshAllEnhancedSelects();
+      });
       [loanSearchKeyword, loanFilterStatus, loanFilterStartMonth, loanFilterEndMonth].forEach(el => {
         el.addEventListener('input', renderInstallments);
         el.addEventListener('change', renderInstallments);
+      });
+      [tripSearchKeyword, tripYearFilter, tripMonthFilter, tripCategoryFilter, tripStatusFilter].forEach(el => {
+        el.addEventListener('input', renderTrips);
+        el.addEventListener('change', renderTrips);
       });
       resetLoanFiltersBtn.addEventListener('click', () => {
         loanSearchKeyword.value = '';
@@ -2383,7 +4517,25 @@
         loanFilterEndMonth.value = addMonths(currentMonth(), 5);
         syncPickerValue(loanFilterStartMonth);
         syncPickerValue(loanFilterEndMonth);
+        refreshAllEnhancedSelects();
         renderInstallments();
+      });
+      resetTripFiltersBtn.addEventListener('click', () => {
+        tripSearchKeyword.value = '';
+        tripYearFilter.value = String(new Date().getFullYear());
+        tripMonthFilter.value = '';
+        tripCategoryFilter.value = '';
+        tripStatusFilter.value = '';
+        refreshAllEnhancedSelects();
+        renderTrips();
+      });
+      tripListViewBtn.addEventListener('click', () => {
+        tripViewMode = 'list';
+        renderTrips();
+      });
+      tripCalendarViewBtn.addEventListener('click', () => {
+        tripViewMode = 'calendar';
+        renderTrips();
       });
       loanListViewBtn.addEventListener('click', () => {
         installmentViewMode = 'list';
@@ -2410,13 +4562,25 @@
         btn.addEventListener('click', () => {
           currentView = btn.dataset.view;
           updateView();
+          if(isMobileMenuLayout()) setMobileMenu(false);
         });
       });
 
       document.addEventListener('keydown', (e) => {
         if(e.key === 'Escape' && !entryModal.classList.contains('hidden')) closeEntryModal();
         if(e.key === 'Escape' && !loanModal.classList.contains('hidden')) closeLoanModal();
+        if(e.key === 'Escape' && !tripModal.classList.contains('hidden')) closeTripModal();
+        if(e.key === 'Escape' && !tripItemModal.classList.contains('hidden')) closeTripItemModal();
+        if(e.key === 'Escape') closeAllEnhancedSelects();
+        if(e.key === 'Escape' && isMobileMenuLayout()) setMobileMenu(false);
       });
+      document.addEventListener('click', (e) => {
+        if(!e.target.closest('.select-enhanced')) closeAllEnhancedSelects();
+        if(isMobileMenuLayout() && mainMenuPanel.classList.contains('is-open') && !e.target.closest('#mainMenuPanel') && !e.target.closest('#mobileMenuToggle')){
+          setMobileMenu(false);
+        }
+      });
+      window.addEventListener('resize', syncResponsiveMenu);
     }
 
     boot().catch(error => {
