@@ -86,6 +86,20 @@
     .auth-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
     .auth-actions{display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap}
     .auth-status{font-size:13px; color:var(--muted)}
+    .auth-link-btn{
+      padding:0;
+      border:none;
+      background:transparent;
+      color:var(--primary);
+      font:inherit;
+      font-size:13px;
+      font-weight:700;
+      cursor:pointer;
+      text-decoration:underline;
+      text-underline-offset:2px;
+    }
+    .auth-link-btn:hover{transform:none; color:#1d4ed8}
+    .auth-link-btn:disabled{opacity:.55; cursor:not-allowed}
     .auth-error{
       margin-top:0;
       background:var(--red-soft);
@@ -167,6 +181,27 @@
       border-radius:999px;
       padding:6px 11px;
       font-size:11px
+    }
+    .save-status-badge{font-weight:800}
+    .save-status-idle{
+      background:rgba(255,255,255,.18);
+      border-color:rgba(255,255,255,.3);
+      color:#fff;
+    }
+    .save-status-saving{
+      background:rgba(255,251,235,.96);
+      border-color:#fde68a;
+      color:#92400e;
+    }
+    .save-status-saved{
+      background:rgba(240,253,244,.96);
+      border-color:#bbf7d0;
+      color:#166534;
+    }
+    .save-status-error{
+      background:rgba(255,241,242,.96);
+      border-color:#fecdd3;
+      color:#b91c1c;
     }
     .layout{display:grid; grid-template-columns:1fr; gap:18px}
     .sidebar{padding:14px 16px; height:fit-content; position:static}
@@ -991,7 +1026,10 @@
             <input type="password" id="authPassword" placeholder="Password" autocomplete="current-password">
           </div>
           <div class="full auth-actions">
-            <button id="loginBtn" class="btn-primary" type="button">Login</button>
+            <div class="small-actions">
+              <button id="loginBtn" class="btn-primary" type="button">Login</button>
+              <button id="resetPasswordBtn" class="auth-link-btn" type="button">ลืมรหัสผ่าน?</button>
+            </div>
             <div id="authStatus" class="auth-status">รอตรวจสอบสถานะการ login...</div>
           </div>
         </div>
@@ -1033,8 +1071,9 @@
           <button id="logoutBtn" class="btn-light btn-sm hidden" type="button">Logout</button>
         </div>
         <div class="small-actions">
-          <button id="saveJsonBtn" class="btn-ghost">💾 Export</button>
+          <button id="saveJsonBtn" class="btn-ghost">💾 Export JSON</button>
           <button id="loadAnotherBtn" class="btn-ghost">📂 Import</button>
+          <div id="saveStatusBadge" class="file-status save-status-badge save-status-idle">พร้อมใช้งาน</div>
           <div id="fileStatus" class="file-status">ยังไม่ได้ผูกไฟล์สำหรับ Save ทับ</div>
         </div>
       </div>
@@ -1755,8 +1794,12 @@
     let firebaseAuth = null;
     let firestoreDb = null;
     let cloudSaveTimer = null;
+    let cloudSaveSequence = 0;
     let isApplyingCloudState = false;
     let isAuthBusy = false;
+    let saveStatus = 'idle';
+    let lastSaveError = '';
+    let saveStatusResetTimer = null;
 
     const $ = (id) => document.getElementById(id);
 
@@ -1765,6 +1808,7 @@
     const authEmail = $('authEmail');
     const authPassword = $('authPassword');
     const loginBtn = $('loginBtn');
+    const resetPasswordBtn = $('resetPasswordBtn');
     const logoutBtn = $('logoutBtn');
     const authStatus = $('authStatus');
     const authError = $('authError');
@@ -1775,6 +1819,7 @@
     const createNewBtn = $('createNewBtn');
     const loadAnotherBtn = $('loadAnotherBtn');
     const saveJsonBtn = $('saveJsonBtn');
+    const saveStatusBadge = $('saveStatusBadge');
     const fileStatus = $('fileStatus');
     const mobileMenuToggle = $('mobileMenuToggle');
     const mainMenuPanel = $('mainMenuPanel');
@@ -2075,6 +2120,33 @@
       return Object.values(firebaseConfig).every(value => String(value || '').trim() && !String(value).includes('TODO'));
     }
 
+    // FIREBASE SAVE STATUS
+    function setSaveStatus(nextStatus = 'idle', errorMessage = ''){
+      saveStatus = nextStatus || 'idle';
+      lastSaveError = saveStatus === 'error' ? String(errorMessage || '').trim() : '';
+      clearTimeout(saveStatusResetTimer);
+      saveStatusResetTimer = null;
+      if(!saveStatusBadge) return;
+
+      const statusMap = {
+        idle: { text:'พร้อมใช้งาน', className:'save-status-idle' },
+        saving: { text:'กำลังบันทึก...', className:'save-status-saving' },
+        saved: { text:'บันทึกแล้ว', className:'save-status-saved' },
+        error: { text:'บันทึกไม่สำเร็จ', className:'save-status-error' }
+      };
+      const current = statusMap[saveStatus] || statusMap.idle;
+      saveStatusBadge.textContent = current.text;
+      saveStatusBadge.classList.remove('save-status-idle','save-status-saving','save-status-saved','save-status-error');
+      saveStatusBadge.classList.add(current.className);
+      saveStatusBadge.title = lastSaveError || current.text;
+
+      if(saveStatus === 'saved'){
+        saveStatusResetTimer = setTimeout(() => {
+          if(saveStatus === 'saved') setSaveStatus('idle');
+        }, 2200);
+      }
+    }
+
     function setAuthStatus(message = ''){
       if(authStatus) authStatus.textContent = message;
     }
@@ -2088,6 +2160,7 @@
     function setAuthBusy(nextBusy, statusText = ''){
       isAuthBusy = nextBusy;
       if(loginBtn) loginBtn.disabled = nextBusy || !isFirebaseConfigReady();
+      if(resetPasswordBtn) resetPasswordBtn.disabled = nextBusy || !isFirebaseConfigReady();
       if(logoutBtn) logoutBtn.disabled = nextBusy;
       if(authEmail) authEmail.disabled = nextBusy;
       if(authPassword) authPassword.disabled = nextBusy;
@@ -2102,6 +2175,7 @@
       }
       if(logoutBtn) logoutBtn.classList.toggle('hidden', !isLoggedIn);
       if(loginBtn) loginBtn.disabled = isAuthBusy || !isFirebaseConfigReady();
+      if(resetPasswordBtn) resetPasswordBtn.disabled = isAuthBusy || !isFirebaseConfigReady();
     }
 
     function showLoginScreen(){
@@ -2174,21 +2248,29 @@
       return appData;
     }
 
-    async function saveUserDataToCloud(){
+    async function saveUserDataToCloud(saveSequence = cloudSaveSequence){
       if(!currentUser || !firestoreDb) return;
       // FIREBASE: save the existing appData shape back to Cloud Firestore.
       await getUserFinanceDocRef(currentUser.uid).set({
         ...normalizeData(appData),
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
       }, { merge: true });
+      if(saveSequence === cloudSaveSequence){
+        setSaveStatus('saved');
+      }
     }
 
     function scheduleCloudSave(){
       if(!currentUser || !firestoreDb || isApplyingCloudState) return;
+      const saveSequence = ++cloudSaveSequence;
+      setSaveStatus('saving');
       clearTimeout(cloudSaveTimer);
       cloudSaveTimer = setTimeout(() => {
-        saveUserDataToCloud().catch(error => {
+        saveUserDataToCloud(saveSequence).catch(error => {
           console.error(error);
+          if(saveSequence === cloudSaveSequence){
+            setSaveStatus('error', error?.message || '');
+          }
           setAuthError('บันทึก Cloud ไม่สำเร็จ ระบบยังเก็บแคชในเครื่องไว้');
           setAuthStatus('Cloud sync มีปัญหาชั่วคราว');
         });
@@ -2201,6 +2283,39 @@
       if(error.code === 'auth/invalid-email') return 'รูปแบบ Email ไม่ถูกต้อง';
       if(error.code === 'auth/too-many-requests') return 'มีการลองเข้าสู่ระบบหลายครั้งเกินไป กรุณารอสักครู่';
       return 'Login ไม่สำเร็จ';
+    }
+
+    // FIREBASE RESET PASSWORD
+    function mapResetPasswordError(error){
+      if(!error?.code) return 'ส่งลิงก์รีเซ็ตรหัสผ่านไม่สำเร็จ';
+      if(error.code === 'auth/invalid-email') return 'รูปแบบอีเมลไม่ถูกต้อง';
+      if(error.code === 'auth/user-not-found') return 'ไม่พบบัญชีผู้ใช้นี้ในระบบ';
+      if(error.code === 'auth/too-many-requests') return 'มีการส่งคำขอหลายครั้งเกินไป กรุณารอสักครู่แล้วลองใหม่';
+      return 'ส่งลิงก์รีเซ็ตรหัสผ่านไม่สำเร็จ';
+    }
+
+    async function handleResetPassword(){
+      if(!firebaseAuth || isAuthBusy) return;
+      const email = String(authEmail?.value || '').trim();
+      if(!email){
+        setAuthError('กรุณากรอกอีเมลก่อนกดลืมรหัสผ่าน');
+        setAuthStatus('รออีเมลสำหรับส่งลิงก์รีเซ็ตรหัสผ่าน');
+        authEmail?.focus();
+        return;
+      }
+      setAuthError('');
+      setAuthBusy(true, 'กำลังส่งลิงก์รีเซ็ตรหัสผ่าน...');
+      try{
+        await firebaseAuth.sendPasswordResetEmail(email);
+        setAuthStatus(`ส่งลิงก์รีเซ็ตรหัสผ่านไปที่ ${email} แล้ว กรุณาตรวจสอบอีเมล`);
+      }catch(error){
+        console.error(error);
+        setAuthError(mapResetPasswordError(error));
+        setAuthStatus('ส่งลิงก์รีเซ็ตรหัสผ่านไม่สำเร็จ');
+      }finally{
+        setAuthBusy(false, currentUser ? 'เข้าสู่ระบบแล้ว' : (authStatus?.textContent || 'พร้อมให้ login'));
+        updateAuthUi();
+      }
     }
 
     async function handleLogin(){
@@ -2232,6 +2347,8 @@
       setAuthBusy(true, 'กำลังออกจากระบบ...');
       try{
         clearTimeout(cloudSaveTimer);
+        cloudSaveSequence = 0;
+        setSaveStatus('idle');
         await firebaseAuth.signOut();
       }catch(error){
         console.error(error);
@@ -2247,6 +2364,7 @@
       currentUser = user;
       updateAuthUi();
       setAuthError('');
+      setSaveStatus('idle');
       setAuthBusy(true, 'กำลังโหลดข้อมูลจาก Cloud Firestore...');
       const localSeedState = await getBestLocalSeedState(user.uid);
       try{
@@ -2254,12 +2372,14 @@
         isApplyingCloudState = true;
         await loadUserDataFromCloud(user.uid);
         enterApp();
+        setSaveStatus('idle');
         setAuthStatus('เข้าสู่ระบบแล้ว');
       }catch(error){
         console.error(error);
         appData = normalizeData(localSeedState?.data || getEmptyAppData());
         isApplyingCloudState = true;
         enterApp();
+        setSaveStatus('idle');
         setAuthError('โหลด Cloud ไม่สำเร็จ จึงใช้ข้อมูลแคชในเครื่องชั่วคราว');
         setAuthStatus('ใช้ข้อมูลแคชชั่วคราว');
       }finally{
@@ -2275,24 +2395,30 @@
         await handleAuthenticatedUser(user);
         return;
       }
+      cloudSaveSequence = 0;
       currentUser = null;
       appData = getEmptyAppData();
+      setSaveStatus('idle');
       showLoginScreen();
       setAuthError('');
       setAuthStatus(isFirebaseConfigReady() ? 'กรุณา login เพื่อใช้งาน' : 'รอ firebaseConfig');
       updateFileStatus();
       updateAuthUi();
     }
-
     function updateFileStatus(){
+      // REFACTOR: keep one status formatter for cloud/login + local file/export state.
+      const cloudLabel = currentUser ? `Cloud: ${currentUser.email || currentUser.uid}` : 'Cloud: ยังไม่ได้ login';
       if(fileHandle && loadedFileName){
-        fileStatus.textContent = `ผูกไฟล์แล้ว: ${loadedFileName} · Save จะพยายามเขียนทับไฟล์เดิม`;
+        fileStatus.textContent = `${cloudLabel} · ผูกไฟล์แล้ว: ${loadedFileName} · Save จะพยายามเขียนทับไฟล์เดิม`;
+      }else if(loadedFileName && lastImportAt){
+        fileStatus.textContent = `${cloudLabel} · Last import: ${loadedFileName} · ${new Date(lastImportAt).toLocaleString('th-TH')}`;
       }else if(loadedFileName){
-        fileStatus.textContent = `โหลดจากไฟล์: ${loadedFileName} · Save จะดาวน์โหลดไฟล์ใหม่`;
+        fileStatus.textContent = `${cloudLabel} · Imported from: ${loadedFileName}`;
       }else{
-        fileStatus.textContent = 'ยังไม่ได้ผูกไฟล์สำหรับ Save ทับ';
+        fileStatus.textContent = `${cloudLabel} · Browser cache is ready`;
       }
     }
+
     function closeAllEnhancedSelects(exceptSelect = null){
       enhancedSelectRegistry.forEach(instance => {
         if(instance.select !== exceptSelect) instance.close();
@@ -2523,6 +2649,15 @@
     }
     function currentDate(){
       return new Date().toISOString().slice(0,10);
+    }
+    function formatDateTimeForFileName(date = new Date()){
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      const seconds = String(date.getSeconds()).padStart(2, '0');
+      return `${year}-${month}-${day}-${hours}-${minutes}-${seconds}`;
     }
     function setQuickAddStatus(message, tone = ''){
       if(!quickAddStatus) return;
@@ -3800,17 +3935,7 @@
       `;
     }
 
-    function renderAll(){
-      initPickers();
-      syncAllPickerValues();
-      refreshAllEnhancedSelects();
-      updateFileStatus();
-      renderMonthly();
-      renderYearly();
-      renderInstallments();
-      updateView();
-      saveToBrowser();
-    }
+    // REMOVED UNUSED: legacy renderAll was overridden by the cloud-aware flow below.
 
     function updateView(){
       document.querySelectorAll('.view').forEach(el => el.classList.add('hidden'));
@@ -3845,56 +3970,50 @@
       mobileMenuToggle.classList.remove('is-active');
       mobileMenuToggle.setAttribute('aria-expanded', 'false');
     }
+    // REFACTOR: centralize shared modal open/close state.
+    function setModalOpen(modal, isOpen){
+      if(!modal) return;
+      modal.classList.toggle('hidden', !isOpen);
+      modal.setAttribute('aria-hidden', isOpen ? 'false' : 'true');
+      document.body.style.overflow = isOpen ? 'hidden' : '';
+    }
 
     function openEntryModal(){
-      entryModal.classList.remove('hidden');
-      entryModal.setAttribute('aria-hidden','false');
-      document.body.style.overflow = 'hidden';
       setQuickAddStatus('');
+      setModalOpen(entryModal, true);
     }
 
     function closeEntryModal(){
-      entryModal.classList.add('hidden');
-      entryModal.setAttribute('aria-hidden','true');
-      document.body.style.overflow = '';
+      setModalOpen(entryModal, false);
     }
 
     function openLoanModal(){
-      loanModal.classList.remove('hidden');
-      loanModal.setAttribute('aria-hidden','false');
-      document.body.style.overflow = 'hidden';
+      setModalOpen(loanModal, true);
     }
 
     function closeLoanModal(){
-      loanModal.classList.add('hidden');
-      loanModal.setAttribute('aria-hidden','true');
-      document.body.style.overflow = '';
+      setModalOpen(loanModal, false);
     }
+
     function openTripModal(){
-      tripModal.classList.remove('hidden');
-      tripModal.setAttribute('aria-hidden','false');
-      document.body.style.overflow = 'hidden';
+      setModalOpen(tripModal, true);
     }
+
     function closeTripModal(){
-      tripModal.classList.add('hidden');
-      tripModal.setAttribute('aria-hidden','true');
-      document.body.style.overflow = '';
+      setModalOpen(tripModal, false);
     }
+
     function openTripItemModal(){
       if(!appData.trips.length){
         alert('กรุณาสร้างทริปก่อน');
         return;
       }
-      tripItemModal.classList.remove('hidden');
-      tripItemModal.setAttribute('aria-hidden','false');
-      document.body.style.overflow = 'hidden';
-    }
-    function closeTripItemModal(){
-      tripItemModal.classList.add('hidden');
-      tripItemModal.setAttribute('aria-hidden','true');
-      document.body.style.overflow = '';
+      setModalOpen(tripItemModal, true);
     }
 
+    function closeTripItemModal(){
+      setModalOpen(tripItemModal, false);
+    }
 
     function openMonthFromYearly(monthKey){
       if(!monthKey) return;
@@ -4306,10 +4425,22 @@
       closeTripItemModal();
       renderAll();
     }
+    // MERGED DUPLICATE ACTION: single import/export flow keeps file-handle overwrite when available.
+    async function importJsonText(jsonText, fileName, handle = null){
+      const parsed = JSON.parse(jsonText);
+      appData = normalizeData(parsed?.data || parsed);
+      fileHandle = handle;
+      loadedFileName = fileName || '';
+      lastImportAt = new Date().toISOString();
+      await writeAppDataToDb(appData, {
+        loadedFileName,
+        lastImportAt
+      }, getLocalCacheKey());
+      enterApp();
+    }
 
     async function openJsonWithHandle(){
       if(!window.showOpenFilePicker){
-        alert('เบราว์เซอร์นี้ไม่รองรับการเปิดไฟล์แบบ Save ทับได้ จะสลับไปใช้การโหลดไฟล์แบบปกติแทน');
         startupJsonFile.click();
         return;
       }
@@ -4320,11 +4451,7 @@
           multiple:false
         });
         const file = await handle.getFile();
-        const text = await file.text();
-        appData = normalizeData(JSON.parse(text));
-        fileHandle = handle;
-        loadedFileName = file.name;
-        enterApp();
+        await importJsonText(await file.text(), file.name, handle);
       }catch(error){
         if(error?.name !== 'AbortError') console.error(error);
       }
@@ -4332,70 +4459,50 @@
 
     function loadJsonFile(file){
       const reader = new FileReader();
-      reader.onload = (e) => {
+      reader.onload = async (e) => {
         try{
-          appData = normalizeData(JSON.parse(e.target.result));
-          fileHandle = null;
-          loadedFileName = file.name || '';
-          enterApp();
-        }catch{
-          alert('ไฟล์ JSON ไม่ถูกต้อง');
+          await importJsonText(String(e.target?.result || ''), file.name || '', null);
+        }catch(error){
+          console.error(error);
+          alert('JSON file is invalid');
         }
       };
       reader.readAsText(file,'utf-8');
     }
 
+    function downloadJsonFile(jsonText, fileName){
+      const blob = new Blob([jsonText], { type:'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileName;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 0);
+    }
+
     async function saveJsonFile(){
-      const jsonText = JSON.stringify(appData, null, 2);
+      // MERGED DUPLICATE ACTION: previous Export and Backup JSON now share one safe export path.
+      const exportData = normalizeData(appData);
+      const jsonText = JSON.stringify(exportData, null, 2);
       if(fileHandle){
         try{
           const writable = await fileHandle.createWritable();
           await writable.write(jsonText);
           await writable.close();
-          alert('บันทึกทับไฟล์เดิมเรียบร้อยแล้ว');
           return;
         }catch(error){
           console.error(error);
-          alert('ไม่สามารถบันทึกทับไฟล์เดิมได้ ระบบจะดาวน์โหลดไฟล์ใหม่แทน');
+          alert('Unable to overwrite the original file. Exporting a new JSON file instead.');
         }
       }
-      const blob = new Blob([jsonText], { type:'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = loadedFileName || 'finance-data.json';
-      a.click();
-      URL.revokeObjectURL(url);
+      const fallbackName = loadedFileName || `finance-data-${formatDateTimeForFileName(new Date())}.json`;
+      downloadJsonFile(jsonText, fallbackName);
     }
 
     function enterApp(){
       welcomeScreen.classList.add('hidden');
       appScreen.classList.remove('hidden');
       renderAll();
-    }
-
-    function createNewData(){
-      appData = { entries: [], installments: [] };
-      fileHandle = null;
-      loadedFileName = '';
-      enterApp();
-    }
-
-    function updateFileStatus(){
-      if(loadedFileName && lastImportAt){
-        fileStatus.textContent = `active · Last import: ${loadedFileName} · ${new Date(lastImportAt).toLocaleString('th-TH')}`;
-      }else if(loadedFileName){
-        fileStatus.textContent = `active · Imported from: ${loadedFileName}`;
-      }else{
-        fileStatus.textContent = 'active · Data is stored automatically in this browser';
-      }
-    }
-
-    function persistCurrentData(meta = {}){
-      writeAppDataToDb(appData, meta).catch(error => {
-        console.error(error);
-        alert('Unable to save data to IndexedDB');
-      });
     }
 
     function renderAll(){
@@ -4413,105 +4520,14 @@
       persistCurrentData();
     }
 
-    async function importJsonText(jsonText, fileName){
-      const parsed = JSON.parse(jsonText);
-      appData = normalizeData(parsed?.data || parsed);
-      loadedFileName = fileName || '';
-      lastImportAt = new Date().toISOString();
-      await writeAppDataToDb(appData, {
-        loadedFileName,
-        lastImportAt
-      });
-      enterApp();
-    }
-
-    async function openJsonWithHandle(){
-      if(!window.showOpenFilePicker){
-        startupJsonFile.click();
-        return;
-      }
-      try{
-        const [handle] = await window.showOpenFilePicker({
-          types:[{ description:'JSON Files', accept:{ 'application/json':['.json'] }}],
-          excludeAcceptAllOption:false,
-          multiple:false
-        });
-        const file = await handle.getFile();
-        await importJsonText(await file.text(), file.name);
-      }catch(error){
-        if(error?.name !== 'AbortError') console.error(error);
-      }
-    }
-
-    function loadJsonFile(file){
-      const reader = new FileReader();
-      reader.onload = async (e) => {
-        try{
-          await importJsonText(String(e.target?.result || ''), file.name || '');
-        }catch(error){
-          console.error(error);
-          alert('JSON file is invalid');
-        }
-      };
-      reader.readAsText(file,'utf-8');
-    }
-
-    async function saveJsonFile(){
-      const exported = {
-        exportedAt: new Date().toISOString(),
-        data: normalizeData(appData)
-      };
-      const jsonText = JSON.stringify(exported.data, null, 2);
-      const blob = new Blob([jsonText], { type:'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = loadedFileName || 'finance-data-export.json';
-      a.click();
-      setTimeout(() => URL.revokeObjectURL(url), 0);
-    }
-
     function createNewData(){
-      appData = { entries: [], installments: [], trips: [] };
+      appData = getEmptyAppData();
       activeTripId = null;
+      fileHandle = null;
       loadedFileName = '';
       lastImportAt = '';
       persistCurrentData({ loadedFileName: '', lastImportAt: '' });
       enterApp();
-    }
-
-    async function boot(){
-      bindEvents();
-      syncResponsiveMenu();
-      initializeEnhancedSelects();
-      populateCategoryDropdowns();
-      const welcomeTitle = document.querySelector('#welcomeScreen .welcome-box p');
-      const importDescription = document.querySelector('#welcomeScreen .action-tile:first-child p');
-      const importHint = document.querySelector('#welcomeScreen .hint');
-      const createDescription = document.querySelector('#welcomeScreen .action-tile:last-child p');
-      if(welcomeTitle) welcomeTitle.textContent = 'Import JSON เดิม หรือเริ่มข้อมูลใหม่ ข้อมูลทั้งหมดจะเก็บอัตโนมัติใน IndexedDB ของเบราว์เซอร์ และ Export เป็น JSON เพื่อย้ายเครื่องได้';
-      if(importDescription) importDescription.textContent = 'เลือกไฟล์ JSON เพื่อ import เข้า IndexedDB แล้วใช้งานต่อในเครื่องนี้ได้ทันที';
-      if(importHint) importHint.textContent = 'หลัง import แล้ว ทุกการแก้ไขจะบันทึกลง IndexedDB อัตโนมัติ และใช้ปุ่ม Export JSON เมื่อต้องการย้ายข้อมูลไปเครื่องอื่น';
-      if(createDescription) createDescription.textContent = 'เริ่มใช้งานด้วยข้อมูลว่าง ระบบจะเก็บข้อมูลอัตโนมัติใน IndexedDB และสามารถ Export JSON ภายหลังได้';
-
-      const persistedState = await migrateLegacyLocalStorage() || await readAppDataFromDb();
-      if(persistedState?.data){
-        appData = normalizeData(persistedState.data);
-        loadedFileName = persistedState.meta?.loadedFileName || '';
-        lastImportAt = persistedState.meta?.lastImportAt || '';
-      }
-
-      clearEntryForm();
-      clearLoanForm();
-      clearTripForm();
-      clearTripItemForm();
-      updateFileStatus();
-      initializeCardCollapsibles();
-      initDatepickers();
-
-      if(persistedState?.data){
-        enterApp();
-      }
     }
 
     function resetMonthlyFilters(){
@@ -4710,17 +4726,6 @@
       renderAll();
     };
 
-    function updateFileStatus(){
-      const cloudLabel = currentUser ? `Cloud: ${currentUser.email || currentUser.uid}` : 'Cloud: ยังไม่ได้ login';
-      if(loadedFileName && lastImportAt){
-        fileStatus.textContent = `${cloudLabel} · Last import: ${loadedFileName} · ${new Date(lastImportAt).toLocaleString('th-TH')}`;
-      }else if(loadedFileName){
-        fileStatus.textContent = `${cloudLabel} · Imported from: ${loadedFileName}`;
-      }else{
-        fileStatus.textContent = `${cloudLabel} · Browser cache is ready`;
-      }
-    }
-
     function persistCurrentData(meta = {}){
       writeAppDataToDb(appData, meta, getLocalCacheKey()).catch(error => {
         console.error(error);
@@ -4746,6 +4751,7 @@
       initializeCardCollapsibles();
       initDatepickers();
       showLoginScreen();
+      setSaveStatus('idle');
       updateFileStatus();
 
       const firebaseReady = initializeFirebaseServices();
@@ -4761,99 +4767,37 @@
         });
       });
     }
-
     function bindEvents(){
-      createNewBtn.addEventListener('click', createNewData);
-      openJsonWithHandleBtn.addEventListener('click', openJsonWithHandle);
-      openJsonSimpleBtn.addEventListener('click', () => startupJsonFile.click());
-      loginBtn?.addEventListener('click', handleLogin);
-      logoutBtn?.addEventListener('click', handleLogout);
-      authPassword?.addEventListener('keydown', (e) => {
-        if(e.key !== 'Enter') return;
-        e.preventDefault();
-        handleLogin();
-      });
-      startupJsonFile.addEventListener('change', (e) => {
-        const file = e.target.files?.[0];
-        if(file) loadJsonFile(file);
-        e.target.value = '';
-      });
-      loadAnotherBtn.addEventListener('click', () => {
+      // REFACTOR: normalize repeated event binding patterns in one place.
+      const bind = (element, events, handler) => {
+        if(!element) return;
+        (Array.isArray(events) ? events : [events]).forEach(eventName => {
+          element.addEventListener(eventName, handler);
+        });
+      };
+      const bindMany = (pairs, handler) => {
+        pairs.forEach(([element, events]) => bind(element, events, handler));
+      };
+      const bindFilterInputs = (elements, handler) => {
+        elements.forEach(element => bind(element, ['input','change'], handler));
+      };
+      const bindModalTrigger = (buttons, clearForm, openModal) => {
+        buttons.forEach(button => bind(button, 'click', () => {
+          clearForm();
+          openModal();
+        }));
+      };
+      const bindModalDismiss = (modal, closeButton, closeModal) => {
+        bind(closeButton, 'click', closeModal);
+        bind(modal, 'click', (e) => {
+          if(e.target === modal) closeModal();
+        });
+      };
+      const openImportPicker = () => {
         if(window.showOpenFilePicker) openJsonWithHandle();
         else startupJsonFile.click();
-      });
-      saveJsonBtn.addEventListener('click', saveJsonFile);
-      mobileMenuToggle?.addEventListener('click', () => {
-        setMobileMenu(!mainMenuPanel.classList.contains('is-open'));
-      });
-
-      rangeStartMonth.addEventListener('change', renderMonthly);
-      rangeEndMonth.addEventListener('change', renderMonthly);
-      monthlyKeyword.addEventListener('input', renderMonthly);
-      monthlyTypeFilter.addEventListener('change', renderMonthly);
-      monthlyCategoryFilter.addEventListener('change', renderMonthly);
-      monthlyMinAmount.addEventListener('input', renderMonthly);
-      monthlyMaxAmount.addEventListener('input', renderMonthly);
-      monthlySort.addEventListener('change', renderMonthly);
-      quickAddInput.addEventListener('input', () => setQuickAddStatus(''));
-      quickAddInput.addEventListener('keydown', (e) => {
-        if(e.key !== 'Enter') return;
-        e.preventDefault();
-        submitQuickAdd();
-      });
-      quickAddSubmitBtn.addEventListener('click', submitQuickAdd);
-      resetMonthlyFiltersBtn.addEventListener('click', resetMonthlyFilters);
-      backFromMonthlyBtn?.addEventListener('click', goBackToPreviousView);
-      backFromTripsBtn?.addEventListener('click', goBackToPreviousView);
-      backFromInstallmentsBtn?.addEventListener('click', goBackToPreviousView);
-      floatingBackBtn?.addEventListener('click', goBackToPreviousView);
-      openEntryModalBtn.addEventListener('click', () => { clearEntryForm(); openEntryModal(); });
-      openEntryModalBtnSecondary.addEventListener('click', () => { clearEntryForm(); openEntryModal(); });
-      closeEntryModalBtn.addEventListener('click', closeEntryModal);
-      entryModal.addEventListener('click', (e) => { if(e.target === entryModal) closeEntryModal(); });
-      openLoanModalBtn.addEventListener('click', () => { clearLoanForm(); openLoanModal(); });
-      closeLoanModalBtn.addEventListener('click', closeLoanModal);
-      loanModal.addEventListener('click', (e) => { if(e.target === loanModal) closeLoanModal(); });
-      openTripModalBtn.addEventListener('click', () => { clearTripForm(); openTripModal(); });
-      openTripItemModalBtn.addEventListener('click', () => { clearTripItemForm(); openTripItemModal(); });
-      closeTripModalBtn.addEventListener('click', closeTripModal);
-      closeTripItemModalBtn.addEventListener('click', closeTripItemModal);
-      tripModal.addEventListener('click', (e) => { if(e.target === tripModal) closeTripModal(); });
-      tripItemModal.addEventListener('click', (e) => { if(e.target === tripItemModal) closeTripItemModal(); });
-      prevYearBtn.addEventListener('click', () => shiftYear(-1));
-      nextYearBtn.addEventListener('click', () => shiftYear(1));
-
-      repeatEnabled.addEventListener('change', () => {
-        repeatCount.disabled = !repeatEnabled.checked;
-        if(!repeatEnabled.checked) repeatCount.value = 1;
-      });
-      entryType.addEventListener('change', updateEntryPaidVisibility);
-
-      saveEntryBtn.addEventListener('click', addOrUpdateEntry);
-      clearEntryBtn.addEventListener('click', clearEntryForm);
-      saveLoanBtn.addEventListener('click', addOrUpdateInstallment);
-      clearLoanBtn.addEventListener('click', clearLoanForm);
-      saveTripBtn.addEventListener('click', addOrUpdateTrip);
-      clearTripBtn.addEventListener('click', clearTripForm);
-      saveTripItemBtn.addEventListener('click', addOrUpdateTripItem);
-      clearTripItemBtn.addEventListener('click', clearTripItemForm);
-      tripItemInstallmentId.addEventListener('change', () => {
-        const linkedInstallment = tripItemInstallmentId.value ? appData.installments.find(item => item.id === tripItemInstallmentId.value) : null;
-        if(!linkedInstallment) return;
-        if(!tripItemAmount.value) tripItemAmount.value = String(round2(getInstallmentDisplayTotal(linkedInstallment)));
-        if(!tripItemTitle.value.trim()) tripItemTitle.value = linkedInstallment.name || '';
-        if(tripItemCategory.value === 'ท่องเที่ยว' || !tripItemCategory.value) tripItemCategory.value = linkedInstallment.category || 'ผ่อนสินค้า';
-        refreshAllEnhancedSelects();
-      });
-      [loanSearchKeyword, loanFilterStatus, loanFilterStartMonth, loanFilterEndMonth].forEach(el => {
-        el.addEventListener('input', renderInstallments);
-        el.addEventListener('change', renderInstallments);
-      });
-      [tripSearchKeyword, tripYearFilter, tripMonthFilter, tripCategoryFilter, tripStatusFilter].forEach(el => {
-        el.addEventListener('input', renderTrips);
-        el.addEventListener('change', renderTrips);
-      });
-      resetLoanFiltersBtn.addEventListener('click', () => {
+      };
+      const resetLoanFilters = () => {
         loanSearchKeyword.value = '';
         loanFilterStatus.value = '';
         loanFilterStartMonth.value = currentMonth();
@@ -4862,8 +4806,8 @@
         syncPickerValue(loanFilterEndMonth);
         refreshAllEnhancedSelects();
         renderInstallments();
-      });
-      resetTripFiltersBtn.addEventListener('click', () => {
+      };
+      const resetTripFilters = () => {
         tripSearchKeyword.value = '';
         tripYearFilter.value = String(new Date().getFullYear());
         tripMonthFilter.value = '';
@@ -4871,59 +4815,132 @@
         tripStatusFilter.value = '';
         refreshAllEnhancedSelects();
         renderTrips();
-      });
-      tripListViewBtn.addEventListener('click', () => {
-        tripViewMode = 'list';
+      };
+      const setTripViewMode = (mode) => {
+        tripViewMode = mode;
         renderTrips();
-      });
-      tripCalendarViewBtn.addEventListener('click', () => {
-        tripViewMode = 'calendar';
-        renderTrips();
-      });
-      loanListViewBtn.addEventListener('click', () => {
-        installmentViewMode = 'list';
+      };
+      const setInstallmentViewMode = (mode) => {
+        installmentViewMode = mode;
         renderInstallments();
+      };
+
+      bind(createNewBtn, 'click', createNewData);
+      bind(openJsonWithHandleBtn, 'click', openJsonWithHandle);
+      bind(openJsonSimpleBtn, 'click', () => startupJsonFile.click());
+      bind(loginBtn, 'click', handleLogin);
+      bind(resetPasswordBtn, 'click', handleResetPassword);
+      bind(logoutBtn, 'click', handleLogout);
+      bind(authPassword, 'keydown', (e) => {
+        if(e.key !== 'Enter') return;
+        e.preventDefault();
+        handleLogin();
       });
-      loanCalendarViewBtn.addEventListener('click', () => {
-        installmentViewMode = 'calendar';
-        renderInstallments();
+      bind(startupJsonFile, 'change', (e) => {
+        const file = e.target.files?.[0];
+        if(file) loadJsonFile(file);
+        e.target.value = '';
       });
-      [loanMonthlyAmount, loanMonthsTotal, loanMonthsPaid, loanPrincipal, loanRemainingOverride, loanInterestRate]
-        .forEach(el => {
-          el.addEventListener('input', updateLoanSmartHint);
-          el.addEventListener('change', updateLoanSmartHint);
-        });
-      loanInterestType.addEventListener('change', () => {
+      bind(loadAnotherBtn, 'click', openImportPicker);
+      bind(saveJsonBtn, 'click', saveJsonFile);
+      bind(mobileMenuToggle, 'click', () => {
+        setMobileMenu(!mainMenuPanel.classList.contains('is-open'));
+      });
+
+      bindMany([
+        [rangeStartMonth, 'change'],
+        [rangeEndMonth, 'change'],
+        [monthlyKeyword, 'input'],
+        [monthlyTypeFilter, 'change'],
+        [monthlyCategoryFilter, 'change'],
+        [monthlyMinAmount, 'input'],
+        [monthlyMaxAmount, 'input'],
+        [monthlySort, 'change']
+      ], renderMonthly);
+      bind(quickAddInput, 'input', () => setQuickAddStatus(''));
+      bind(quickAddInput, 'keydown', (e) => {
+        if(e.key !== 'Enter') return;
+        e.preventDefault();
+        submitQuickAdd();
+      });
+      bind(quickAddSubmitBtn, 'click', submitQuickAdd);
+      bind(resetMonthlyFiltersBtn, 'click', resetMonthlyFilters);
+      [backFromMonthlyBtn, backFromTripsBtn, backFromInstallmentsBtn, floatingBackBtn].forEach(button => bind(button, 'click', goBackToPreviousView));
+
+      bindModalTrigger([openEntryModalBtn, openEntryModalBtnSecondary], clearEntryForm, openEntryModal);
+      bindModalDismiss(entryModal, closeEntryModalBtn, closeEntryModal);
+      bindModalTrigger([openLoanModalBtn], clearLoanForm, openLoanModal);
+      bindModalDismiss(loanModal, closeLoanModalBtn, closeLoanModal);
+      bindModalTrigger([openTripModalBtn], clearTripForm, openTripModal);
+      bindModalTrigger([openTripItemModalBtn], clearTripItemForm, openTripItemModal);
+      bindModalDismiss(tripModal, closeTripModalBtn, closeTripModal);
+      bindModalDismiss(tripItemModal, closeTripItemModalBtn, closeTripItemModal);
+
+      bind(prevYearBtn, 'click', () => shiftYear(-1));
+      bind(nextYearBtn, 'click', () => shiftYear(1));
+      bind(repeatEnabled, 'change', () => {
+        repeatCount.disabled = !repeatEnabled.checked;
+        if(!repeatEnabled.checked) repeatCount.value = 1;
+      });
+      bind(entryType, 'change', updateEntryPaidVisibility);
+
+      bind(saveEntryBtn, 'click', addOrUpdateEntry);
+      bind(clearEntryBtn, 'click', clearEntryForm);
+      bind(saveLoanBtn, 'click', addOrUpdateInstallment);
+      bind(clearLoanBtn, 'click', clearLoanForm);
+      bind(saveTripBtn, 'click', addOrUpdateTrip);
+      bind(clearTripBtn, 'click', clearTripForm);
+      bind(saveTripItemBtn, 'click', addOrUpdateTripItem);
+      bind(clearTripItemBtn, 'click', clearTripItemForm);
+      bind(tripItemInstallmentId, 'change', () => {
+        const linkedInstallment = tripItemInstallmentId.value ? appData.installments.find(item => item.id === tripItemInstallmentId.value) : null;
+        if(!linkedInstallment) return;
+        if(!tripItemAmount.value) tripItemAmount.value = String(round2(getInstallmentDisplayTotal(linkedInstallment)));
+        if(!tripItemTitle.value.trim()) tripItemTitle.value = linkedInstallment.name || '';
+        if(tripItemCategory.value === 'ท่องเที่ยว' || !tripItemCategory.value) tripItemCategory.value = linkedInstallment.category || 'ผ่อนสินค้า';
+        refreshAllEnhancedSelects();
+      });
+
+      bindFilterInputs([loanSearchKeyword, loanFilterStatus, loanFilterStartMonth, loanFilterEndMonth], renderInstallments);
+      bindFilterInputs([tripSearchKeyword, tripYearFilter, tripMonthFilter, tripCategoryFilter, tripStatusFilter], renderTrips);
+      bind(resetLoanFiltersBtn, 'click', resetLoanFilters);
+      bind(resetTripFiltersBtn, 'click', resetTripFilters);
+      bind(tripListViewBtn, 'click', () => setTripViewMode('list'));
+      bind(tripCalendarViewBtn, 'click', () => setTripViewMode('calendar'));
+      bind(loanListViewBtn, 'click', () => setInstallmentViewMode('list'));
+      bind(loanCalendarViewBtn, 'click', () => setInstallmentViewMode('calendar'));
+
+      bindFilterInputs([loanMonthlyAmount, loanMonthsTotal, loanMonthsPaid, loanPrincipal, loanRemainingOverride, loanInterestRate], updateLoanSmartHint);
+      bind(loanInterestType, 'change', () => {
         if(loanInterestType.value === 'none') loanInterestRate.value = '';
         updateLoanSmartHint();
       });
-      yearlyYearPicker.addEventListener('change', () => {
-        renderYearly();
-      });
+      bind(yearlyYearPicker, 'change', renderYearly);
 
       document.querySelectorAll('.menu-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
+        bind(btn, 'click', () => {
           currentView = btn.dataset.view;
           updateView();
           if(isMobileMenuLayout()) setMobileMenu(false);
         });
       });
 
-      document.addEventListener('keydown', (e) => {
-        if(e.key === 'Escape' && !entryModal.classList.contains('hidden')) closeEntryModal();
-        if(e.key === 'Escape' && !loanModal.classList.contains('hidden')) closeLoanModal();
-        if(e.key === 'Escape' && !tripModal.classList.contains('hidden')) closeTripModal();
-        if(e.key === 'Escape' && !tripItemModal.classList.contains('hidden')) closeTripItemModal();
-        if(e.key === 'Escape') closeAllEnhancedSelects();
-        if(e.key === 'Escape' && isMobileMenuLayout()) setMobileMenu(false);
+      bind(document, 'keydown', (e) => {
+        if(e.key !== 'Escape') return;
+        if(!entryModal.classList.contains('hidden')) closeEntryModal();
+        if(!loanModal.classList.contains('hidden')) closeLoanModal();
+        if(!tripModal.classList.contains('hidden')) closeTripModal();
+        if(!tripItemModal.classList.contains('hidden')) closeTripItemModal();
+        closeAllEnhancedSelects();
+        if(isMobileMenuLayout()) setMobileMenu(false);
       });
-      document.addEventListener('click', (e) => {
+      bind(document, 'click', (e) => {
         if(!e.target.closest('.select-enhanced')) closeAllEnhancedSelects();
         if(isMobileMenuLayout() && mainMenuPanel.classList.contains('is-open') && !e.target.closest('#mainMenuPanel') && !e.target.closest('#mobileMenuToggle')){
           setMobileMenu(false);
         }
       });
-      window.addEventListener('resize', syncResponsiveMenu);
+      bind(window, 'resize', syncResponsiveMenu);
     }
 
     boot().catch(error => {
