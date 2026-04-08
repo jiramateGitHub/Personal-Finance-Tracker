@@ -1675,6 +1675,7 @@
   <script src="https://www.gstatic.com/firebasejs/11.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/11.7.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/11.7.1/firebase-app-check-compat.js"></script>
   <script>
     const STORAGE_KEY = 'finance_tracker_simple_v4';
     const DB_NAME = 'finance_tracker_db';
@@ -2121,21 +2122,31 @@
       return await readAppDataFromDb(DB_RECORD_KEY);
     }
 
-    function initializeFirebaseServices(){
-      if(typeof firebase === 'undefined'){
+    function initializeFirebaseServices() {
+      if (typeof firebase === 'undefined') {
         setAuthError('Firebase SDK โหลดไม่สำเร็จ');
         setAuthStatus('ไม่สามารถเริ่ม Firebase ได้');
         updateAuthUi();
         return false;
       }
-      if(!isFirebaseConfigReady()){
+
+      if (!isFirebaseConfigReady()) {
         setAuthError('TODO: วางค่า firebaseConfig จริงก่อนใช้งาน');
         setAuthStatus('รอ firebaseConfig');
         updateAuthUi();
         return false;
       }
-      // FIREBASE: initialize Auth + Firestore for this single-file app.
+
       const app = firebase.apps.length ? firebase.app() : firebase.initializeApp(firebaseConfig);
+
+      // FIREBASE APP CHECK
+      if (typeof firebase.appCheck === 'function') {
+        firebase.appCheck(app).activate(
+          "6LcnXa0sAAAAAF8at2tcxe2WFjxQ0ocjq3xX_8m1",
+          true
+        );
+      }
+
       firebaseAuth = firebase.auth(app);
       firestoreDb = firebase.firestore(app);
       updateAuthUi();
