@@ -1941,7 +1941,6 @@
   <script src="https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/11.7.1/firebase-app-check-compat.js"></script>
   <script>
-    const STORAGE_KEY = 'finance_tracker_simple_v4';
     const DB_NAME = 'finance_tracker_db';
     const DB_VERSION = 1;
     const DB_STORE_NAME = 'app_state';
@@ -2328,21 +2327,6 @@
       lastImportAt = payload.meta.lastImportAt || '';
     }
 
-    async function migrateLegacyLocalStorage(){
-      try{
-        const existingDb = await readAppDataFromDb();
-        if(existingDb?.data) return existingDb;
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if(!raw) return null;
-        const legacyData = buildV2FromCurrentAppData(normalizeData(JSON.parse(raw)));
-        await writeAppDataToDb(legacyData);
-        localStorage.removeItem(STORAGE_KEY);
-        return { data: legacyData, meta: { loadedFileName: '', lastImportAt: '' } };
-      }catch(error){
-        console.error(error);
-        return null;
-      }
-    }
     function normalizeData(parsed){
       return {
         entries: Array.isArray(parsed.entries) ? parsed.entries.map(x => ({
@@ -2856,32 +2840,6 @@
         || String(a.categoryId || '').localeCompare(String(b.categoryId || ''), 'th'));
     }
 
-    function getTripActualTotals(v2Input, tripId, options = {}){
-      const data = ensureV2Data(v2Input);
-      const trip = data.trips.find(item => item.id === tripId);
-      if(!trip){
-        return { tripId, total: 0, count: 0, transactions: [], categoryTotals: [] };
-      }
-      const linkedInstallmentIds = new Set(data.installmentPlans
-        .filter(item => item.tripId === tripId)
-        .map(item => item.id));
-      const includeLinkedInstallments = options.includeLinkedInstallments !== false;
-      const transactions = data.transactions.filter(item => {
-        if(item.tripId === tripId) return true;
-        if(!includeLinkedInstallments) return false;
-        return !item.tripId && !!item.installmentPlanId && linkedInstallmentIds.has(item.installmentPlanId);
-      });
-      return {
-        tripId,
-        total: round2(transactions.reduce((sum, item) => sum + Number(item.amount || 0), 0)),
-        count: transactions.length,
-        transactions: transactions.slice().sort((a, b) =>
-          String(a.date || '').localeCompare(String(b.date || ''))
-          || String(a.id || '').localeCompare(String(b.id || ''))),
-        categoryTotals: getMonthlyCategoryTotals(transactions, '', {})
-      };
-    }
-
     function getInstallmentPlanStatus(planOrId, v2Input = null){
       const data = Array.isArray(v2Input)
         ? { transactions: v2Input, installmentPlans: [] }
@@ -3195,13 +3153,6 @@
       };
     }
 
-    function hydrateCurrentAppData(input){
-      if(input?.schemaVersion === APP_SCHEMA_VERSION){
-        return buildCurrentAppDataFromV2(input);
-      }
-      return normalizeData(input || getEmptyAppData());
-    }
-
     function getLocalCacheKey(uid = currentUser?.uid){
       return uid ? `${DB_RECORD_KEY}:${uid}` : DB_RECORD_KEY;
     }
@@ -3329,8 +3280,6 @@
     async function getBestLocalSeedState(uid){
       const userCache = await readAppDataFromDb(getLocalCacheKey(uid));
       if(userCache?.data) return userCache;
-      const migrated = await migrateLegacyLocalStorage();
-      if(migrated?.data) return migrated;
       return await readAppDataFromDb(DB_RECORD_KEY);
     }
 
@@ -3560,7 +3509,7 @@
         setAuthStatus('เข้าสู่ระบบแล้ว');
       }catch(error){
         console.error(error);
-        appData = hydrateCurrentAppData(localSeedState?.data || getEmptyAppDataV2());
+        appData = buildCurrentAppDataFromV2(localSeedState?.data || getEmptyAppDataV2());
         lastPersistedDataFingerprint = getV2DataFingerprint(localSeedState?.data || getEmptyAppDataV2());
         isApplyingCloudState = true;
         enterApp();
