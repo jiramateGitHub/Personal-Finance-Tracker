@@ -1005,6 +1005,31 @@
     }
     .trip-calendar-item:first-child{border-top:none}
     .trip-calendar-item button{width:100%; text-align:left}
+    .trip-detail-tabs{display:flex; gap:8px; flex-wrap:wrap} /* --NEW */
+    .trip-detail-tab{background:#fff; color:#334155; border:1px solid #dbeafe} /* --NEW */
+    .trip-detail-tab.is-active{background:var(--primary-soft); color:var(--primary); border-color:#93c5fd} /* --NEW */
+    .trip-tab-panel{display:grid; gap:16px} /* --NEW */
+    .trip-overview-grid{display:grid; grid-template-columns:1.15fr .85fr; gap:16px} /* --NEW */
+    .trip-mini-summary-grid{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px} /* --NEW */
+    .trip-summary-stack,.trip-warning-stack,.trip-plan-row-list{display:grid; gap:12px} /* --NEW */
+    .trip-overview-card,.trip-plan-row-card{ /* --NEW */
+      border:1px solid #dbe3ef; border-radius:18px; padding:16px;
+      background:linear-gradient(180deg,#ffffff,#fbfdff);
+      display:grid; gap:12px;
+    }
+    .trip-overview-card.is-near-limit,.trip-plan-row-card.is-near-limit{border-color:#fde68a; background:linear-gradient(180deg,#fffdf5,#ffffff)} /* --NEW */
+    .trip-overview-card.is-over-budget,.trip-plan-row-card.is-over-budget{border-color:#fecdd3; background:linear-gradient(180deg,#fff1f2,#ffffff)} /* --NEW */
+    .trip-overview-head{display:flex; justify-content:space-between; gap:10px; align-items:flex-start; flex-wrap:wrap} /* --NEW */
+    .trip-overview-head h4,.trip-plan-row-head h4{margin:0} /* --NEW */
+    .trip-plan-row-head{display:flex; justify-content:space-between; gap:10px; align-items:flex-start; flex-wrap:wrap} /* --NEW */
+    .trip-plan-row-grid{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px} /* --NEW */
+    .trip-plan-stat{padding:10px 12px; border-radius:14px; background:#fff; border:1px solid #e2e8f0; display:grid; gap:4px} /* --NEW */
+    .trip-plan-stat .label{font-size:12px; font-weight:800; color:var(--muted); text-transform:uppercase; letter-spacing:.04em} /* --NEW */
+    .trip-plan-stat .value{font-weight:800} /* --NEW */
+    .trip-plan-stat .value.trip-negative{color:#b91c1c} /* --NEW */
+    .trip-progress-meta{display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; color:var(--muted); font-size:13px} /* --NEW */
+    .trip-budget-empty-state{display:grid; gap:12px} /* --NEW */
+    .trip-budget-note{padding:14px 16px; border-radius:16px; background:#fff; border:1px solid #dbeafe; color:#334155} /* --NEW */
     .year-grid.year-grid-enhanced{grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px}
     .month-box.enhanced{padding:18px; gap:12px; background:linear-gradient(180deg,#ffffff,#fbfdff)}
     .month-balance-hero{display:flex; justify-content:space-between; gap:12px; align-items:end; padding:14px 16px; border-radius:16px; background:#f8fbff; border:1px solid #dbe7ff}
@@ -1150,7 +1175,7 @@
       .app{padding:12px}
       .layout{grid-template-columns:1fr}
       .sidebar{position:static}
-    .toolbar-inline,.year-grid,.form-grid,.year-grid.year-grid-enhanced,.monthly-insight-grid,.mini-summary-grid,.monthly-budget-grid,.monthly-workspace-grid{grid-template-columns:1fr 1fr}
+    .toolbar-inline,.year-grid,.form-grid,.year-grid.year-grid-enhanced,.monthly-insight-grid,.mini-summary-grid,.monthly-budget-grid,.monthly-workspace-grid,.trip-overview-grid,.trip-mini-summary-grid,.trip-plan-row-grid{grid-template-columns:1fr 1fr}
       .compact-filter-bar,.compact-filter-row,.trip-inline-filters,.trip-stat-grid{grid-template-columns:1fr 1fr}
       .quick-add-bar{grid-template-columns:1fr}
       .installment-filters,.calendar-grid{grid-template-columns:1fr 1fr}
@@ -1194,7 +1219,7 @@
         height:58px;
       }
       .floating-back-btn .floating-back-label{display:none}
-    .toolbar-inline,.year-grid,.form-grid,.year-grid.year-grid-enhanced,.compact-filter-bar,.compact-filter-row,.installment-filters,.calendar-grid,.installment-kv,.trip-inline-filters,.trip-stat-grid,.trip-detail-grid,.quick-add-bar,.monthly-insight-grid,.mini-summary-grid,.monthly-budget-grid,.budget-stat-grid,.goal-stat-grid,.monthly-workspace-grid{grid-template-columns:1fr}
+    .toolbar-inline,.year-grid,.form-grid,.year-grid.year-grid-enhanced,.compact-filter-bar,.compact-filter-row,.installment-filters,.calendar-grid,.installment-kv,.trip-inline-filters,.trip-stat-grid,.trip-detail-grid,.quick-add-bar,.monthly-insight-grid,.mini-summary-grid,.monthly-budget-grid,.budget-stat-grid,.goal-stat-grid,.monthly-workspace-grid,.trip-overview-grid,.trip-mini-summary-grid,.trip-plan-row-grid{grid-template-columns:1fr}
       .trip-card-footer,.trip-detail-top,.trip-section-title{align-items:flex-start}
       .trip-item-card{grid-template-columns:1fr}
       .trip-item-actions{justify-content:flex-start}
@@ -2083,6 +2108,48 @@
     </div>
   </div>
 
+  <div id="tripBudgetModal" class="modal-backdrop hidden" aria-hidden="true"> <!-- --NEW -->
+    <div class="modal-dialog card" role="dialog" aria-modal="true" aria-labelledby="tripBudgetFormTitle"> <!-- --NEW -->
+      <div class="modal-header"> <!-- --NEW -->
+        <div>
+          <h3 id="tripBudgetFormTitle" style="margin:0">➕ จัดแผนงบทริป</h3>
+          <div class="meta">เพิ่มหรือแก้ไขงบแยกตามหมวดของทริปที่เลือก</div>
+        </div>
+        <div class="small-actions">
+          <div id="tripBudgetEditBadge" class="badge hidden">✏️ กำลังแก้ไข</div>
+          <button id="closeTripBudgetModalBtn" class="btn-light modal-close">✕ ปิด</button>
+        </div>
+      </div>
+      <div class="modal-body">
+        <div class="form-grid">
+          <div id="tripBudgetModalSummary" class="span-2 notice-box">
+            เลือกทริปและหมวดที่ต้องการวางแผนงบ แล้วระบบจะนำไปเทียบกับรายการจริงในทริปให้อัตโนมัติ
+          </div>
+          <div class="span-2">
+            <label for="tripBudgetTripId">ทริป</label>
+            <select id="tripBudgetTripId"><option value="">เลือกทริป</option></select>
+          </div>
+          <div>
+            <label for="tripBudgetLineCategory">หมวดหมู่</label>
+            <select id="tripBudgetLineCategory"></select>
+          </div>
+          <div>
+            <label for="tripBudgetLineAmount">งบประมาณ (บาท)</label>
+            <input type="number" id="tripBudgetLineAmount" min="0" step="0.01" placeholder="0.00">
+          </div>
+          <div class="span-2">
+            <label for="tripBudgetNote">หมายเหตุของแผนงบ (ถ้ามี)</label>
+            <input type="text" id="tripBudgetNote" placeholder="เช่น กันงบช้อปปิ้งเผื่อไว้เล็กน้อย">
+          </div>
+          <div class="full small-actions">
+            <button id="saveTripBudgetBtn" class="btn-primary">💾 บันทึกแผนงบ</button>
+            <button id="clearTripBudgetBtn" class="btn-light">✕ ล้างฟอร์ม</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- --NEW -->
   <div id="budgetModal" class="modal-backdrop hidden" aria-hidden="true">
     <div class="modal-dialog card" role="dialog" aria-modal="true" aria-labelledby="budgetFormTitle">
@@ -2251,9 +2318,12 @@
     let editingTripItemId = null;
     let editingBudgetId = null; // --NEW
     let editingGoalId = null; // --NEW
+    let editingTripBudgetLineId = null; // --NEW
+    let activeTripBudgetTripId = null; // --NEW
     let activeTripId = null;
     let installmentViewMode = 'list';
     let tripViewMode = 'list';
+    let activeTripDetailTab = 'overview'; // --NEW
     let pendingViewNavigation = null;
     let navigationHistory = [];
     let fileHandle = null;
@@ -2377,6 +2447,8 @@
     const loanModal = $('loanModal');
     const openLoanModalBtn = $('openLoanModalBtn');
     const closeLoanModalBtn = $('closeLoanModalBtn');
+    const tripBudgetModal = $('tripBudgetModal'); // --NEW
+    const closeTripBudgetModalBtn = $('closeTripBudgetModalBtn'); // --NEW
     const prevYearBtn = $('prevYearBtn');
     const nextYearBtn = $('nextYearBtn');
 
@@ -2412,6 +2484,15 @@
     const goalNote = $('goalNote'); // --NEW
     const saveGoalBtn = $('saveGoalBtn'); // --NEW
     const clearGoalBtn = $('clearGoalBtn'); // --NEW
+    const tripBudgetFormTitle = $('tripBudgetFormTitle'); // --NEW
+    const tripBudgetEditBadge = $('tripBudgetEditBadge'); // --NEW
+    const tripBudgetTripId = $('tripBudgetTripId'); // --NEW
+    const tripBudgetLineCategory = $('tripBudgetLineCategory'); // --NEW
+    const tripBudgetLineAmount = $('tripBudgetLineAmount'); // --NEW
+    const tripBudgetNote = $('tripBudgetNote'); // --NEW
+    const tripBudgetModalSummary = $('tripBudgetModalSummary'); // --NEW
+    const saveTripBudgetBtn = $('saveTripBudgetBtn'); // --NEW
+    const clearTripBudgetBtn = $('clearTripBudgetBtn'); // --NEW
 
     const yearlyYearPicker = $('yearlyYearPicker');
     const yearlyScreenLabel = $('yearlyScreenLabel');
@@ -2509,6 +2590,8 @@
     const DEFAULT_SAVE_BUDGET_TEXT = saveBudgetBtn?.textContent || ''; // --NEW
     const DEFAULT_GOAL_FORM_TITLE = goalFormTitle?.textContent || ''; // --NEW
     const DEFAULT_SAVE_GOAL_TEXT = saveGoalBtn?.textContent || ''; // --NEW
+    const DEFAULT_TRIP_BUDGET_FORM_TITLE = tripBudgetFormTitle?.textContent || ''; // --NEW
+    const DEFAULT_SAVE_TRIP_BUDGET_TEXT = saveTripBudgetBtn?.textContent || ''; // --NEW
     const DEFAULT_LOAN_FORM_TITLE = loanFormTitle?.textContent || '';
     const DEFAULT_SAVE_LOAN_TEXT = saveLoanBtn?.textContent || '';
     const DEFAULT_TRIP_FORM_TITLE = tripFormTitle?.textContent || '';
@@ -2654,7 +2737,7 @@
             isPaid: item.isPaid == null ? true : !!item.isPaid
           })) : []
         })) : [],
-        budgets: Array.isArray(parsed.budgets) ? parsed.budgets.map(item => normalizeBudgetRecord(item)).filter(item => item.amount > 0 && !!item.categoryId && !!item.month) : [], // --CHANGED
+        budgets: normalizeRuntimeBudgetCollection(Array.isArray(parsed.budgets) ? parsed.budgets : []), // --CHANGED
         goals: Array.isArray(parsed.goals) ? parsed.goals.map(item => normalizeGoalRecord(item)).filter(item => item.targetAmount > 0 && !!item.name) : [] // --CHANGED
       };
     }
@@ -2757,6 +2840,28 @@
       };
     }
 
+    function mergeBudgetLinesByCategory(lines = [], fallbackCategoryId = DEFAULT_CATEGORY_ID){ // --NEW
+      const merged = new Map();
+      lines.forEach((line, index) => {
+        const normalized = normalizeBudgetLine(line, fallbackCategoryId);
+        if(!normalized.categoryId || normalized.amount <= 0) return;
+        const current = merged.get(normalized.categoryId);
+        if(current){
+          current.amount = round2(Number(current.amount || 0) + Number(normalized.amount || 0));
+          if(!current.id) current.id = normalized.id || `budget-line-${index + 1}`;
+          return;
+        }
+        merged.set(normalized.categoryId, {
+          id: normalized.id || `budget-line-${index + 1}`,
+          categoryId: normalized.categoryId,
+          amount: round2(Number(normalized.amount || 0))
+        });
+      });
+      return Array.from(merged.values()).sort((a, b) =>
+        String(a.categoryId || '').localeCompare(String(b.categoryId || ''), 'th')
+        || String(a.id || '').localeCompare(String(b.id || '')));
+    }
+
     function validateTransaction(input = {}){
       const now = createIsoTimestamp();
       const normalizedDate = normalizeDateValue(input.date);
@@ -2850,9 +2955,11 @@
         ? [{ id: normalizeRequiredText(input.lineId, crypto.randomUUID()), categoryId: fallbackMonthlyCategoryId, amount: input.amount }]
         : [];
       const rawLines = (Array.isArray(input.lines) && input.lines.length ? input.lines : monthlyLineSeed);
-      const lines = rawLines
-        .map(line => normalizeBudgetLine(line, scope === 'trip' ? DEFAULT_TRIP_CATEGORY_ID : ''))
-        .filter(line => line.amount > 0 && !!line.categoryId);
+      const lines = (scope === 'trip'
+        ? mergeBudgetLinesByCategory(rawLines, DEFAULT_TRIP_CATEGORY_ID)
+        : rawLines
+          .map(line => normalizeBudgetLine(line, ''))
+          .filter(line => line.amount > 0 && !!line.categoryId));
       const primaryLine = lines[0] || null;
       const alertThresholds = (Array.isArray(input.alertThresholds) ? input.alertThresholds : [0.8, 1])
         .map(value => Number(value))
@@ -2929,6 +3036,62 @@
         ...normalized,
         lineId: normalized.lines[0]?.id || crypto.randomUUID()
       };
+    }
+
+    function normalizeTripBudgetRecord(input = {}){ // --NEW
+      const normalized = validateBudget({
+        ...input,
+        scope: 'trip',
+        name: normalizeRequiredText(input.name, 'Trip Budget'),
+        tripId: normalizeNullableText(input.tripId),
+        note: normalizeNullableText(input.note),
+        lines: mergeBudgetLinesByCategory(Array.isArray(input.lines) ? input.lines : [], DEFAULT_TRIP_CATEGORY_ID),
+        alertThresholds: Array.isArray(input.alertThresholds) ? input.alertThresholds : [0.8, 1],
+        enabled: input.enabled !== false
+      }).value;
+      return {
+        ...normalized,
+        lines: mergeBudgetLinesByCategory(normalized.lines, DEFAULT_TRIP_CATEGORY_ID),
+        amount: round2((normalized.lines || []).reduce((sum, line) => sum + Number(line.amount || 0), 0))
+      };
+    }
+
+    function normalizeRuntimeBudgetCollection(records = []){ // --NEW
+      const monthlyRecords = [];
+      const tripMap = new Map();
+      (Array.isArray(records) ? records : []).forEach(item => {
+        const scope = normalizeEnumValue(item?.scope, BUDGET_SCOPES, 'monthly');
+        if(scope === 'trip'){
+          const tripBudget = normalizeTripBudgetRecord(item);
+          if(!tripBudget.tripId || !tripBudget.lines.length || tripBudget.amount <= 0) return;
+          const existing = tripMap.get(tripBudget.tripId);
+          if(!existing){
+            tripMap.set(tripBudget.tripId, tripBudget);
+            return;
+          }
+          const mergedRecord = normalizeTripBudgetRecord({
+            ...existing,
+            id: existing.id || tripBudget.id,
+            name: existing.name || tripBudget.name,
+            note: existing.note || tripBudget.note || null,
+            lines: [...(existing.lines || []), ...(tripBudget.lines || [])],
+            createdAt: existing.createdAt || tripBudget.createdAt,
+            updatedAt: tripBudget.updatedAt || existing.updatedAt
+          });
+          tripMap.set(tripBudget.tripId, mergedRecord);
+          return;
+        }
+        const monthlyBudget = normalizeBudgetRecord(item);
+        if(monthlyBudget.amount > 0 && !!monthlyBudget.categoryId && !!monthlyBudget.month){
+          monthlyRecords.push(monthlyBudget);
+        }
+      });
+      return [...monthlyRecords, ...Array.from(tripMap.values())].sort((a, b) =>
+        String(a.scope || '').localeCompare(String(b.scope || ''))
+        || String(a.month || '').localeCompare(String(b.month || ''))
+        || String(a.tripId || '').localeCompare(String(b.tripId || ''))
+        || String(a.name || '').localeCompare(String(b.name || ''), 'th')
+        || String(a.id || '').localeCompare(String(b.id || '')));
     }
 
     function normalizeGoalRecord(input = {}){ // --NEW
@@ -3010,8 +3173,8 @@
       const trips = (Array.isArray(parsed.trips) ? parsed.trips : [])
         .map(item => validateTrip(item).value)
         .filter(item => !!item.name);
-      const budgets = (Array.isArray(parsed.budgets) ? parsed.budgets : [])
-        .map(item => validateBudget(item).value)
+      const budgets = normalizeRuntimeBudgetCollection((Array.isArray(parsed.budgets) ? parsed.budgets : [])
+        .map(item => validateBudget(item).value))
         .filter(item => item.lines.length > 0);
       const goals = (Array.isArray(parsed.goals) ? parsed.goals : [])
         .map(item => validateGoal(item).value)
@@ -3244,6 +3407,7 @@
         }).value)).filter(item => item.amount > 0 && !!item.title);
 
       const monthlyBudgets = runtime.budgets // --NEW
+        .filter(item => normalizeEnumValue(item?.scope, BUDGET_SCOPES, 'monthly') === 'monthly')
         .map(item => validateBudget({
           ...item,
           scope: 'monthly',
@@ -3252,10 +3416,18 @@
         }).value)
         .filter(item => item.scope === 'monthly' && !!item.month && item.lines.length > 0);
 
-      const tripBudgets = [];
+      const tripBudgets = runtime.budgets // --NEW
+        .filter(item => normalizeEnumValue(item?.scope, BUDGET_SCOPES, 'monthly') === 'trip')
+        .map(item => normalizeTripBudgetRecord({
+          ...item,
+          createdAt: item.createdAt || updatedAt,
+          updatedAt
+        }))
+        .filter(item => item.scope === 'trip' && !!item.tripId && item.lines.length > 0);
       const trips = runtime.trips.map(trip => {
         const budgetAmount = trip.budget === '' || trip.budget == null ? null : Number(trip.budget);
-        if(Number.isFinite(budgetAmount) && budgetAmount > 0){
+        const hasDetailedTripBudget = tripBudgets.some(item => item.tripId === trip.id);
+        if(!hasDetailedTripBudget && Number.isFinite(budgetAmount) && budgetAmount > 0){
           tripBudgets.push(validateBudget({
             id: `budget-trip-${trip.id}`,
             scope: 'trip',
@@ -3406,13 +3578,14 @@
         };
       });
 
-      const budgets = data.budgets // --NEW
-        .filter(item => item.scope === 'monthly' && !!item.month)
-        .map(item => normalizeBudgetRecord({
-          ...item,
-          categoryId: item.categoryId ?? item.lines?.[0]?.categoryId,
-          amount: item.amount ?? item.lines?.[0]?.amount
-        }));
+      const budgets = normalizeRuntimeBudgetCollection(data.budgets // --NEW
+        .map(item => item.scope === 'trip'
+          ? normalizeTripBudgetRecord(item)
+          : normalizeBudgetRecord({
+            ...item,
+            categoryId: item.categoryId ?? item.lines?.[0]?.categoryId,
+            amount: item.amount ?? item.lines?.[0]?.amount
+          })));
 
       const goals = data.goals.map(item => normalizeGoalRecord(item)); // --NEW
 
@@ -4016,9 +4189,10 @@
       budgetCategory.innerHTML = options; // --NEW
       loanCategory.innerHTML = options;
       tripItemCategory.innerHTML = options;
+      tripBudgetLineCategory.innerHTML = options; // --NEW
       monthlyCategoryFilter.innerHTML = '<option value="">ทุกหมวดหมู่</option>' + options;
       tripCategoryFilter.innerHTML = '<option value="">ทุกหมวดหมู่</option>' + options;
-      [entryCategory, budgetCategory, goalStatus, loanCategory, tripItemCategory, monthlyCategoryFilter, tripCategoryFilter, tripYearFilter, tripMonthFilter].forEach(refreshEnhancedSelect); // --CHANGED
+      [entryCategory, budgetCategory, goalStatus, loanCategory, tripItemCategory, tripBudgetLineCategory, monthlyCategoryFilter, tripCategoryFilter, tripYearFilter, tripMonthFilter].forEach(refreshEnhancedSelect); // --CHANGED
       refreshTripOptions();
     }
     function refreshTripOptions(){
@@ -4029,6 +4203,8 @@
         .join('');
       tripItemTripId.innerHTML = '<option value="">เลือกทริป</option>' + options;
       refreshEnhancedSelect(tripItemTripId);
+      tripBudgetTripId.innerHTML = '<option value="">เลือกทริป</option>' + options; // --NEW
+      refreshEnhancedSelect(tripBudgetTripId); // --NEW
       const installmentOptions = appData.installments
         .slice()
         .sort((a,b) => String(a.name || '').localeCompare(String(b.name || ''),'th'))
@@ -4313,6 +4489,7 @@
       const focusDate = options.focusDate || getTripRelevantDates(trip)[0] || '';
       const focusMonth = getMonthKeyFromDate(focusDate);
       activeTripId = targetId;
+      activeTripDetailTab = options.itemId ? 'actual' : 'overview'; // --NEW
       tripViewMode = 'list';
       currentView = 'trips';
       tripSearchKeyword.value = trip.name || '';
@@ -4631,7 +4808,7 @@
 
     function getBudgetsByMonth(monthKey){ // --NEW
       return normalizeData(appData).budgets
-        .filter(item => item.enabled !== false && item.month === monthKey)
+        .filter(item => item.scope === 'monthly' && item.enabled !== false && item.month === monthKey)
         .sort((a, b) => String(a.name || '').localeCompare(String(b.name || ''), 'th') || String(a.id || '').localeCompare(String(b.id || '')));
     }
 
@@ -5903,6 +6080,440 @@
       if(trip.endDate && today > trip.endDate) return 'completed';
       return 'ongoing';
     }
+    function normalizeTripDetailTab(value){ // --NEW
+      return ['overview', 'actual', 'plan'].includes(value) ? value : 'overview';
+    }
+    function getTripBudgetRecord(tripId){ // --NEW
+      if(!tripId) return null;
+      const trip = appData.trips.find(item => item.id === tripId);
+      const record = normalizeData(appData).budgets
+        .find(item => item.scope === 'trip' && item.tripId === tripId && item.enabled !== false);
+      if(!record) return null;
+      return normalizeTripBudgetRecord({
+        ...record,
+        name: record.name || (trip?.name ? `Budget: ${trip.name}` : 'Trip Budget')
+      });
+    }
+    function getTripBudgetLines(tripId){ // --NEW
+      return getTripBudgetRecord(tripId)?.lines || [];
+    }
+    function getTripBudgetSeedAmount(tripId){ // --NEW
+      const trip = appData.trips.find(item => item.id === tripId);
+      const amount = Number(trip?.budget);
+      return Number.isFinite(amount) && amount > 0 ? round2(amount) : 0;
+    }
+    function getTripPlannedTotal(tripId){ // --NEW
+      const record = getTripBudgetRecord(tripId);
+      if(record?.lines?.length) return round2(record.lines.reduce((sum, line) => sum + Number(line.amount || 0), 0));
+      return getTripBudgetSeedAmount(tripId);
+    }
+    function getTripActualTotal(tripId){ // --NEW
+      const trip = appData.trips.find(item => item.id === tripId);
+      return round2((trip?.items || []).reduce((sum, item) => sum + Number(item.amount || 0), 0));
+    }
+    function getTripActualByCategory(tripId){ // --NEW
+      const trip = appData.trips.find(item => item.id === tripId);
+      const totals = new Map();
+      (trip?.items || []).forEach(item => {
+        const amount = Number(item.amount || 0);
+        if(!Number.isFinite(amount) || amount <= 0) return;
+        const categoryId = item.category || DEFAULT_TRIP_CATEGORY_ID;
+        totals.set(categoryId, round2((totals.get(categoryId) || 0) + amount));
+      });
+      return Object.fromEntries(Array.from(totals.entries()).sort((a, b) =>
+        String(a[0] || '').localeCompare(String(b[0] || ''), 'th')));
+    }
+    function getTripPlanVsActualRows(tripId){ // --NEW
+      const tripBudget = getTripBudgetRecord(tripId);
+      const thresholds = Array.isArray(tripBudget?.alertThresholds) && tripBudget.alertThresholds.length
+        ? tripBudget.alertThresholds.map(value => Number(value)).filter(value => Number.isFinite(value) && value > 0).sort((a, b) => a - b)
+        : [0.8, 1];
+      const plannedMap = new Map(getTripBudgetLines(tripId).map(line => [line.categoryId, round2(Number(line.amount || 0))]));
+      const actualByCategory = getTripActualByCategory(tripId);
+      const categories = Array.from(new Set([
+        ...plannedMap.keys(),
+        ...Object.keys(actualByCategory)
+      ])).sort((a, b) => String(a || '').localeCompare(String(b || ''), 'th'));
+      return categories.map(categoryId => {
+        const planned = round2(plannedMap.get(categoryId) || 0);
+        const actual = round2(Number(actualByCategory[categoryId] || 0));
+        const remaining = round2(planned - actual);
+        const ratio = planned > 0 ? actual / planned : (actual > 0 ? 1.01 : 0);
+        let key = 'safe';
+        let label = planned > 0 ? 'ปลอดภัย' : 'ยังไม่ตั้งงบ';
+        if(planned > 0 && ratio > (thresholds[1] || 1)){
+          key = 'over-budget';
+          label = 'เกินงบ';
+        }else if(planned > 0 && ratio >= (thresholds[0] || 0.8)){
+          key = 'near-limit';
+          label = 'ใกล้เต็มงบ';
+        }else if(planned <= 0 && actual > 0){
+          key = 'over-budget';
+          label = 'ไม่มีแผนงบ';
+        }
+        return {
+          categoryId,
+          planned,
+          actual,
+          remaining,
+          overAmount: round2(Math.max(0, actual - planned)),
+          usageRatio: ratio,
+          usagePercent: planned > 0 ? Math.round(ratio * 100) : 0,
+          key,
+          label
+        };
+      }).sort((a, b) => b.actual - a.actual || b.planned - a.planned || String(a.categoryId || '').localeCompare(String(b.categoryId || ''), 'th'));
+    }
+    function getTripBudgetStatus(tripId){ // --NEW
+      const planned = getTripPlannedTotal(tripId);
+      const actual = getTripActualTotal(tripId);
+      const remaining = round2(planned - actual);
+      const thresholds = getTripBudgetRecord(tripId)?.alertThresholds || [0.8, 1];
+      const usageRatio = planned > 0 ? actual / planned : 0;
+      let key = 'safe';
+      let label = planned > 0 ? 'ปลอดภัย' : 'ยังไม่ตั้งงบ';
+      if(planned > 0 && usageRatio > (thresholds[1] || 1)){
+        key = 'over-budget';
+        label = 'เกินงบ';
+      }else if(planned > 0 && usageRatio >= (thresholds[0] || 0.8)){
+        key = 'near-limit';
+        label = 'ใกล้เต็มงบ';
+      }
+      return {
+        key,
+        label,
+        planned,
+        actual,
+        remaining,
+        overAmount: round2(Math.max(0, actual - planned)),
+        usageRatio,
+        usagePercent: planned > 0 ? Math.round(usageRatio * 100) : 0
+      };
+    }
+    function getTripStatusLabel(status){ // --NEW
+      return status === 'upcoming' ? 'ยังไม่เริ่ม' : (status === 'completed' ? 'จบทริปแล้ว' : 'กำลังเดินทาง');
+    }
+    function getTripBudgetWarningItems(tripId){ // --NEW
+      const items = [];
+      const rows = getTripPlanVsActualRows(tripId);
+      const overall = getTripBudgetStatus(tripId);
+      rows.filter(row => row.key === 'over-budget').slice(0, 3).forEach(row => {
+        items.push({
+          tone: 'danger',
+          text: row.planned > 0
+            ? `หมวด${formatCategoryLabel(row.categoryId)}เกินงบ ${formatMoney(row.overAmount)}`
+            : `หมวด${formatCategoryLabel(row.categoryId)}มีค่าใช้จ่าย ${formatMoney(row.actual)} แต่ยังไม่ได้ตั้งงบ`
+        });
+      });
+      rows.filter(row => row.key === 'near-limit').slice(0, 2).forEach(row => {
+        items.push({
+          tone: 'warning',
+          text: `หมวด${formatCategoryLabel(row.categoryId)}ใช้งบไปแล้ว ${row.usagePercent}%`
+        });
+      });
+      if(overall.key === 'over-budget'){
+        items.unshift({
+          tone: 'danger',
+          text: `ทริปนี้ใช้งบรวมเกินแล้ว ${formatMoney(overall.overAmount)}`
+        });
+      }else if(overall.key === 'near-limit'){
+        items.unshift({
+          tone: 'warning',
+          text: `ใช้งบรวมไปแล้ว ${overall.usagePercent}% ของแผนทริป`
+        });
+      }
+      return items.slice(0, 4);
+    }
+    function getTripBudgetSummaryLines(tripId){ // --NEW
+      const status = getTripBudgetStatus(tripId);
+      const rows = getTripPlanVsActualRows(tripId);
+      const lines = [];
+      if(status.planned > 0){
+        lines.push(`ใช้งบไปแล้ว ${status.usagePercent}%`);
+      }else{
+        lines.push(status.actual > 0 ? 'มีรายการจริงแล้ว แต่ยังไม่ได้ตั้งแผนงบแบบแยกหมวด' : 'ยังไม่มีการใช้จ่ายและยังไม่ได้ตั้งแผนงบ');
+      }
+      const overRow = rows.find(row => row.overAmount > 0);
+      if(overRow){
+        lines.push(`เกินงบหมวด${formatCategoryLabel(overRow.categoryId)} ${formatMoney(overRow.overAmount)}`);
+      }else{
+        const topActual = rows.find(row => row.actual > 0);
+        if(topActual) lines.push(`ใช้จ่ายสูงสุดที่หมวด${formatCategoryLabel(topActual.categoryId)} ${formatMoney(topActual.actual)}`);
+      }
+      if(status.planned > 0){
+        lines.push(status.remaining >= 0
+          ? `คงเหลืองบ ${formatMoney(status.remaining)}`
+          : `งบรวมเกิน ${formatMoney(Math.abs(status.remaining))}`);
+      }
+      return lines.slice(0, 3);
+    }
+    function renderTripOverviewTab(trip, items, dayList){ // --NEW
+      const status = getTripBudgetStatus(trip.id);
+      const rows = getTripPlanVsActualRows(trip.id);
+      const topActualRows = rows.filter(row => row.actual > 0).slice(0, 3);
+      const overRows = rows.filter(row => row.overAmount > 0).slice(0, 3);
+      const warnings = getTripBudgetWarningItems(trip.id);
+      const summaryLines = getTripBudgetSummaryLines(trip.id);
+      const progressWidth = Math.min(100, Math.max(0, status.usagePercent));
+      return `
+        <div class="trip-tab-panel">
+          <div class="trip-mini-summary-grid">
+            <div class="mini-summary-card balance-soft">
+              <div class="label">Planned</div>
+              <div class="value">${formatMoney(status.planned)}</div>
+            </div>
+            <div class="mini-summary-card expense-soft">
+              <div class="label">Actual</div>
+              <div class="value">${formatMoney(status.actual)}</div>
+            </div>
+            <div class="mini-summary-card ${status.remaining < 0 ? 'expense-soft' : 'income-soft'}">
+              <div class="label">${status.remaining < 0 ? 'Over' : 'Remaining'}</div>
+              <div class="value">${formatMoney(Math.abs(status.remaining))}</div>
+            </div>
+            <div class="mini-summary-card balance-soft">
+              <div class="label">Trip Days</div>
+              <div class="value">${dayList.length}</div>
+            </div>
+          </div>
+          <div class="trip-overview-grid">
+            <div class="trip-overview-card ${status.key === 'near-limit' ? 'is-near-limit' : status.key === 'over-budget' ? 'is-over-budget' : ''}">
+              <div class="trip-overview-head">
+                <div>
+                  <h4>${escapeHtml(trip.name)}</h4>
+                  <div class="meta">${escapeHtml(trip.destination || 'ไม่ระบุปลายทาง')} · ${escapeHtml(getTripDateRangeLabel(trip))}</div>
+                </div>
+                <span class="status-pill ${status.key}">${escapeHtml(status.label)}</span>
+              </div>
+              <div class="trip-progress-meta">
+                <span>${status.planned > 0 ? `ใช้งบไปแล้ว ${status.usagePercent}%` : 'ยังไม่ตั้งงบรวมของทริป'}</span>
+                <span>${items.length} รายการจริง</span>
+              </div>
+              <div class="progress budget-progress-bar"><div class="${status.key}" style="width:${progressWidth}%"></div></div>
+              <div class="trip-summary-stack">
+                ${summaryLines.map(text => `<div class="soft-insight-item">${escapeHtml(text)}</div>`).join('')}
+              </div>
+            </div>
+            <div class="trip-summary-stack">
+              <div class="trip-overview-card">
+                <div class="trip-overview-head">
+                  <h4>ใช้จ่ายสูงสุด</h4>
+                  <span class="pill">${topActualRows.length} หมวด</span>
+                </div>
+                <div class="insight-list">
+                  ${topActualRows.length ? topActualRows.map(row => `
+                    <div class="insight-item">
+                      <div class="insight-item-main">
+                        <div class="insight-item-title">${escapeHtml(formatCategoryLabel(row.categoryId))}</div>
+                        <div class="meta">${row.planned > 0 ? `แผน ${formatMoney(row.planned)}` : 'ยังไม่ได้ตั้งงบหมวดนี้'}</div>
+                      </div>
+                      <div class="insight-item-amount">${formatMoney(row.actual)}</div>
+                    </div>
+                  `).join('') : '<div class="empty">ยังไม่มีค่าใช้จ่ายจริงในทริปนี้</div>'}
+                </div>
+              </div>
+              <div class="trip-overview-card ${overRows.length ? 'is-over-budget' : ''}">
+                <div class="trip-overview-head">
+                  <h4>หมวดที่ต้องจับตา</h4>
+                  <span class="pill">${overRows.length ? `${overRows.length} หมวด` : 'ยังไม่มี'}</span>
+                </div>
+                <div class="insight-list">
+                  ${overRows.length ? overRows.map(row => `
+                    <div class="insight-item">
+                      <div class="insight-item-main">
+                        <div class="insight-item-title">${escapeHtml(formatCategoryLabel(row.categoryId))}</div>
+                        <div class="meta">ใช้จริง ${formatMoney(row.actual)} / แผน ${formatMoney(row.planned)}</div>
+                      </div>
+                      <div class="insight-item-amount budget-negative">${formatMoney(row.overAmount)}</div>
+                    </div>
+                  `).join('') : '<div class="empty">ยังไม่มีหมวดที่เกินงบ</div>'}
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="soft-insight-list">
+            ${warnings.length
+              ? warnings.map(item => `<div class="soft-insight-item ${item.tone}">${escapeHtml(item.text)}</div>`).join('')
+              : '<div class="soft-insight-item">ทริปนี้ยังไม่มีสัญญาณเตือนด้านงบ</div>'}
+          </div>
+        </div>
+      `;
+    }
+    function renderTripActualTab(trip, items, dayList){ // --NEW
+      return `
+        <div class="trip-tab-panel">
+          <div class="trip-section-title">
+            <div>
+              <h4 style="margin:0">รายการจริง</h4>
+              <div class="meta">รายการค่าใช้จ่ายจริงของทริปนี้ แยกตามวันตามข้อมูลเดิม</div>
+            </div>
+            <div class="small-actions">
+              <button class="btn-primary btn-sm" onclick="createTripItemForTrip('${trip.id}')">＋ เพิ่มรายการ</button>
+            </div>
+          </div>
+          <div class="trip-day-stack">
+            ${dayList.length ? dayList.map(day => {
+              const dayItems = items.filter(item => item.date === day);
+              const dayTotal = dayItems.reduce((sum, item) => sum + Number(item.amount || 0), 0);
+              const collapseId = `trip-day-items-${trip.id}-${day.replace(/[^0-9]/g,'')}`;
+              return `
+                <div class="trip-day-block">
+                  <div class="trip-day-header">
+                    <div class="trip-day-summary">
+                      <h4>${escapeHtml(day)}</h4>
+                      <span class="pill">${dayItems.length} รายการ</span>
+                      <span class="pill">รวม ${formatMoney(dayTotal)}</span>
+                    </div>
+                    <button type="button" class="card-toggle btn-sm trip-day-toggle" onclick="toggleTripDay('${collapseId}', this)">
+                      <span class="chev" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M5 7.5 10 12.5 15 7.5"></path></svg></span>
+                    </button>
+                  </div>
+                  <div id="${collapseId}" class="trip-day-items">
+                    ${dayItems.map(item => {
+                      const linkedInstallment = getInstallmentLinkForTripItem(item);
+                      const paymentState = getTripItemPaymentState(item);
+                      return `
+                        <div class="trip-item-card" id="trip-item-${trip.id}-${item.id}">
+                          <div class="trip-item-main">
+                            <div class="trip-item-title-row">
+                              <strong>${escapeHtml(item.title)}</strong>
+                              <strong class="amount-expense trip-item-amount">${formatMoney(item.amount)}</strong>
+                            </div>
+                            <div class="trip-item-meta">
+                              <span class="meta">${escapeHtml(formatCategoryLabel(item.category || DEFAULT_TRIP_CATEGORY_ID))}</span>
+                              ${getPaymentStatusBadge(paymentState.isPaid)}
+                              ${item.note ? `<span class="meta">${escapeHtml(item.note)}</span>` : ''}
+                            </div>
+                            ${linkedInstallment ? `<div class="readonly-note">ลิงก์กับยอดผ่อน: ${escapeHtml(linkedInstallment.name)} · จ่ายรายเดือน ${formatMoney(linkedInstallment.monthlyAmount || 0)} · สถานะจะอ้างอิงจากยอดผ่อน</div>` : ''}
+                          </div>
+                          <div class="trip-item-actions">
+                            <button class="payment-toggle ${paymentState.isPaid ? 'is-paid' : 'is-unpaid'}" onclick="toggleTripItemPaid('${trip.id}','${item.id}')">
+                              <input type="checkbox" ${paymentState.isPaid ? 'checked' : ''}>
+                              <span>${linkedInstallment ? 'ไปปรับที่ยอดผ่อน' : (paymentState.isPaid ? 'จ่ายแล้ว' : 'ยังไม่จ่าย')}</span>
+                            </button>
+                            <button class="btn-light btn-sm" onclick="editTripItem('${trip.id}','${item.id}')">แก้ไข</button>
+                            ${linkedInstallment ? `<button class="btn-light btn-sm" onclick="goToInstallments('${linkedInstallment.id}','${getMonthKeyFromDate(item.date) || ''}')">ไปยอดผ่อน</button>` : ''}
+                            <button class="btn-danger btn-sm" onclick="deleteTripItem('${trip.id}','${item.id}')">ลบ</button>
+                          </div>
+                        </div>
+                      `;
+                    }).join('')}
+                  </div>
+                </div>
+              `;
+            }).join('') : '<div class="empty">ยังไม่มีรายการจริงในทริปนี้</div>'}
+          </div>
+        </div>
+      `;
+    }
+    function renderTripPlanTab(trip){ // --NEW
+      const tripBudget = getTripBudgetRecord(trip.id);
+      const rows = getTripPlanVsActualRows(trip.id);
+      const plannedRows = rows.filter(row => row.planned > 0);
+      const seedAmount = getTripBudgetSeedAmount(trip.id);
+      const totalPlanned = getTripPlannedTotal(trip.id);
+      const unplannedRows = rows.filter(row => row.planned <= 0 && row.actual > 0);
+      if(!plannedRows.length){
+        return `
+          <div class="trip-tab-panel">
+            <div class="trip-section-title">
+              <div>
+                <h4 style="margin:0">แผนงบ</h4>
+                <div class="meta">แยกงบทริปเป็นรายหมวด แล้วดูเทียบกับรายการจริงได้ทันที</div>
+              </div>
+              <div class="small-actions">
+                <button class="btn-primary btn-sm" onclick="openTripBudgetModalForTrip('${trip.id}')">＋ เพิ่มบรรทัดงบ</button>
+              </div>
+            </div>
+            <div class="trip-budget-empty-state">
+              <div class="empty">ยังไม่มีการจัดสรรงบรายหมวดสำหรับทริปนี้</div>
+              ${seedAmount > 0 ? `<div class="notice-box"><strong>${formatMoney(seedAmount)}</strong><br><span class="meta">ทริปนี้มีงบรวมจากฟอร์มสร้างทริปอยู่แล้ว แต่ยังไม่ได้กระจายเป็นหมวด</span></div>` : ''}
+              <div class="small-actions">
+                ${seedAmount > 0 ? `<button class="btn-light btn-sm" onclick="initializeTripBudgetFromSeed('${trip.id}')">ใช้ยอดงบรวมเดิมเป็นจุดเริ่มต้น</button>` : ''}
+                <button class="btn-primary btn-sm" onclick="openTripBudgetModalForTrip('${trip.id}')">เริ่มวางแผนงบ</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+      return `
+        <div class="trip-tab-panel">
+          <div class="trip-section-title">
+            <div>
+              <h4 style="margin:0">แผนงบ</h4>
+              <div class="meta">รวมแผนงบ ${formatMoney(totalPlanned)} · ${plannedRows.length} หมวด</div>
+            </div>
+            <div class="small-actions">
+              <button class="btn-primary btn-sm" onclick="openTripBudgetModalForTrip('${trip.id}')">＋ เพิ่มบรรทัดงบ</button>
+            </div>
+          </div>
+          ${tripBudget?.note ? `<div class="trip-budget-note">${escapeHtml(tripBudget.note)}</div>` : ''}
+          <div class="trip-plan-row-list">
+            ${plannedRows.map(row => {
+              const width = Math.min(100, Math.max(0, row.usagePercent));
+              return `
+                <div class="trip-plan-row-card ${row.key === 'near-limit' ? 'is-near-limit' : row.key === 'over-budget' ? 'is-over-budget' : ''}">
+                  <div class="trip-plan-row-head">
+                    <div>
+                      <h4>${escapeHtml(formatCategoryLabel(row.categoryId))}</h4>
+                      <div class="meta">${row.actual > 0 ? `ใช้จริง ${formatMoney(row.actual)}` : 'ยังไม่มีรายการจริงในหมวดนี้'}</div>
+                    </div>
+                    <div class="small-actions">
+                      <span class="status-pill ${row.key}">${escapeHtml(row.label)}</span>
+                      <button class="btn-light btn-sm" onclick="editTripBudgetLine('${trip.id}','${row.categoryId}')">แก้ไข</button>
+                      <button class="btn-danger btn-sm" onclick="deleteTripBudgetLine('${trip.id}','${row.categoryId}')">ลบ</button>
+                    </div>
+                  </div>
+                  <div class="trip-plan-row-grid">
+                    <div class="trip-plan-stat">
+                      <div class="label">Planned</div>
+                      <div class="value">${formatMoney(row.planned)}</div>
+                    </div>
+                    <div class="trip-plan-stat">
+                      <div class="label">Actual</div>
+                      <div class="value">${formatMoney(row.actual)}</div>
+                    </div>
+                    <div class="trip-plan-stat">
+                      <div class="label">${row.remaining < 0 ? 'Over' : 'Remaining'}</div>
+                      <div class="value ${row.remaining < 0 ? 'trip-negative' : ''}">${formatMoney(Math.abs(row.remaining))}</div>
+                    </div>
+                    <div class="trip-plan-stat">
+                      <div class="label">Usage</div>
+                      <div class="value">${row.planned > 0 ? `${row.usagePercent}%` : '-'}</div>
+                    </div>
+                  </div>
+                  <div class="budget-progress-row">
+                    <div class="trip-progress-meta">
+                      <span>${row.planned > 0 ? `ใช้งบไป ${row.usagePercent}%` : 'ยังไม่มีงบตั้งต้น'}</span>
+                      <span>${row.remaining < 0 ? `เกิน ${formatMoney(Math.abs(row.remaining))}` : `เหลือ ${formatMoney(row.remaining)}`}</span>
+                    </div>
+                    <div class="progress budget-progress-bar"><div class="${row.key}" style="width:${width}%"></div></div>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+          ${unplannedRows.length ? `
+            <div class="trip-overview-card is-over-budget">
+              <div class="trip-overview-head">
+                <h4>หมวดที่ยังไม่ได้จัดงบ</h4>
+                <span class="pill">${unplannedRows.length} หมวด</span>
+              </div>
+              <div class="insight-list">
+                ${unplannedRows.map(row => `
+                  <div class="insight-item">
+                    <div class="insight-item-main">
+                      <div class="insight-item-title">${escapeHtml(formatCategoryLabel(row.categoryId))}</div>
+                      <div class="meta">ยังไม่มีบรรทัดงบในหมวดนี้</div>
+                    </div>
+                    <div class="insight-item-amount">${formatMoney(row.actual)}</div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          ` : ''}
+        </div>
+      `;
+    }
     function getTripDateRangeLabel(trip){
       if(trip.startDate && trip.endDate) return `${trip.startDate} - ${trip.endDate}`;
       return trip.startDate || trip.endDate || '-';
@@ -6008,7 +6619,9 @@
       }
       const trips = appData.trips.slice().sort((a,b) => String(a.startDate || '').localeCompare(String(b.startDate || '')) || String(a.name || '').localeCompare(String(b.name || ''),'th'));
       const filteredTrips = trips.filter(tripMatchesFilter);
+      const previousActiveTripId = activeTripId; // --NEW
       ensureActiveTrip(filteredTrips);
+      if(activeTripId !== previousActiveTripId) activeTripDetailTab = 'overview'; // --NEW
       tripFilterResultLabel.textContent = `แสดง ${filteredTrips.length} จากทั้งหมด ${trips.length} ทริป`;
       tripFilterSummary.innerHTML = getActiveTripFilterText().length
         ? getActiveTripFilterText().map(text => `<span class="pill">${escapeHtml(text)}</span>`).join('')
@@ -6035,9 +6648,11 @@
 
       tripListContainer.innerHTML = filteredTrips.map(trip => {
         const status = getTripStatus(trip);
-        const statusLabel = status === 'upcoming' ? 'ยังไม่เริ่ม' : (status === 'completed' ? 'จบทริปแล้ว' : 'กำลังเดินทาง');
-        const progressText = trip.budget !== '' && Number(trip.budget || 0) > 0
-          ? `${Math.round((getTripTotal(trip) / Number(trip.budget || 1)) * 100)}% ของงบ`
+        const statusLabel = getTripStatusLabel(status); // --CHANGED
+        const plannedTotal = getTripPlannedTotal(trip.id); // --NEW
+        const actualTotal = getTripActualTotal(trip.id); // --NEW
+        const progressText = plannedTotal > 0
+          ? `${Math.round((actualTotal / Math.max(plannedTotal, 1)) * 100)}% ของงบ`
           : 'ยังไม่ได้ตั้งงบ';
         return `
           <div class="trip-card ${trip.id === activeTripId ? 'active' : ''}" id="trip-card-${trip.id}">
@@ -6057,10 +6672,10 @@
             <div class="trip-card-total">
               <div>
                 <div class="meta">ค่าใช้จ่ายรวม</div>
-                <strong>${formatMoney(getTripTotal(trip))}</strong>
+                <strong>${formatMoney(actualTotal)}</strong>
               </div>
               <div style="text-align:right">
-                <div class="meta">งบ ${trip.budget === '' ? '-' : formatMoney(trip.budget)}</div>
+                <div class="meta">งบ ${plannedTotal > 0 ? formatMoney(plannedTotal) : '-'}</div>
                 <div class="meta">${escapeHtml(progressText)}</div>
               </div>
             </div>
@@ -6117,16 +6732,24 @@
       const trip = filteredTrips.find(item => item.id === activeTripId) || filteredTrips[0];
       const items = (trip.items || []).slice().sort((a,b) => String(a.date || '').localeCompare(String(b.date || '')) || Number(b.amount || 0) - Number(a.amount || 0));
       const dayList = getTripDays(trip);
-      const categoryTotals = new Map();
-      items.forEach(item => categoryTotals.set(item.category || 'ท่องเที่ยว', (categoryTotals.get(item.category || 'ท่องเที่ยว') || 0) + Number(item.amount || 0)));
-      const topCategoryEntry = Array.from(categoryTotals.entries()).sort((a,b) => b[1] - a[1])[0];
+      const actualByCategory = getTripActualByCategory(trip.id); // --NEW
+      const topCategoryEntry = Object.entries(actualByCategory).sort((a,b) => Number(b[1] || 0) - Number(a[1] || 0))[0];
       const linkedItems = items.filter(item => item.installmentId);
       const linkedTotal = linkedItems.reduce((sum, item) => sum + Number(item.amount || 0), 0);
+      const tripBudgetStatus = getTripBudgetStatus(trip.id); // --NEW
+      const tripStatusLabel = getTripStatusLabel(getTripStatus(trip)); // --NEW
+      activeTripDetailTab = normalizeTripDetailTab(activeTripDetailTab); // --NEW
       tripSummaryLabel.textContent = `${trip.name} · ${trip.destination || 'ไม่ระบุปลายทาง'}`;
-      tripExpenseTotal.textContent = formatMoney(getTripTotal(trip));
+      tripExpenseTotal.textContent = formatMoney(tripBudgetStatus.actual);
       tripDayCount.textContent = String(dayList.length);
       tripItemCount.textContent = String(items.length);
       tripTopCategory.textContent = topCategoryEntry ? formatCategoryLabel(topCategoryEntry[0]) : '-';
+
+      const detailTabContent = activeTripDetailTab === 'actual' // --NEW
+        ? renderTripActualTab(trip, items, dayList)
+        : (activeTripDetailTab === 'plan'
+          ? renderTripPlanTab(trip)
+          : renderTripOverviewTab(trip, items, dayList));
 
       tripDetailContainer.innerHTML = `
         <div class="trip-detail">
@@ -6138,98 +6761,31 @@
               </div>
               <div class="small-actions">
                 <button class="btn-primary btn-sm" onclick="createTripItemForTrip('${trip.id}')">＋ เพิ่มรายการ</button>
+                <button class="btn-light btn-sm" onclick="openTripBudgetModalForTrip('${trip.id}')">แผนงบ</button>
                 <button class="btn-light btn-sm" onclick="editTrip('${trip.id}')">แก้ไขทริป</button>
               </div>
             </div>
             <div class="trip-stat-grid">
-              <div class="trip-highlight"><span class="meta">ค่าใช้จ่ายรวม</span><strong>${formatMoney(getTripTotal(trip))}</strong></div>
-              <div class="trip-highlight"><span class="meta">งบประมาณ</span><strong>${trip.budget === '' ? '-' : formatMoney(trip.budget)}</strong></div>
+              <div class="trip-highlight"><span class="meta">ค่าใช้จ่ายรวม</span><strong>${formatMoney(tripBudgetStatus.actual)}</strong></div>
+              <div class="trip-highlight"><span class="meta">งบที่วางแผน</span><strong>${tripBudgetStatus.planned > 0 ? formatMoney(tripBudgetStatus.planned) : '-'}</strong></div>
               <div class="trip-highlight"><span class="meta">วันที่มีรายการ</span><strong>${dayList.length}</strong></div>
               <div class="trip-highlight"><span class="meta">รายการทั้งหมด</span><strong>${items.length}</strong></div>
             </div>
             <div class="trip-chip-row">
               <span class="pill">${escapeHtml(getTripDateRangeLabel(trip))}</span>
-              <span class="pill">${escapeHtml(getTripStatus(trip) === 'upcoming' ? 'ยังไม่เริ่ม' : getTripStatus(trip) === 'completed' ? 'จบทริปแล้ว' : 'กำลังเดินทาง')}</span>
+              <span class="pill">${escapeHtml(tripStatusLabel)}</span>
               <span class="pill">${linkedItems.length} รายการลิงก์ยอดผ่อน</span>
+              <span class="pill">${tripBudgetStatus.planned > 0 ? `ใช้งบ ${tripBudgetStatus.usagePercent}%` : 'ยังไม่ตั้งงบรายหมวด'}</span>
+            </div>
+            <div class="trip-detail-tabs">
+              <button class="btn-sm trip-detail-tab ${activeTripDetailTab === 'overview' ? 'is-active' : ''}" onclick="setTripDetailTab('overview')">ภาพรวม</button>
+              <button class="btn-sm trip-detail-tab ${activeTripDetailTab === 'actual' ? 'is-active' : ''}" onclick="setTripDetailTab('actual')">รายการจริง</button>
+              <button class="btn-sm trip-detail-tab ${activeTripDetailTab === 'plan' ? 'is-active' : ''}" onclick="setTripDetailTab('plan')">แผนงบ</button>
             </div>
             ${trip.note ? `<div class="trip-note-box">${escapeHtml(trip.note)}</div>` : ''}
           </div>
           ${linkedItems.length ? `<div class="notice-box"><strong>${formatMoney(linkedTotal)}</strong><br><span class="meta">มูลค่ารายการที่ลิงก์กับยอดผ่อน ${linkedItems.length} รายการ หน้ารายเดือนจะนับจากยอดผ่อนเท่านั้น</span></div>` : ''}
-          <div class="trip-detail-grid">
-            <div class="trip-category-stack">
-              <div class="trip-section-title">
-                <h4 style="margin:0">สรุปตามหมวด</h4>
-                <div class="trip-chip-row">
-                  <span class="pill">${categoryTotals.size} หมวด</span>
-                  <span class="pill">หมวดสูงสุด ${topCategoryEntry ? escapeHtml(formatCategoryLabel(topCategoryEntry[0])) : '-'}</span>
-                  <span class="pill">วันแรก ${dayList[0] ? escapeHtml(dayList[0]) : '-'}</span>
-                  <span class="pill">วันล่าสุด ${dayList[dayList.length - 1] ? escapeHtml(dayList[dayList.length - 1]) : '-'}</span>
-                </div>
-              </div>
-              ${categoryTotals.size ? Array.from(categoryTotals.entries()).sort((a,b) => b[1] - a[1]).map(([category, amount]) => `
-                <div class="trip-category-card">
-                  <span>${escapeHtml(formatCategoryLabel(category))}</span>
-                  <strong>${formatMoney(amount)}</strong>
-                </div>
-              `).join('') : '<div class="empty">ยังไม่มีรายการในทริปนี้</div>'}
-            </div>
-          </div>
-          <div class="trip-day-stack">
-            <div class="trip-section-title">
-              <h4 style="margin:0">รายการแยกตามวัน</h4>
-              <span class="pill">${dayList.length} วัน</span>
-            </div>
-            ${dayList.length ? dayList.map(day => {
-              const dayItems = items.filter(item => item.date === day);
-              const dayTotal = dayItems.reduce((sum, item) => sum + Number(item.amount || 0), 0);
-              const collapseId = `trip-day-items-${trip.id}-${day.replace(/[^0-9]/g,'')}`;
-              return `
-                <div class="trip-day-block">
-                  <div class="trip-day-header">
-                    <div class="trip-day-summary">
-                      <h4>${escapeHtml(day)}</h4>
-                      <span class="pill">${dayItems.length} รายการ</span>
-                      <span class="pill">รวม ${formatMoney(dayTotal)}</span>
-                    </div>
-                    <button type="button" class="card-toggle btn-sm trip-day-toggle" onclick="toggleTripDay('${collapseId}', this)">
-                      <span class="chev" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M5 7.5 10 12.5 15 7.5"></path></svg></span>
-                    </button>
-                  </div>
-                  <div id="${collapseId}" class="trip-day-items">
-                    ${dayItems.map(item => {
-                      const linkedInstallment = getInstallmentLinkForTripItem(item);
-                      const paymentState = getTripItemPaymentState(item);
-                      return `
-                      <div class="trip-item-card" id="trip-item-${trip.id}-${item.id}">
-                        <div class="trip-item-main">
-                          <div class="trip-item-title-row">
-                            <strong>${escapeHtml(item.title)}</strong>
-                            <strong class="amount-expense trip-item-amount">${formatMoney(item.amount)}</strong>
-                          </div>
-                          <div class="trip-item-meta">
-                            <span class="meta">${escapeHtml(formatCategoryLabel(item.category || 'ท่องเที่ยว'))}</span>
-                            ${getPaymentStatusBadge(paymentState.isPaid)}
-                            ${item.note ? `<span class="meta">${escapeHtml(item.note)}</span>` : ''}
-                          </div>
-                          ${linkedInstallment ? `<div class="readonly-note">ลิงก์กับยอดผ่อน: ${escapeHtml(linkedInstallment.name)} · จ่ายรายเดือน ${formatMoney(linkedInstallment.monthlyAmount || 0)} · สถานะจะอ้างอิงจากยอดผ่อน</div>` : ''}
-                        </div>
-                        <div class="trip-item-actions">
-                          <button class="payment-toggle ${paymentState.isPaid ? 'is-paid' : 'is-unpaid'}" onclick="toggleTripItemPaid('${trip.id}','${item.id}')">
-                            <input type="checkbox" ${paymentState.isPaid ? 'checked' : ''}>
-                            <span>${linkedInstallment ? 'ไปปรับที่ยอดผ่อน' : (paymentState.isPaid ? 'จ่ายแล้ว' : 'ยังไม่จ่าย')}</span>
-                          </button>
-                          <button class="btn-light btn-sm" onclick="editTripItem('${trip.id}','${item.id}')">แก้ไข</button>
-                          ${linkedInstallment ? `<button class="btn-light btn-sm" onclick="goToInstallments('${linkedInstallment.id}','${getMonthKeyFromDate(item.date) || ''}')">ไปยอดผ่อน</button>` : ''}
-                          <button class="btn-danger btn-sm" onclick="deleteTripItem('${trip.id}','${item.id}')">ลบ</button>
-                        </div>
-                      </div>
-                    `;
-                    }).join('')}
-                  </div>
-                </div>
-              `;
-            }).join('') : '<div class="empty">ยังไม่มีรายการในทริปนี้</div>'}
-          </div>
+          ${detailTabContent}
         </div>
       `;
     }
@@ -6302,6 +6858,18 @@
 
     function closeGoalModal(){ // --NEW
       setModalOpen(goalModal, false);
+    }
+
+    function openTripBudgetModal(){ // --NEW
+      if(!appData.trips.length){
+        alert('กรุณาสร้างทริปก่อน');
+        return;
+      }
+      setModalOpen(tripBudgetModal, true);
+    }
+
+    function closeTripBudgetModal(){ // --NEW
+      setModalOpen(tripBudgetModal, false);
     }
 
     function openLoanModal(){
@@ -6613,6 +7181,118 @@
       syncPickerValue(tripItemDate);
       refreshAllEnhancedSelects();
     }
+    function clearTripBudgetForm(tripId = activeTripBudgetTripId || activeTripId || appData.trips[0]?.id || ''){ // --NEW
+      editingTripBudgetLineId = null;
+      activeTripBudgetTripId = tripId || null;
+      tripBudgetFormTitle.textContent = DEFAULT_TRIP_BUDGET_FORM_TITLE;
+      tripBudgetEditBadge.classList.add('hidden');
+      saveTripBudgetBtn.textContent = DEFAULT_SAVE_TRIP_BUDGET_TEXT;
+      tripBudgetTripId.value = tripId || '';
+      tripBudgetLineCategory.value = CATEGORY_OPTIONS.includes(DEFAULT_TRIP_CATEGORY_ID) ? DEFAULT_TRIP_CATEGORY_ID : (CATEGORY_OPTIONS[0] || '');
+      tripBudgetLineAmount.value = '';
+      tripBudgetNote.value = getTripBudgetRecord(tripId)?.note || '';
+      tripBudgetModalSummary.textContent = tripId
+        ? `กำลังวางแผนงบให้ทริป ${appData.trips.find(item => item.id === tripId)?.name || ''}`
+        : 'เลือกทริปและหมวดที่ต้องการวางแผนงบ แล้วระบบจะนำไปเทียบกับรายการจริงในทริปให้อัตโนมัติ';
+      refreshAllEnhancedSelects();
+    }
+    function fillTripBudgetForm(tripId, categoryId = ''){ // --NEW
+      const tripBudget = getTripBudgetRecord(tripId);
+      const line = (tripBudget?.lines || []).find(item => item.categoryId === categoryId);
+      clearTripBudgetForm(tripId);
+      if(!line) return;
+      editingTripBudgetLineId = categoryId;
+      tripBudgetFormTitle.textContent = '✏️ แก้ไขแผนงบทริป';
+      tripBudgetEditBadge.classList.remove('hidden');
+      saveTripBudgetBtn.textContent = '💾 บันทึกการแก้ไข';
+      tripBudgetLineCategory.value = line.categoryId || DEFAULT_TRIP_CATEGORY_ID;
+      tripBudgetLineAmount.value = line.amount;
+      tripBudgetNote.value = tripBudget?.note || '';
+      tripBudgetModalSummary.textContent = `กำลังแก้ไขหมวด ${formatCategoryLabel(line.categoryId || DEFAULT_TRIP_CATEGORY_ID)} ของทริป ${appData.trips.find(item => item.id === tripId)?.name || ''}`;
+      refreshAllEnhancedSelects();
+    }
+    function replaceTripBudgetRecord(record){ // --NEW
+      const normalizedRecord = normalizeTripBudgetRecord(record);
+      appData.budgets = normalizeRuntimeBudgetCollection([
+        ...appData.budgets.filter(item => !(item.scope === 'trip' && item.tripId === normalizedRecord.tripId)),
+        normalizedRecord
+      ]);
+    }
+    function removeTripBudgetRecord(tripId){ // --NEW
+      appData.budgets = normalizeRuntimeBudgetCollection(appData.budgets.filter(item => !(item.scope === 'trip' && item.tripId === tripId)));
+    }
+    function addOrUpdateTripBudgetLine(){ // --NEW
+      if(!tripBudgetTripId.value || !tripBudgetLineCategory.value || tripBudgetLineAmount.value === ''){
+        alert('กรุณาเลือกทริป หมวดหมู่ และงบประมาณ');
+        return;
+      }
+      const amount = Number(tripBudgetLineAmount.value);
+      if(!Number.isFinite(amount) || amount <= 0){
+        alert('งบประมาณต้องมากกว่า 0');
+        return;
+      }
+      const trip = appData.trips.find(item => item.id === tripBudgetTripId.value);
+      if(!trip){
+        alert('ไม่พบทริปที่เลือก');
+        return;
+      }
+      const existingRecord = getTripBudgetRecord(trip.id);
+      const existingLines = (existingRecord?.lines || []).slice();
+      const baseLine = editingTripBudgetLineId ? existingLines.find(line => line.categoryId === editingTripBudgetLineId) : null;
+      const nextLines = existingLines.filter(line => line.categoryId !== editingTripBudgetLineId);
+      if(nextLines.some(line => line.categoryId === tripBudgetLineCategory.value)){
+        alert('หมวดนี้มีอยู่แล้วในแผนงบทริป ให้แก้ไขบรรทัดเดิมแทน');
+        return;
+      }
+      nextLines.push({
+        id: baseLine?.id || crypto.randomUUID(),
+        categoryId: tripBudgetLineCategory.value,
+        amount
+      });
+      replaceTripBudgetRecord({
+        id: existingRecord?.id || `budget-trip-${trip.id}`,
+        scope: 'trip',
+        tripId: trip.id,
+        name: existingRecord?.name || (trip.name ? `Budget: ${trip.name}` : 'Trip Budget'),
+        note: tripBudgetNote.value.trim() || null,
+        lines: nextLines,
+        alertThresholds: existingRecord?.alertThresholds || [0.8, 1],
+        enabled: existingRecord?.enabled !== false,
+        createdAt: existingRecord?.createdAt || createIsoTimestamp(),
+        updatedAt: createIsoTimestamp()
+      });
+      activeTripId = trip.id;
+      activeTripDetailTab = 'plan';
+      clearTripBudgetForm(trip.id);
+      closeTripBudgetModal();
+      renderAll();
+    }
+    function initializeTripBudgetFromSeed(tripId){ // --NEW
+      const trip = appData.trips.find(item => item.id === tripId);
+      const seedAmount = getTripBudgetSeedAmount(tripId);
+      if(!trip || seedAmount <= 0) return;
+      const existingRecord = getTripBudgetRecord(tripId);
+      if(existingRecord?.lines?.length) return;
+      replaceTripBudgetRecord({
+        id: existingRecord?.id || `budget-trip-${trip.id}`,
+        scope: 'trip',
+        tripId: trip.id,
+        name: existingRecord?.name || (trip.name ? `Budget: ${trip.name}` : 'Trip Budget'),
+        note: existingRecord?.note || null,
+        lines: [{
+          id: crypto.randomUUID(),
+          categoryId: DEFAULT_TRIP_CATEGORY_ID,
+          amount: seedAmount
+        }],
+        alertThresholds: existingRecord?.alertThresholds || [0.8, 1],
+        enabled: existingRecord?.enabled !== false,
+        createdAt: existingRecord?.createdAt || createIsoTimestamp(),
+        updatedAt: createIsoTimestamp()
+      });
+      activeTripId = trip.id;
+      activeTripDetailTab = 'plan';
+      renderAll();
+    }
 
     function addOrUpdateEntry(){
       if(!entryDate.value || !entryTitle.value.trim() || !entryAmount.value){
@@ -6837,6 +7517,7 @@
         appData.trips.push(payload);
       }
       activeTripId = payload.id;
+      activeTripDetailTab = 'overview'; // --NEW
       clearTripForm();
       closeTripModal();
       renderAll();
@@ -7114,6 +7795,7 @@
     };
     window.selectTrip = function(id){
       activeTripId = id;
+      activeTripDetailTab = 'overview'; // --NEW
       currentView = 'trips';
       renderTrips();
       updateView();
@@ -7122,8 +7804,55 @@
     window.goToTrip = function(id, itemId = '', focusDate = ''){
       applyTripNavigation(id, { itemId, focusDate });
     };
+    window.setTripDetailTab = function(tab){ // --NEW
+      activeTripDetailTab = normalizeTripDetailTab(tab);
+      renderTrips();
+    };
+    window.openTripBudgetModalForTrip = function(tripId){ // --NEW
+      if(!tripId) return;
+      activeTripId = tripId;
+      activeTripBudgetTripId = tripId;
+      activeTripDetailTab = 'plan';
+      currentView = 'trips';
+      updateView();
+      clearTripBudgetForm(tripId);
+      refreshAllEnhancedSelects();
+      openTripBudgetModal();
+    };
+    window.editTripBudgetLine = function(tripId, categoryId){ // --NEW
+      activeTripId = tripId;
+      activeTripBudgetTripId = tripId;
+      activeTripDetailTab = 'plan';
+      currentView = 'trips';
+      updateView();
+      fillTripBudgetForm(tripId, categoryId);
+      openTripBudgetModal();
+    };
+    window.deleteTripBudgetLine = function(tripId, categoryId){ // --NEW
+      if(!confirm('ลบบรรทัดงบนี้ออกจากแผนทริปใช่ไหม?')) return;
+      const tripBudget = getTripBudgetRecord(tripId);
+      if(!tripBudget) return;
+      const remainingLines = (tripBudget.lines || []).filter(line => line.categoryId !== categoryId);
+      if(remainingLines.length){
+        replaceTripBudgetRecord({
+          ...tripBudget,
+          lines: remainingLines,
+          updatedAt: createIsoTimestamp()
+        });
+      }else{
+        removeTripBudgetRecord(tripId);
+      }
+      if(editingTripBudgetLineId === categoryId) clearTripBudgetForm(tripId);
+      activeTripId = tripId;
+      activeTripDetailTab = 'plan';
+      renderAll();
+    };
+    window.initializeTripBudgetFromSeed = function(tripId){ // --NEW
+      initializeTripBudgetFromSeed(tripId);
+    };
     window.createTripItemForTrip = function(id){
       activeTripId = id;
+      activeTripDetailTab = 'actual'; // --NEW
       clearTripItemForm();
       tripItemTripId.value = id;
       refreshAllEnhancedSelects();
@@ -7152,8 +7881,13 @@
     window.deleteTrip = function(id){
       if(!confirm('ลบทริปนี้พร้อมรายการทั้งหมดใช่ไหม?')) return;
       appData.trips = appData.trips.filter(x => x.id !== id);
-      if(activeTripId === id) activeTripId = appData.trips[0]?.id || null;
+      appData.budgets = normalizeRuntimeBudgetCollection(appData.budgets.filter(item => !(item.scope === 'trip' && item.tripId === id))); // --NEW
+      if(activeTripId === id){
+        activeTripId = appData.trips[0]?.id || null;
+        activeTripDetailTab = 'overview'; // --NEW
+      }
       if(editingTripId === id) clearTripForm();
+      if(activeTripBudgetTripId === id) clearTripBudgetForm(appData.trips[0]?.id || ''); // --NEW
       renderAll();
     };
     window.editTripItem = function(tripId, itemId){
@@ -7161,6 +7895,7 @@
       const item = trip?.items?.find(x => x.id === itemId);
       if(!trip || !item) return;
       activeTripId = tripId;
+      activeTripDetailTab = 'actual'; // --NEW
       currentView = 'trips';
       updateView();
       editingTripItemId = itemId;
@@ -7418,6 +8153,7 @@
       bindModalDismiss(budgetModal, closeBudgetModalBtn, closeBudgetModal); // --NEW
       bindModalTrigger([openGoalModalBtn], clearGoalForm, openGoalModal); // --NEW
       bindModalDismiss(goalModal, closeGoalModalBtn, closeGoalModal); // --NEW
+      bindModalDismiss(tripBudgetModal, closeTripBudgetModalBtn, closeTripBudgetModal); // --NEW
       bindModalTrigger([openLoanModalBtn], clearLoanForm, openLoanModal);
       bindModalDismiss(loanModal, closeLoanModalBtn, closeLoanModal);
       bindModalTrigger([openTripModalBtn], clearTripForm, openTripModal);
@@ -7450,6 +8186,12 @@
         e.preventDefault();
         addOrUpdateGoal();
       });
+      bind(tripBudgetModal, 'keydown', (e) => { // --NEW
+        if(e.key !== 'Enter' || e.defaultPrevented) return;
+        if(e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT' || e.target.closest('button')) return;
+        e.preventDefault();
+        addOrUpdateTripBudgetLine();
+      });
 
       bind(saveEntryBtn, 'click', addOrUpdateEntry);
       bind(clearEntryBtn, 'click', clearEntryForm);
@@ -7457,6 +8199,8 @@
       bind(clearBudgetBtn, 'click', clearBudgetForm); // --NEW
       bind(saveGoalBtn, 'click', addOrUpdateGoal); // --NEW
       bind(clearGoalBtn, 'click', clearGoalForm); // --NEW
+      bind(saveTripBudgetBtn, 'click', addOrUpdateTripBudgetLine); // --NEW
+      bind(clearTripBudgetBtn, 'click', () => clearTripBudgetForm(tripBudgetTripId.value || activeTripBudgetTripId || activeTripId || '')); // --NEW
       bind(saveLoanBtn, 'click', addOrUpdateInstallment);
       bind(clearLoanBtn, 'click', clearLoanForm);
       bind(saveTripBtn, 'click', addOrUpdateTrip);
@@ -7470,6 +8214,9 @@
         if(!tripItemTitle.value.trim()) tripItemTitle.value = linkedInstallment.name || '';
         if(tripItemCategory.value === 'ท่องเที่ยว' || !tripItemCategory.value) tripItemCategory.value = linkedInstallment.category || 'ผ่อนสินค้า';
         refreshAllEnhancedSelects();
+      });
+      bind(tripBudgetTripId, 'change', () => { // --NEW
+        clearTripBudgetForm(tripBudgetTripId.value || '');
       });
 
       bindFilterInputs([loanSearchKeyword, loanFilterStatus, loanFilterStartMonth, loanFilterEndMonth], renderInstallments);
@@ -7501,6 +8248,7 @@
         if(!entryModal.classList.contains('hidden')) closeEntryModal();
         if(!budgetModal.classList.contains('hidden')) closeBudgetModal(); // --NEW
         if(!goalModal.classList.contains('hidden')) closeGoalModal(); // --NEW
+        if(!tripBudgetModal.classList.contains('hidden')) closeTripBudgetModal(); // --NEW
         if(!loanModal.classList.contains('hidden')) closeLoanModal();
         if(!tripModal.classList.contains('hidden')) closeTripModal();
         if(!tripItemModal.classList.contains('hidden')) closeTripItemModal();
