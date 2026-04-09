@@ -6088,7 +6088,14 @@
       }, getLocalCacheKey());
       if(currentUser && firestoreDb){
         lastCloudSavedFingerprint = '';
-        await saveUserDataToCloud(++cloudSaveSequence, { force: true });
+        try{
+          await saveUserDataToCloud(++cloudSaveSequence, { force: true });
+        }catch(error){
+          console.error(error);
+          setSaveStatus('error', error?.message || '');
+          setAuthError('นำเข้าข้อมูลสำเร็จแล้ว แต่ยังซิงก์ขึ้น cloud ไม่ได้ ข้อมูลล่าสุดยังอยู่ในอุปกรณ์นี้');
+          setAuthStatus('ซิงก์ข้อมูลชั่วคราวมีปัญหา');
+        }
       }
       enterApp();
     }
