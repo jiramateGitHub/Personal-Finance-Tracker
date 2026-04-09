@@ -2031,6 +2031,38 @@
     let lastManualEntryCategoryByType = { income:'เงินเดือน', expense:'อื่นๆ' }; // --NEW
     let monthlyQuickFilterMode = ''; // --NEW
     let monthlyQuickFilterSnapshot = null; // --NEW
+    let lastPersistedDataFingerprint = '';
+    let lastCloudSavedFingerprint = '';
+
+    const APP_SCHEMA_VERSION = 2;
+    const DEFAULT_BASE_CURRENCY = 'THB';
+    const DEFAULT_LOCALE = 'th-TH';
+    const DEFAULT_TIMEZONE = 'Asia/Bangkok';
+    const DEFAULT_CATEGORY_ID = CATEGORY_OPTIONS[CATEGORY_OPTIONS.length - 1] || 'Other';
+    const DEFAULT_INSTALLMENT_CATEGORY_ID = CATEGORY_OPTIONS[28] || DEFAULT_CATEGORY_ID;
+    const DEFAULT_TRIP_CATEGORY_ID = CATEGORY_OPTIONS[31] || DEFAULT_CATEGORY_ID;
+    const DEFAULT_V2_VIEW = 'monthly';
+    const TRANSACTION_TYPES = Object.freeze(['income', 'expense']);
+    const TRANSACTION_STATUSES = Object.freeze(['cleared', 'pending']);
+    const CATEGORY_KINDS = Object.freeze(['income', 'expense', 'mixed']);
+    const INSTALLMENT_INTEREST_TYPES = Object.freeze(['none', 'flat', 'reducing']);
+    const BUDGET_SCOPES = Object.freeze(['monthly', 'trip']);
+    const GOAL_TYPES = Object.freeze(['savings']);
+    const GOAL_STATUSES = Object.freeze(['active', 'paused', 'completed']);
+    const FIRESTORE_V2_COLLECTIONS = Object.freeze({
+      meta: 'meta',
+      profile: 'profile',
+      settings: 'settings',
+      masters: 'masters',
+      transactions: 'transactions',
+      recurringRules: 'recurringRules',
+      installmentPlans: 'installmentPlans',
+      trips: 'trips',
+      budgets: 'budgets',
+      goals: 'goals'
+    });
+    const FIRESTORE_V2_MAIN_DOC_ID = 'main';
+    const FIRESTORE_V2_META_DOC_ID = 'app';
 
     const $ = (id) => document.getElementById(id);
 
@@ -2275,12 +2307,15 @@
 
     async function writeAppDataToDb(data, meta = {}, recordKey = getLocalCacheKey()){
       const db = await openAppDatabase();
+      const normalizedV2Data = ensureV2Data(data, {
+        updatedAt: createIsoTimestamp()
+      });
       const payload = {
-        data: normalizeData(data),
+        data: normalizedV2Data,
         meta: {
           loadedFileName: meta.loadedFileName ?? loadedFileName,
           lastImportAt: meta.lastImportAt ?? lastImportAt,
-          updatedAt: new Date().toISOString()
+          updatedAt: normalizedV2Data.meta.updatedAt
         }
       };
       await new Promise((resolve, reject) => {
@@ -2299,7 +2334,7 @@
         if(existingDb?.data) return existingDb;
         const raw = localStorage.getItem(STORAGE_KEY);
         if(!raw) return null;
-        const legacyData = normalizeData(JSON.parse(raw));
+        const legacyData = buildV2FromCurrentAppData(normalizeData(JSON.parse(raw)));
         await writeAppDataToDb(legacyData);
         localStorage.removeItem(STORAGE_KEY);
         return { data: legacyData, meta: { loadedFileName: '', lastImportAt: '' } };
@@ -2364,6 +2399,807 @@
 
     function getEmptyAppData(){
       return normalizeData({ entries: [], installments: [], trips: [] });
+    }
+
+    function createIsoTimestamp(value = new Date()){
+      const parsed = value instanceof Date ? value : new Date(value);
+      return Number.isNaN(parsed.getTime()) ? new Date().toISOString() : parsed.toISOString();
+    }
+    function normalizeNullableText(value){
+      const text = String(value ?? '').trim();
+      return text ? text : null;
+    }
+    function normalizeRequiredText(value, fallback = ''){
+      const text = String(value ?? '').trim();
+      const fallbackText = String(fallback ?? '').trim();
+      return text || fallbackText;
+    }
+    function normalizeIsoTimestamp(value, fallback = null){
+      if(value == null || value === '') return fallback;
+      const parsed = new Date(value);
+      return Number.isNaN(parsed.getTime()) ? fallback : parsed.toISOString();
+    }
+    function normalizeDateValue(value){
+      const text = normalizeNullableText(value);
+      return text && /^\d{4}-\d{2}-\d{2}$/.test(text) ? text : null;
+    }
+    function normalizeMonthKeyValue(value){
+      const text = normalizeNullableText(value);
+      return text && /^\d{4}-\d{2}$/.test(text) ? text : null;
+    }
+    function normalizeNullableNumber(value){
+      if(value === '' || value == null) return null;
+      const number = Number(value);
+      return Number.isFinite(number) ? round2(number) : null;
+    }
+    function normalizePositiveNumberValue(value, fallback = 0){
+      const normalized = normalizeNullableNumber(value);
+      return normalized != null && normalized > 0 ? normalized : fallback;
+    }
+    function normalizePositiveIntegerValue(value, fallback = null){
+      if(value === '' || value == null) return fallback;
+      const number = Math.trunc(Number(value));
+      return Number.isFinite(number) && number > 0 ? number : fallback;
+    }
+    function uniqueStringList(values){
+      return Array.from(new Set((Array.isArray(values) ? values : [])
+        .map(value => normalizeNullableText(value))
+        .filter(Boolean))).sort((a, b) => String(a).localeCompare(String(b), 'th'));
+    }
+    function normalizeEnumValue(value, allowedValues, fallback){
+      return allowedValues.includes(value) ? value : fallback;
+    }
+    function mergeCategoryKind(left = 'mixed', right = 'mixed'){
+      const current = normalizeEnumValue(left, CATEGORY_KINDS, 'mixed');
+      const next = normalizeEnumValue(right, CATEGORY_KINDS, 'mixed');
+      if(current === next) return current;
+      if(current === 'mixed' || next === 'mixed') return 'mixed';
+      return 'mixed';
+    }
+    function createCategoryMaster(categoryId, options = {}){
+      const id = normalizeRequiredText(categoryId, DEFAULT_CATEGORY_ID);
+      return {
+        id,
+        label: normalizeRequiredText(options.label ?? options.name, id),
+        kind: normalizeEnumValue(options.kind, CATEGORY_KINDS, 'mixed'),
+        isArchived: !!options.isArchived
+      };
+    }
+    function getDefaultProfileV2(){
+      return {
+        id: 'primary',
+        displayName: null,
+        baseCurrency: DEFAULT_BASE_CURRENCY,
+        locale: DEFAULT_LOCALE,
+        timezone: DEFAULT_TIMEZONE
+      };
+    }
+    function getDefaultSettingsV2(){
+      return {
+        defaultView: DEFAULT_V2_VIEW,
+        monthStartsOn: 1,
+        includePendingInMonthlyTotals: true
+      };
+    }
+    function getDefaultMastersV2(){
+      return {
+        categories: CATEGORY_OPTIONS.map(category => createCategoryMaster(category)),
+        tags: []
+      };
+    }
+    function normalizeBudgetLine(line = {}, fallbackCategoryId = DEFAULT_CATEGORY_ID){
+      return {
+        id: normalizeRequiredText(line.id, crypto.randomUUID()),
+        categoryId: normalizeRequiredText(line.categoryId ?? line.category, fallbackCategoryId),
+        amount: normalizePositiveNumberValue(line.amount, 0)
+      };
+    }
+
+    function validateTransaction(input = {}){
+      const now = createIsoTimestamp();
+      const normalizedDate = normalizeDateValue(input.date);
+      const normalizedAmount = normalizePositiveNumberValue(input.amount, 0);
+      const type = normalizeEnumValue(input.type, TRANSACTION_TYPES, 'expense');
+      const value = {
+        id: normalizeRequiredText(input.id, crypto.randomUUID()),
+        type,
+        date: normalizedDate || currentDate(),
+        monthKey: normalizeMonthKeyValue(input.monthKey) || getMonthKeyFromDate(normalizedDate || currentDate()) || currentMonth(),
+        amount: normalizedAmount,
+        currency: normalizeRequiredText(input.currency, DEFAULT_BASE_CURRENCY),
+        categoryId: normalizeRequiredText(input.categoryId ?? input.category, DEFAULT_CATEGORY_ID),
+        title: normalizeRequiredText(input.title, ''),
+        note: normalizeNullableText(input.note),
+        status: normalizeEnumValue(input.status, TRANSACTION_STATUSES, type === 'expense' ? 'cleared' : 'cleared'),
+        sourceModule: normalizeRequiredText(input.sourceModule, 'manual'),
+        sourceRefId: normalizeNullableText(input.sourceRefId),
+        tripId: normalizeNullableText(input.tripId),
+        installmentPlanId: normalizeNullableText(input.installmentPlanId),
+        recurringRuleId: normalizeNullableText(input.recurringRuleId),
+        goalId: normalizeNullableText(input.goalId),
+        createdAt: normalizeIsoTimestamp(input.createdAt, now),
+        updatedAt: normalizeIsoTimestamp(input.updatedAt, now)
+      };
+      const errors = [];
+      if(!normalizeNullableText(input.title)) errors.push('title is required');
+      if(!normalizedDate) errors.push('date must be YYYY-MM-DD');
+      if(normalizedAmount <= 0) errors.push('amount must be greater than 0');
+      if(!value.categoryId) errors.push('categoryId is required');
+      return { ok: errors.length === 0, errors, value };
+    }
+
+    function validateInstallmentPlan(input = {}){
+      const now = createIsoTimestamp();
+      const paymentAmount = normalizePositiveNumberValue(input.paymentAmount ?? input.monthlyAmount, 0);
+      const installmentCount = normalizePositiveIntegerValue(input.installmentCount ?? input.totalMonths, null);
+      const paymentDayRaw = normalizePositiveIntegerValue(input.paymentDay ?? input.dueDay, null);
+      const balanceSnapshotAmount = normalizeNullableNumber(input.balanceSnapshotAmount ?? input.remainingOverride);
+      const value = {
+        id: normalizeRequiredText(input.id, crypto.randomUUID()),
+        name: normalizeRequiredText(input.name, ''),
+        categoryId: normalizeRequiredText(input.categoryId ?? input.category, DEFAULT_INSTALLMENT_CATEGORY_ID),
+        tripId: normalizeNullableText(input.tripId),
+        paymentAmount,
+        installmentCount: installmentCount || 1,
+        startMonth: normalizeMonthKeyValue(input.startMonth),
+        paymentDay: paymentDayRaw == null ? null : Math.min(31, paymentDayRaw),
+        principalAmount: normalizeNullableNumber(input.principalAmount ?? input.principal),
+        interestType: normalizeEnumValue(input.interestType, INSTALLMENT_INTEREST_TYPES, 'none'),
+        interestRate: normalizeNullableNumber(input.interestRate),
+        note: normalizeNullableText(input.note ?? input.interestNote),
+        balanceSnapshotAmount,
+        balanceSnapshotMonth: normalizeMonthKeyValue(input.balanceSnapshotMonth) || (balanceSnapshotAmount != null ? currentMonth() : null),
+        createdAt: normalizeIsoTimestamp(input.createdAt, now),
+        updatedAt: normalizeIsoTimestamp(input.updatedAt, now)
+      };
+      if(value.interestType === 'none') value.interestRate = null;
+      const errors = [];
+      if(!value.name) errors.push('name is required');
+      if(paymentAmount <= 0) errors.push('paymentAmount must be greater than 0');
+      if(!installmentCount) errors.push('installmentCount must be at least 1');
+      return { ok: errors.length === 0, errors, value };
+    }
+
+    function validateTrip(input = {}){
+      const now = createIsoTimestamp();
+      const startDate = normalizeDateValue(input.startDate);
+      const endDate = normalizeDateValue(input.endDate);
+      const value = {
+        id: normalizeRequiredText(input.id, crypto.randomUUID()),
+        name: normalizeRequiredText(input.name, ''),
+        destination: normalizeNullableText(input.destination),
+        startDate,
+        endDate,
+        note: normalizeNullableText(input.note),
+        createdAt: normalizeIsoTimestamp(input.createdAt, now),
+        updatedAt: normalizeIsoTimestamp(input.updatedAt, now)
+      };
+      const errors = [];
+      if(!value.name) errors.push('name is required');
+      if(startDate && endDate && endDate < startDate) errors.push('endDate must not be before startDate');
+      return { ok: errors.length === 0, errors, value };
+    }
+
+    function validateBudget(input = {}){
+      const now = createIsoTimestamp();
+      const scope = normalizeEnumValue(input.scope, BUDGET_SCOPES, 'monthly');
+      const lines = (Array.isArray(input.lines) ? input.lines : [])
+        .map(line => normalizeBudgetLine(line, scope === 'trip' ? DEFAULT_TRIP_CATEGORY_ID : DEFAULT_CATEGORY_ID))
+        .filter(line => line.amount > 0 && !!line.categoryId);
+      const value = {
+        id: normalizeRequiredText(input.id, crypto.randomUUID()),
+        scope,
+        name: normalizeRequiredText(input.name, scope === 'trip' ? 'Trip Budget' : 'Monthly Budget'),
+        month: scope === 'monthly' ? normalizeMonthKeyValue(input.month) : null,
+        tripId: scope === 'trip' ? normalizeNullableText(input.tripId) : null,
+        note: normalizeNullableText(input.note),
+        lines,
+        createdAt: normalizeIsoTimestamp(input.createdAt, now),
+        updatedAt: normalizeIsoTimestamp(input.updatedAt, now)
+      };
+      const errors = [];
+      if(scope === 'monthly' && !value.month) errors.push('month is required for monthly budgets');
+      if(scope === 'trip' && !value.tripId) errors.push('tripId is required for trip budgets');
+      if(!lines.length) errors.push('at least one budget line is required');
+      return { ok: errors.length === 0, errors, value };
+    }
+
+    function validateGoal(input = {}){
+      const now = createIsoTimestamp();
+      const targetAmount = normalizePositiveNumberValue(input.targetAmount, 0);
+      const value = {
+        id: normalizeRequiredText(input.id, crypto.randomUUID()),
+        name: normalizeRequiredText(input.name, ''),
+        kind: normalizeEnumValue(input.kind ?? input.goalType, GOAL_TYPES, 'savings'),
+        targetAmount,
+        targetDate: normalizeDateValue(input.targetDate),
+        linkedCategoryId: normalizeNullableText(input.linkedCategoryId),
+        note: normalizeNullableText(input.note),
+        status: normalizeEnumValue(input.status, GOAL_STATUSES, 'active'),
+        createdAt: normalizeIsoTimestamp(input.createdAt, now),
+        updatedAt: normalizeIsoTimestamp(input.updatedAt, now)
+      };
+      const errors = [];
+      if(!value.name) errors.push('name is required');
+      if(targetAmount <= 0) errors.push('targetAmount must be greater than 0');
+      return { ok: errors.length === 0, errors, value };
+    }
+
+    function normalizeRecurringRuleV2(input = {}){
+      const now = createIsoTimestamp();
+      return {
+        id: normalizeRequiredText(input.id, crypto.randomUUID()),
+        isActive: input.isActive == null ? true : !!input.isActive,
+        type: normalizeEnumValue(input.type, TRANSACTION_TYPES, 'expense'),
+        title: normalizeRequiredText(input.title, ''),
+        categoryId: normalizeRequiredText(input.categoryId ?? input.category, DEFAULT_CATEGORY_ID),
+        amount: normalizePositiveNumberValue(input.amount, 0),
+        currency: normalizeRequiredText(input.currency, DEFAULT_BASE_CURRENCY),
+        cadence: normalizeRequiredText(input.cadence, 'monthly'),
+        interval: Math.max(1, normalizePositiveIntegerValue(input.interval, 1) || 1),
+        dayOfMonth: normalizePositiveIntegerValue(input.dayOfMonth, null),
+        startDate: normalizeDateValue(input.startDate) || currentDate(),
+        endDate: normalizeDateValue(input.endDate),
+        note: normalizeNullableText(input.note),
+        tripId: normalizeNullableText(input.tripId),
+        goalId: normalizeNullableText(input.goalId),
+        createdAt: normalizeIsoTimestamp(input.createdAt, now),
+        updatedAt: normalizeIsoTimestamp(input.updatedAt, now)
+      };
+    }
+
+    function buildMasterCategoriesV2(seedCategories = [], referencedCategoryIds = [], transactions = [], recurringRules = [], installmentPlans = []){
+      const categoryMap = new Map();
+      const registerCategory = (categoryId, options = {}) => {
+        const category = createCategoryMaster(categoryId, options);
+        const existing = categoryMap.get(category.id);
+        if(existing){
+          categoryMap.set(category.id, {
+            ...existing,
+            label: existing.label || category.label,
+            kind: mergeCategoryKind(existing.kind, category.kind),
+            isArchived: existing.isArchived && category.isArchived
+          });
+          return;
+        }
+        categoryMap.set(category.id, category);
+      };
+
+      getDefaultMastersV2().categories.forEach(category => registerCategory(category.id, category));
+      (Array.isArray(seedCategories) ? seedCategories : []).forEach(category => {
+        registerCategory(category?.id ?? category, {
+          label: category?.label ?? category?.name,
+          kind: category?.kind,
+          isArchived: category?.isArchived
+        });
+      });
+      referencedCategoryIds.forEach(categoryId => registerCategory(categoryId));
+      transactions.forEach(transaction => registerCategory(transaction.categoryId, { kind: transaction.type }));
+      recurringRules.forEach(rule => registerCategory(rule.categoryId, { kind: rule.type }));
+      installmentPlans.forEach(plan => registerCategory(plan.categoryId, { kind: 'expense' }));
+
+      return Array.from(categoryMap.values()).sort((a, b) =>
+        String(a.label || a.id).localeCompare(String(b.label || b.id), 'th'));
+    }
+
+    function normalizeV2Data(parsed = {}){
+      const now = createIsoTimestamp();
+      const transactions = (Array.isArray(parsed.transactions) ? parsed.transactions : [])
+        .map(item => validateTransaction(item).value)
+        .filter(item => item.amount > 0 && !!item.title);
+      const recurringRules = (Array.isArray(parsed.recurringRules) ? parsed.recurringRules : [])
+        .map(item => normalizeRecurringRuleV2(item))
+        .filter(item => item.amount > 0 && !!item.title);
+      const installmentPlans = (Array.isArray(parsed.installmentPlans) ? parsed.installmentPlans : [])
+        .map(item => validateInstallmentPlan(item).value)
+        .filter(item => item.paymentAmount > 0 && item.installmentCount > 0 && !!item.name);
+      const trips = (Array.isArray(parsed.trips) ? parsed.trips : [])
+        .map(item => validateTrip(item).value)
+        .filter(item => !!item.name);
+      const budgets = (Array.isArray(parsed.budgets) ? parsed.budgets : [])
+        .map(item => validateBudget(item).value)
+        .filter(item => item.lines.length > 0);
+      const goals = (Array.isArray(parsed.goals) ? parsed.goals : [])
+        .map(item => validateGoal(item).value)
+        .filter(item => item.targetAmount > 0 && !!item.name);
+      const referencedCategoryIds = uniqueStringList([
+        ...transactions.map(item => item.categoryId),
+        ...recurringRules.map(item => item.categoryId),
+        ...installmentPlans.map(item => item.categoryId),
+        ...budgets.flatMap(item => item.lines.map(line => line.categoryId)),
+        ...goals.map(item => item.linkedCategoryId).filter(Boolean)
+      ]);
+      const seedCategories = Array.isArray(parsed?.masters?.categories) ? parsed.masters.categories : [];
+
+      return {
+        schemaVersion: APP_SCHEMA_VERSION,
+        profile: {
+          ...getDefaultProfileV2(),
+          ...(parsed.profile || {}),
+          displayName: normalizeNullableText(parsed?.profile?.displayName),
+          baseCurrency: normalizeRequiredText(parsed?.profile?.baseCurrency, DEFAULT_BASE_CURRENCY),
+          locale: normalizeRequiredText(parsed?.profile?.locale, DEFAULT_LOCALE),
+          timezone: normalizeRequiredText(parsed?.profile?.timezone, DEFAULT_TIMEZONE)
+        },
+        settings: {
+          ...getDefaultSettingsV2(),
+          ...(parsed.settings || {}),
+          defaultView: normalizeRequiredText(parsed?.settings?.defaultView, DEFAULT_V2_VIEW),
+          monthStartsOn: Math.min(31, Math.max(1, normalizePositiveIntegerValue(parsed?.settings?.monthStartsOn, 1) || 1)),
+          includePendingInMonthlyTotals: parsed?.settings?.includePendingInMonthlyTotals !== false
+        },
+        masters: {
+          categories: buildMasterCategoriesV2(seedCategories, referencedCategoryIds, transactions, recurringRules, installmentPlans),
+          tags: uniqueStringList(parsed?.masters?.tags)
+        },
+        transactions: transactions.sort((a, b) =>
+          String(a.date || '').localeCompare(String(b.date || ''))
+          || String(a.type || '').localeCompare(String(b.type || ''))
+          || String(a.id || '').localeCompare(String(b.id || ''))),
+        recurringRules: recurringRules.sort((a, b) =>
+          String(a.title || '').localeCompare(String(b.title || ''), 'th')
+          || String(a.id || '').localeCompare(String(b.id || ''))),
+        installmentPlans: installmentPlans.sort((a, b) =>
+          String(a.startMonth || '').localeCompare(String(b.startMonth || ''))
+          || String(a.name || '').localeCompare(String(b.name || ''), 'th')
+          || String(a.id || '').localeCompare(String(b.id || ''))),
+        trips: trips.sort((a, b) =>
+          String(a.startDate || '').localeCompare(String(b.startDate || ''))
+          || String(a.name || '').localeCompare(String(b.name || ''), 'th')
+          || String(a.id || '').localeCompare(String(b.id || ''))),
+        budgets: budgets.sort((a, b) =>
+          String(a.scope || '').localeCompare(String(b.scope || ''))
+          || String(a.month || '').localeCompare(String(b.month || ''))
+          || String(a.tripId || '').localeCompare(String(b.tripId || ''))
+          || String(a.name || '').localeCompare(String(b.name || ''), 'th')),
+        goals: goals.sort((a, b) =>
+          String(a.name || '').localeCompare(String(b.name || ''), 'th')
+          || String(a.id || '').localeCompare(String(b.id || ''))),
+        meta: {
+          createdAt: normalizeIsoTimestamp(parsed?.meta?.createdAt, now),
+          updatedAt: normalizeIsoTimestamp(parsed?.meta?.updatedAt, now),
+          exportedAt: normalizeIsoTimestamp(parsed?.meta?.exportedAt, null)
+        }
+      };
+    }
+
+    function getEmptyAppDataV2(){
+      const now = createIsoTimestamp();
+      return normalizeV2Data({
+        schemaVersion: APP_SCHEMA_VERSION,
+        profile: getDefaultProfileV2(),
+        settings: getDefaultSettingsV2(),
+        masters: getDefaultMastersV2(),
+        transactions: [],
+        recurringRules: [],
+        installmentPlans: [],
+        trips: [],
+        budgets: [],
+        goals: [],
+        meta: {
+          createdAt: now,
+          updatedAt: now,
+          exportedAt: null
+        }
+      });
+    }
+
+    function ensureV2Data(input, options = {}){
+      if(input?.schemaVersion === APP_SCHEMA_VERSION){
+        const merged = {
+          ...input,
+          meta: {
+            ...(input.meta || {}),
+            ...(options.createdAt !== undefined ? { createdAt: options.createdAt } : {}),
+            ...(options.updatedAt !== undefined ? { updatedAt: options.updatedAt } : {}),
+            ...(options.exportedAt !== undefined ? { exportedAt: options.exportedAt } : {})
+          }
+        };
+        return normalizeV2Data(merged);
+      }
+      return buildV2FromCurrentAppData(input, options);
+    }
+
+    function getV2DataFingerprint(input){
+      const normalized = ensureV2Data(input);
+      return JSON.stringify({
+        ...normalized,
+        meta: {
+          ...normalized.meta,
+          updatedAt: null,
+          exportedAt: null
+        }
+      });
+    }
+
+    function getTransactionsByMonth(dataOrTransactions, monthKey, options = {}){
+      const transactions = Array.isArray(dataOrTransactions)
+        ? dataOrTransactions
+        : ensureV2Data(dataOrTransactions).transactions;
+      return transactions
+        .filter(item => {
+          const itemMonth = item.monthKey || getMonthKeyFromDate(item.date);
+          if(monthKey && itemMonth !== monthKey) return false;
+          if(options.type && item.type !== options.type) return false;
+          if(options.status && item.status !== options.status) return false;
+          if(options.tripId && item.tripId !== options.tripId) return false;
+          if(options.installmentPlanId && item.installmentPlanId !== options.installmentPlanId) return false;
+          if(options.goalId && item.goalId !== options.goalId) return false;
+          return true;
+        })
+        .sort((a, b) =>
+          String(a.date || '').localeCompare(String(b.date || ''))
+          || String(a.id || '').localeCompare(String(b.id || '')));
+    }
+
+    function getMonthlyCategoryTotals(dataOrTransactions, monthKey, options = {}){
+      const transactions = getTransactionsByMonth(dataOrTransactions, monthKey, options);
+      const categoryMap = new Map();
+      transactions.forEach(item => {
+        const categoryId = item.categoryId || DEFAULT_CATEGORY_ID;
+        const bucket = categoryMap.get(categoryId) || {
+          categoryId,
+          income: 0,
+          expense: 0,
+          total: 0,
+          count: 0
+        };
+        if(item.type === 'income') bucket.income += Number(item.amount || 0);
+        else bucket.expense += Number(item.amount || 0);
+        bucket.total += Number(item.amount || 0);
+        bucket.count += 1;
+        categoryMap.set(categoryId, bucket);
+      });
+      return Array.from(categoryMap.values()).sort((a, b) =>
+        b.total - a.total
+        || b.count - a.count
+        || String(a.categoryId || '').localeCompare(String(b.categoryId || ''), 'th'));
+    }
+
+    function getTripActualTotals(v2Input, tripId, options = {}){
+      const data = ensureV2Data(v2Input);
+      const trip = data.trips.find(item => item.id === tripId);
+      if(!trip){
+        return { tripId, total: 0, count: 0, transactions: [], categoryTotals: [] };
+      }
+      const linkedInstallmentIds = new Set(data.installmentPlans
+        .filter(item => item.tripId === tripId)
+        .map(item => item.id));
+      const includeLinkedInstallments = options.includeLinkedInstallments !== false;
+      const transactions = data.transactions.filter(item => {
+        if(item.tripId === tripId) return true;
+        if(!includeLinkedInstallments) return false;
+        return !item.tripId && !!item.installmentPlanId && linkedInstallmentIds.has(item.installmentPlanId);
+      });
+      return {
+        tripId,
+        total: round2(transactions.reduce((sum, item) => sum + Number(item.amount || 0), 0)),
+        count: transactions.length,
+        transactions: transactions.slice().sort((a, b) =>
+          String(a.date || '').localeCompare(String(b.date || ''))
+          || String(a.id || '').localeCompare(String(b.id || ''))),
+        categoryTotals: getMonthlyCategoryTotals(transactions, '', {})
+      };
+    }
+
+    function getInstallmentPlanStatus(planOrId, v2Input = null){
+      const data = Array.isArray(v2Input)
+        ? { transactions: v2Input, installmentPlans: [] }
+        : ensureV2Data(v2Input || getEmptyAppDataV2());
+      const plan = typeof planOrId === 'string'
+        ? data.installmentPlans.find(item => item.id === planOrId)
+        : validateInstallmentPlan(planOrId || {}).value;
+      if(!plan){
+        return {
+          planId: normalizeNullableText(planOrId),
+          paidCount: 0,
+          remainingCount: 0,
+          paidMonthKeys: [],
+          paidAmount: 0,
+          scheduledAmount: 0,
+          remainingAmount: 0,
+          isCompleted: false
+        };
+      }
+      const transactions = (Array.isArray(v2Input) ? v2Input : data.transactions)
+        .filter(item => item.installmentPlanId === plan.id && item.type === 'expense');
+      const paidMonthKeys = uniqueStringList(transactions.map(item => item.monthKey || getMonthKeyFromDate(item.date)));
+      const paidCount = Math.min(plan.installmentCount, paidMonthKeys.length);
+      const scheduledAmount = round2(Number(plan.paymentAmount || 0) * Number(plan.installmentCount || 0));
+      const paidAmount = round2(transactions.reduce((sum, item) => sum + Number(item.amount || 0), 0));
+      const remainingCount = Math.max(0, Number(plan.installmentCount || 0) - paidCount);
+      const remainingAmount = plan.balanceSnapshotAmount != null
+        ? round2(Math.max(0, Number(plan.balanceSnapshotAmount || 0)))
+        : round2(Math.max(0, scheduledAmount - paidAmount));
+      return {
+        planId: plan.id,
+        paidCount,
+        remainingCount,
+        paidMonthKeys,
+        paidAmount,
+        scheduledAmount,
+        remainingAmount,
+        isCompleted: remainingCount === 0 || remainingAmount <= 0
+      };
+    }
+
+    function buildV2FromCurrentAppData(currentData = getEmptyAppData(), options = {}){
+      const runtime = normalizeData(currentData || getEmptyAppData());
+      const updatedAt = normalizeIsoTimestamp(options.updatedAt, createIsoTimestamp());
+      const createdAt = normalizeIsoTimestamp(options.createdAt, updatedAt);
+      const exportedAt = normalizeIsoTimestamp(options.exportedAt, null);
+
+      const manualTransactions = runtime.entries.map(entry => validateTransaction({
+        id: normalizeRequiredText(entry.id, crypto.randomUUID()),
+        type: entry.type === 'income' ? 'income' : 'expense',
+        date: entry.date || currentDate(),
+        amount: Number(entry.amount || 0),
+        currency: DEFAULT_BASE_CURRENCY,
+        categoryId: entry.category || DEFAULT_CATEGORY_ID,
+        title: entry.title || '',
+        note: entry.note || null,
+        status: entry.type === 'expense' && !entry.isPaid ? 'pending' : 'cleared',
+        sourceModule: 'manual',
+        sourceRefId: entry.id || null,
+        tripId: null,
+        installmentPlanId: null,
+        recurringRuleId: null,
+        goalId: null,
+        createdAt: updatedAt,
+        updatedAt
+      }).value).filter(item => item.amount > 0 && !!item.title);
+
+      const installmentTripLinkById = new Map();
+      runtime.trips.forEach(trip => {
+        (trip.items || []).forEach(item => {
+          if(item.installmentId && !installmentTripLinkById.has(item.installmentId)){
+            installmentTripLinkById.set(item.installmentId, trip.id);
+          }
+        });
+      });
+
+      const installmentPlans = runtime.installments.map(item => validateInstallmentPlan({
+        id: item.id,
+        name: item.name,
+        categoryId: item.category || DEFAULT_INSTALLMENT_CATEGORY_ID,
+        tripId: installmentTripLinkById.get(item.id) || null,
+        paymentAmount: Number(item.monthlyAmount || 0),
+        installmentCount: Number(item.totalMonths || 0),
+        startMonth: item.startMonth || null,
+        paymentDay: item.dueDay === '' || item.dueDay == null ? null : Number(item.dueDay),
+        principalAmount: item.principal === '' || item.principal == null ? null : Number(item.principal),
+        interestType: item.interestType || 'none',
+        interestRate: item.interestRate === '' || item.interestRate == null ? null : Number(item.interestRate),
+        note: item.interestNote || null,
+        balanceSnapshotAmount: item.remainingOverride === '' || item.remainingOverride == null ? null : Number(item.remainingOverride),
+        balanceSnapshotMonth: item.remainingOverride === '' || item.remainingOverride == null ? null : currentMonth(),
+        createdAt: updatedAt,
+        updatedAt
+      }).value).filter(item => item.paymentAmount > 0 && !!item.name);
+
+      const installmentTransactions = runtime.installments.flatMap(item =>
+        getNormalizedInstallmentPaidMonthKeys(item).map(monthKey => validateTransaction({
+          id: `tx-installment-${item.id}-${monthKey}`,
+          type: 'expense',
+          date: safeDateFromMonth(monthKey, item.dueDay || 1),
+          monthKey,
+          amount: Number(item.monthlyAmount || 0),
+          currency: DEFAULT_BASE_CURRENCY,
+          categoryId: item.category || DEFAULT_INSTALLMENT_CATEGORY_ID,
+          title: item.name ? `Installment: ${item.name}` : 'Installment Payment',
+          note: item.interestNote || null,
+          status: 'cleared',
+          sourceModule: 'installment',
+          sourceRefId: `${item.id}:${monthKey}`,
+          tripId: null,
+          installmentPlanId: item.id || null,
+          recurringRuleId: null,
+          goalId: null,
+          createdAt: updatedAt,
+          updatedAt
+        }).value)).filter(item => item.amount > 0 && !!item.title);
+
+      const tripBudgets = [];
+      const trips = runtime.trips.map(trip => {
+        const budgetAmount = trip.budget === '' || trip.budget == null ? null : Number(trip.budget);
+        if(Number.isFinite(budgetAmount) && budgetAmount > 0){
+          tripBudgets.push(validateBudget({
+            id: `budget-trip-${trip.id}`,
+            scope: 'trip',
+            name: trip.name ? `Budget: ${trip.name}` : 'Trip Budget',
+            tripId: trip.id,
+            note: null,
+            lines: [{ id: `budget-trip-${trip.id}-line-1`, categoryId: DEFAULT_TRIP_CATEGORY_ID, amount: budgetAmount }],
+            createdAt: updatedAt,
+            updatedAt
+          }).value);
+        }
+        return validateTrip({
+          id: trip.id,
+          name: trip.name,
+          destination: trip.destination,
+          startDate: trip.startDate,
+          endDate: trip.endDate,
+          note: trip.note,
+          createdAt: updatedAt,
+          updatedAt
+        }).value;
+      }).filter(item => !!item.name);
+
+      const tripTransactions = runtime.trips.flatMap(trip => (trip.items || [])
+        .filter(item => !item.installmentId)
+        .map(item => validateTransaction({
+          id: `tx-trip-${trip.id}-${item.id}`,
+          type: 'expense',
+          date: item.date || trip.startDate || currentDate(),
+          amount: Number(item.amount || 0),
+          currency: DEFAULT_BASE_CURRENCY,
+          categoryId: item.category || DEFAULT_TRIP_CATEGORY_ID,
+          title: item.title || (trip.name ? `${trip.name} Expense` : 'Trip Expense'),
+          note: item.note || trip.note || null,
+          status: item.isPaid === false ? 'pending' : 'cleared',
+          sourceModule: 'trip',
+          sourceRefId: item.id || null,
+          tripId: trip.id || null,
+          installmentPlanId: null,
+          recurringRuleId: null,
+          goalId: null,
+          createdAt: updatedAt,
+          updatedAt
+        }).value)).filter(item => item.amount > 0 && !!item.title);
+
+      return normalizeV2Data({
+        schemaVersion: APP_SCHEMA_VERSION,
+        profile: options.profile || getDefaultProfileV2(),
+        settings: options.settings || getDefaultSettingsV2(),
+        masters: options.masters || getDefaultMastersV2(),
+        transactions: [...manualTransactions, ...tripTransactions, ...installmentTransactions],
+        recurringRules: Array.isArray(options.recurringRules) ? options.recurringRules : [],
+        installmentPlans,
+        trips,
+        budgets: tripBudgets,
+        goals: Array.isArray(options.goals) ? options.goals : [],
+        meta: {
+          createdAt,
+          updatedAt,
+          exportedAt
+        }
+      });
+    }
+
+    function buildCurrentAppDataFromV2(v2Input = getEmptyAppDataV2()){
+      const data = ensureV2Data(v2Input);
+      const tripBudgetTotals = new Map();
+      data.budgets
+        .filter(item => item.scope === 'trip' && !!item.tripId)
+        .forEach(item => {
+          const currentTotal = tripBudgetTotals.get(item.tripId) || 0;
+          const budgetTotal = item.lines.reduce((sum, line) => sum + Number(line.amount || 0), 0);
+          tripBudgetTotals.set(item.tripId, round2(currentTotal + budgetTotal));
+        });
+
+      const entries = data.transactions
+        .filter(item => !item.tripId && !item.installmentPlanId)
+        .map(item => ({
+          id: item.sourceRefId || item.id,
+          type: item.type,
+          date: item.date || '',
+          category: item.categoryId || DEFAULT_CATEGORY_ID,
+          title: item.title || '',
+          amount: Number(item.amount || 0),
+          note: item.note || '',
+          isPaid: item.type === 'expense' ? item.status !== 'pending' : true
+        }));
+
+      const installments = data.installmentPlans.map(plan => {
+        const status = getInstallmentPlanStatus(plan, data);
+        return {
+          id: plan.id,
+          name: plan.name,
+          category: plan.categoryId || DEFAULT_INSTALLMENT_CATEGORY_ID,
+          monthlyAmount: Number(plan.paymentAmount || 0),
+          totalMonths: Number(plan.installmentCount || 0),
+          paidMonths: status.paidCount,
+          startMonth: plan.startMonth || '',
+          principal: plan.principalAmount == null ? 0 : Number(plan.principalAmount || 0),
+          remainingOverride: plan.balanceSnapshotAmount == null ? '' : Number(plan.balanceSnapshotAmount || 0),
+          dueDay: plan.paymentDay == null ? '' : Number(plan.paymentDay || 0),
+          interestType: plan.interestType || 'none',
+          interestRate: plan.interestRate == null ? '' : Number(plan.interestRate || 0),
+          interestNote: plan.note || '',
+          paidMonthKeys: status.paidMonthKeys
+        };
+      });
+
+      const trips = data.trips.map(trip => {
+        const linkedInstallmentPlanIds = data.installmentPlans
+          .filter(plan => plan.tripId === trip.id)
+          .map(plan => plan.id);
+        const directItems = data.transactions
+          .filter(item => item.tripId === trip.id)
+          .map(item => ({
+            id: item.sourceRefId || item.id,
+            date: item.date || '',
+            category: item.categoryId || DEFAULT_TRIP_CATEGORY_ID,
+            title: item.title || '',
+            amount: Number(item.amount || 0),
+            note: item.note || '',
+            installmentId: '',
+            isPaid: item.status !== 'pending'
+          }));
+        const linkedItems = data.transactions
+          .filter(item => !item.tripId && !!item.installmentPlanId && linkedInstallmentPlanIds.includes(item.installmentPlanId))
+          .map(item => ({
+            id: item.sourceRefId || `linked-${trip.id}-${item.id}`,
+            date: item.date || '',
+            category: item.categoryId || DEFAULT_TRIP_CATEGORY_ID,
+            title: item.title || '',
+            amount: Number(item.amount || 0),
+            note: item.note || '',
+            installmentId: item.installmentPlanId || '',
+            isPaid: item.status !== 'pending'
+          }));
+        return {
+          id: trip.id,
+          name: trip.name,
+          destination: trip.destination || '',
+          startDate: trip.startDate || '',
+          endDate: trip.endDate || '',
+          budget: tripBudgetTotals.has(trip.id) ? tripBudgetTotals.get(trip.id) : '',
+          note: trip.note || '',
+          items: [...directItems, ...linkedItems].sort((a, b) =>
+            String(a.date || '').localeCompare(String(b.date || ''))
+            || String(a.title || '').localeCompare(String(b.title || ''), 'th'))
+        };
+      });
+
+      return normalizeData({ entries, installments, trips });
+    }
+
+    function parseImportedV2Data(parsed){
+      if(!parsed || Number(parsed.schemaVersion) !== APP_SCHEMA_VERSION){
+        if(parsed?.schemaVersion == null){
+          throw new Error(`Import file is missing schemaVersion. Only schemaVersion ${APP_SCHEMA_VERSION} is supported in this round.`);
+        }
+        throw new Error(`Unsupported schemaVersion ${parsed.schemaVersion}. Expected ${APP_SCHEMA_VERSION}.`);
+      }
+      return normalizeV2Data(parsed);
+    }
+
+    function buildExportDataV2(input = appData){
+      const exportedAt = createIsoTimestamp();
+      return ensureV2Data(input, {
+        updatedAt: createIsoTimestamp(),
+        exportedAt
+      });
+    }
+
+    function buildFirestoreV2Payload(input = appData){
+      const data = ensureV2Data(input, { updatedAt: createIsoTimestamp() });
+      return {
+        meta: {
+          schemaVersion: data.schemaVersion,
+          createdAt: data.meta.createdAt,
+          updatedAt: data.meta.updatedAt,
+          exportedAt: data.meta.exportedAt
+        },
+        profile: data.profile,
+        settings: data.settings,
+        masters: data.masters,
+        transactions: data.transactions,
+        recurringRules: data.recurringRules,
+        installmentPlans: data.installmentPlans,
+        trips: data.trips,
+        budgets: data.budgets,
+        goals: data.goals
+      };
+    }
+
+    function hydrateCurrentAppData(input){
+      if(input?.schemaVersion === APP_SCHEMA_VERSION){
+        return buildCurrentAppDataFromV2(input);
+      }
+      return normalizeData(input || getEmptyAppData());
     }
 
     function getLocalCacheKey(uid = currentUser?.uid){
@@ -2437,8 +3273,57 @@
       updateAuthUi();
     }
 
-    function getUserFinanceDocRef(uid){
-      return firestoreDb.collection('users').doc(uid).collection('finance').doc('main');
+    function getUserFinanceCollectionRef(uid, collectionName){
+      return firestoreDb.collection('users').doc(uid).collection(collectionName);
+    }
+    function getUserFinanceItemDocRef(uid, collectionName, docId = FIRESTORE_V2_MAIN_DOC_ID){
+      return getUserFinanceCollectionRef(uid, collectionName).doc(docId);
+    }
+    async function commitFirestoreOperations(operations = []){
+      const chunkSize = 400;
+      for(let index = 0; index < operations.length; index += chunkSize){
+        const batch = firestoreDb.batch();
+        operations.slice(index, index + chunkSize).forEach(operation => {
+          if(operation.type === 'delete') batch.delete(operation.ref);
+          else batch.set(operation.ref, operation.data, { merge: false });
+        });
+        await batch.commit();
+      }
+    }
+    async function syncFirestoreCollection(uid, collectionName, items = []){
+      const collectionRef = getUserFinanceCollectionRef(uid, collectionName);
+      const snapshot = await collectionRef.get();
+      const nextIds = new Set((Array.isArray(items) ? items : []).map(item => item.id));
+      const operations = [];
+      (Array.isArray(items) ? items : []).forEach(item => {
+        operations.push({
+          type: 'set',
+          ref: collectionRef.doc(item.id),
+          data: item
+        });
+      });
+      snapshot.forEach(doc => {
+        if(!nextIds.has(doc.id)){
+          operations.push({ type: 'delete', ref: doc.ref });
+        }
+      });
+      await commitFirestoreOperations(operations);
+    }
+    async function writeUserDataToCloudV2(uid, sourceData){
+      const payload = buildFirestoreV2Payload(sourceData);
+      await Promise.all([
+        getUserFinanceItemDocRef(uid, FIRESTORE_V2_COLLECTIONS.meta, FIRESTORE_V2_META_DOC_ID).set(payload.meta, { merge: false }),
+        getUserFinanceItemDocRef(uid, FIRESTORE_V2_COLLECTIONS.profile).set(payload.profile, { merge: false }),
+        getUserFinanceItemDocRef(uid, FIRESTORE_V2_COLLECTIONS.settings).set(payload.settings, { merge: false }),
+        getUserFinanceItemDocRef(uid, FIRESTORE_V2_COLLECTIONS.masters).set(payload.masters, { merge: false }),
+        syncFirestoreCollection(uid, FIRESTORE_V2_COLLECTIONS.transactions, payload.transactions),
+        syncFirestoreCollection(uid, FIRESTORE_V2_COLLECTIONS.recurringRules, payload.recurringRules),
+        syncFirestoreCollection(uid, FIRESTORE_V2_COLLECTIONS.installmentPlans, payload.installmentPlans),
+        syncFirestoreCollection(uid, FIRESTORE_V2_COLLECTIONS.trips, payload.trips),
+        syncFirestoreCollection(uid, FIRESTORE_V2_COLLECTIONS.budgets, payload.budgets),
+        syncFirestoreCollection(uid, FIRESTORE_V2_COLLECTIONS.goals, payload.goals)
+      ]);
+      return payload;
     }
 
     async function getBestLocalSeedState(uid){
@@ -2479,43 +3364,94 @@
       return true;
     }
 
-    async function createDefaultUserDocIfMissing(uid, seedData = getEmptyAppData()){
-      const docRef = getUserFinanceDocRef(uid);
-      const snapshot = await docRef.get();
+    async function createDefaultUserDocIfMissing(uid, seedData = getEmptyAppDataV2()){
+      const metaRef = getUserFinanceItemDocRef(uid, FIRESTORE_V2_COLLECTIONS.meta, FIRESTORE_V2_META_DOC_ID);
+      const snapshot = await metaRef.get();
       if(snapshot.exists) return snapshot.data();
-      const safeData = normalizeData(seedData || getEmptyAppData());
-      await docRef.set({
-        ...safeData,
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      const safeData = ensureV2Data(seedData || getEmptyAppDataV2(), {
+        updatedAt: createIsoTimestamp()
       });
+      await writeUserDataToCloudV2(uid, safeData);
       return safeData;
     }
 
     async function loadUserDataFromCloud(uid){
-      const snapshot = await getUserFinanceDocRef(uid).get();
-      const remoteData = snapshot.exists ? snapshot.data() : getEmptyAppData();
-      appData = normalizeData(remoteData || getEmptyAppData());
+      const [
+        metaSnapshot,
+        profileSnapshot,
+        settingsSnapshot,
+        mastersSnapshot,
+        transactionsSnapshot,
+        recurringRulesSnapshot,
+        installmentPlansSnapshot,
+        tripsSnapshot,
+        budgetsSnapshot,
+        goalsSnapshot
+      ] = await Promise.all([
+        getUserFinanceItemDocRef(uid, FIRESTORE_V2_COLLECTIONS.meta, FIRESTORE_V2_META_DOC_ID).get(),
+        getUserFinanceItemDocRef(uid, FIRESTORE_V2_COLLECTIONS.profile).get(),
+        getUserFinanceItemDocRef(uid, FIRESTORE_V2_COLLECTIONS.settings).get(),
+        getUserFinanceItemDocRef(uid, FIRESTORE_V2_COLLECTIONS.masters).get(),
+        getUserFinanceCollectionRef(uid, FIRESTORE_V2_COLLECTIONS.transactions).get(),
+        getUserFinanceCollectionRef(uid, FIRESTORE_V2_COLLECTIONS.recurringRules).get(),
+        getUserFinanceCollectionRef(uid, FIRESTORE_V2_COLLECTIONS.installmentPlans).get(),
+        getUserFinanceCollectionRef(uid, FIRESTORE_V2_COLLECTIONS.trips).get(),
+        getUserFinanceCollectionRef(uid, FIRESTORE_V2_COLLECTIONS.budgets).get(),
+        getUserFinanceCollectionRef(uid, FIRESTORE_V2_COLLECTIONS.goals).get()
+      ]);
+      const hasRemoteData = metaSnapshot.exists
+        || profileSnapshot.exists
+        || settingsSnapshot.exists
+        || mastersSnapshot.exists
+        || transactionsSnapshot.size > 0
+        || recurringRulesSnapshot.size > 0
+        || installmentPlansSnapshot.size > 0
+        || tripsSnapshot.size > 0
+        || budgetsSnapshot.size > 0
+        || goalsSnapshot.size > 0;
+      const remoteData = hasRemoteData ? normalizeV2Data({
+        schemaVersion: metaSnapshot.data()?.schemaVersion || APP_SCHEMA_VERSION,
+        profile: profileSnapshot.data() || getDefaultProfileV2(),
+        settings: settingsSnapshot.data() || getDefaultSettingsV2(),
+        masters: mastersSnapshot.data() || getDefaultMastersV2(),
+        transactions: transactionsSnapshot.docs.map(doc => doc.data()),
+        recurringRules: recurringRulesSnapshot.docs.map(doc => doc.data()),
+        installmentPlans: installmentPlansSnapshot.docs.map(doc => doc.data()),
+        trips: tripsSnapshot.docs.map(doc => doc.data()),
+        budgets: budgetsSnapshot.docs.map(doc => doc.data()),
+        goals: goalsSnapshot.docs.map(doc => doc.data()),
+        meta: metaSnapshot.data() || {}
+      }) : getEmptyAppDataV2();
+      appData = buildCurrentAppDataFromV2(remoteData);
+      lastPersistedDataFingerprint = getV2DataFingerprint(remoteData);
+      lastCloudSavedFingerprint = lastPersistedDataFingerprint;
       return appData;
     }
 
-    async function saveUserDataToCloud(saveSequence = cloudSaveSequence){
+    async function saveUserDataToCloud(saveSequence = cloudSaveSequence, options = {}){
       if(!currentUser || !firestoreDb) return;
-      await getUserFinanceDocRef(currentUser.uid).set({
-        ...normalizeData(appData),
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-      }, { merge: true });
+      const v2Data = ensureV2Data(appData, { updatedAt: createIsoTimestamp() });
+      const fingerprint = getV2DataFingerprint(v2Data);
+      if(!options.force && fingerprint === lastCloudSavedFingerprint){
+        if(saveSequence === cloudSaveSequence){
+          setSaveStatus('saved');
+        }
+        return;
+      }
+      await writeUserDataToCloudV2(currentUser.uid, v2Data);
+      lastCloudSavedFingerprint = fingerprint;
       if(saveSequence === cloudSaveSequence){
         setSaveStatus('saved');
       }
     }
 
-    function scheduleCloudSave(){
+    function scheduleCloudSave(options = {}){
       if(!currentUser || !firestoreDb || isApplyingCloudState) return;
       const saveSequence = ++cloudSaveSequence;
       setSaveStatus('saving');
       clearTimeout(cloudSaveTimer);
       cloudSaveTimer = setTimeout(() => {
-        saveUserDataToCloud(saveSequence).catch(error => {
+        saveUserDataToCloud(saveSequence, options).catch(error => {
           console.error(error);
           if(saveSequence === cloudSaveSequence){
             setSaveStatus('error', error?.message || '');
@@ -2616,7 +3552,7 @@
       setAuthBusy(true, 'กำลังโหลดข้อมูล...');
       const localSeedState = await getBestLocalSeedState(user.uid);
       try{
-        await createDefaultUserDocIfMissing(user.uid, localSeedState?.data || getEmptyAppData());
+        await createDefaultUserDocIfMissing(user.uid, localSeedState?.data || getEmptyAppDataV2());
         isApplyingCloudState = true;
         await loadUserDataFromCloud(user.uid);
         enterApp();
@@ -2624,7 +3560,8 @@
         setAuthStatus('เข้าสู่ระบบแล้ว');
       }catch(error){
         console.error(error);
-        appData = normalizeData(localSeedState?.data || getEmptyAppData());
+        appData = hydrateCurrentAppData(localSeedState?.data || getEmptyAppDataV2());
+        lastPersistedDataFingerprint = getV2DataFingerprint(localSeedState?.data || getEmptyAppDataV2());
         isApplyingCloudState = true;
         enterApp();
         setSaveStatus('idle');
@@ -2646,6 +3583,8 @@
       cloudSaveSequence = 0;
       currentUser = null;
       appData = getEmptyAppData();
+      lastPersistedDataFingerprint = '';
+      lastCloudSavedFingerprint = '';
       setSaveStatus('idle');
       showLoginScreen();
       setAuthError('');
@@ -2891,11 +3830,17 @@
       renderAll();
     }
 
+    function formatLocalDateValue(date = new Date()){
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
     function currentMonth(){
-      return new Date().toISOString().slice(0,7);
+      return formatLocalDateValue(new Date()).slice(0,7);
     }
     function currentDate(){
-      return new Date().toISOString().slice(0,10);
+      return formatLocalDateValue(new Date());
     }
     function formatDateTimeForFileName(date = new Date()){
       const year = date.getFullYear();
@@ -2909,7 +3854,7 @@
     function getDateOffset(days){ // --NEW
       const date = new Date();
       date.setDate(date.getDate() + Number(days || 0));
-      return date.toISOString().slice(0,10);
+      return formatLocalDateValue(date);
     }
     function focusQuickAddInput(){ // --NEW
       if(!quickAddInput) return;
@@ -5131,14 +6076,20 @@
     // MERGED DUPLICATE ACTION: single import/export flow keeps file-handle overwrite when available.
     async function importJsonText(jsonText, fileName, handle = null){
       const parsed = JSON.parse(jsonText);
-      appData = normalizeData(parsed?.data || parsed);
+      const importedData = parseImportedV2Data(parsed);
+      appData = buildCurrentAppDataFromV2(importedData);
       fileHandle = handle;
       loadedFileName = fileName || '';
-      lastImportAt = new Date().toISOString();
-      await writeAppDataToDb(appData, {
+      lastImportAt = createIsoTimestamp();
+      lastPersistedDataFingerprint = getV2DataFingerprint(importedData);
+      await writeAppDataToDb(importedData, {
         loadedFileName,
         lastImportAt
       }, getLocalCacheKey());
+      if(currentUser && firestoreDb){
+        lastCloudSavedFingerprint = '';
+        await saveUserDataToCloud(++cloudSaveSequence, { force: true });
+      }
       enterApp();
     }
 
@@ -5156,7 +6107,10 @@
         const file = await handle.getFile();
         await importJsonText(await file.text(), file.name, handle);
       }catch(error){
-        if(error?.name !== 'AbortError') console.error(error);
+        if(error?.name !== 'AbortError'){
+          console.error(error);
+          alert(error?.message || 'JSON file is invalid');
+        }
       }
     }
 
@@ -5167,7 +6121,7 @@
           await importJsonText(String(e.target?.result || ''), file.name || '', null);
         }catch(error){
           console.error(error);
-          alert('JSON file is invalid');
+          alert(error?.message || 'JSON file is invalid');
         }
       };
       reader.readAsText(file,'utf-8');
@@ -5185,7 +6139,7 @@
 
     async function saveJsonFile(){
       // MERGED DUPLICATE ACTION: previous Export and Backup JSON now share one safe export path.
-      const exportData = normalizeData(appData);
+      const exportData = buildExportDataV2(appData);
       const jsonText = JSON.stringify(exportData, null, 2);
       if(fileHandle){
         try{
@@ -5454,7 +6408,12 @@
     };
 
     function persistCurrentData(meta = {}){
-      writeAppDataToDb(appData, meta, getLocalCacheKey()).catch(error => {
+      const v2Data = ensureV2Data(appData, { updatedAt: createIsoTimestamp() });
+      const fingerprint = getV2DataFingerprint(v2Data);
+      const hasMetaOnlyChanges = meta.loadedFileName !== undefined || meta.lastImportAt !== undefined;
+      if(!hasMetaOnlyChanges && fingerprint === lastPersistedDataFingerprint) return;
+      lastPersistedDataFingerprint = fingerprint;
+      writeAppDataToDb(v2Data, meta, getLocalCacheKey()).catch(error => {
         console.error(error);
         alert('บันทึกข้อมูลในอุปกรณ์นี้ไม่สำเร็จ');
       });
