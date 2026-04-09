@@ -683,6 +683,50 @@
     .quick-add-status.success{color:var(--green)}
     .quick-add-status.error{color:var(--red)}
     .quick-add-submit{min-height:46px; white-space:nowrap}
+    /* --NEW */
+    .frequent-entry-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+      gap:10px;
+    }
+    /* --NEW */
+    .frequent-entry-btn{
+      width:100%;
+      padding:14px 16px;
+      border-radius:16px;
+      border:1px solid #d7e7ff;
+      background:
+        radial-gradient(circle at top right, rgba(37,99,235,.12), transparent 34%),
+        linear-gradient(180deg,#ffffff,#f8fbff);
+      color:var(--text);
+      display:grid;
+      gap:6px;
+      text-align:left;
+      align-content:start;
+    }
+    /* --NEW */
+    .frequent-entry-btn:hover{
+      border-color:#93c5fd;
+      box-shadow:0 12px 26px rgba(37,99,235,.12);
+    }
+    /* --NEW */
+    .frequent-entry-btn .meta{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+    /* --NEW */
+    .frequent-entry-amount{
+      font-size:18px;
+      font-weight:800;
+      color:#1d4ed8;
+    }
+    /* --NEW */
+    .entry-row-highlight td{
+      background:#eff6ff;
+      transition:background-color .25s ease;
+    }
     .modal-section-divider{
       margin:18px 0;
       padding-top:18px;
@@ -1201,8 +1245,10 @@
       <div id="mainMenuPanel" class="header-menu" aria-hidden="false">
         <div class="menu-title">เมนูหลัก</div>
         <div class="menu">
-          <button class="menu-btn" data-view="monthly">🗓️ รายเดือน</button>
-          <button class="menu-btn active" data-view="yearly">🌤️ ภาพรวมทั้งปี</button>
+          <!-- --CHANGED -->
+          <button class="menu-btn active" data-view="monthly">🗓️ รายเดือน</button>
+          <!-- --CHANGED -->
+          <button class="menu-btn" data-view="yearly">🌤️ ภาพรวมทั้งปี</button>
           <button class="menu-btn" data-view="trips">✈️ ทริป</button>
           <button class="menu-btn" data-view="installments">💳 ยอดผ่อน</button>
         </div>
@@ -1212,7 +1258,8 @@
     <div class="layout">
       <main class="content">
 
-        <section id="view-monthly" class="view hidden">
+        <!-- --CHANGED -->
+        <section id="view-monthly" class="view">
           <div class="panel card">
             <div class="section-header">
               <div>
@@ -1301,6 +1348,17 @@
             </div>
           </div>
 
+          <!-- --NEW -->
+          <div class="panel card">
+            <div class="section-header">
+              <div>
+                <h3>ใช้บ่อย</h3>
+                <div class="meta">กดครั้งเดียวเพื่อสร้างรายการเดิมของวันนี้ทันที</div>
+              </div>
+            </div>
+            <div id="recentEntriesContainer"></div>
+          </div>
+
           <div class="panel card">
             <div class="section-header">
               <div>
@@ -1329,7 +1387,8 @@
         </section>
 
         
-        <section id="view-yearly" class="view">
+        <!-- --CHANGED -->
+        <section id="view-yearly" class="view hidden">
           <div class="panel card">
             <div class="section-header">
               <div>
@@ -1895,7 +1954,7 @@
     };
 
     let appData = { entries: [], installments: [], trips: [] };
-    let currentView = 'yearly';
+    let currentView = 'monthly'; // --CHANGED
     let databasePromise = null;
     let loadedFileName = '';
     let lastImportAt = '';
@@ -1919,6 +1978,9 @@
     let saveStatus = 'idle';
     let lastSaveError = '';
     let saveStatusResetTimer = null;
+    let hasInitializedMonthlyRange = false; // --NEW
+    let pendingEntryHighlightId = ''; // --NEW
+    let entryHighlightTimer = null; // --NEW
 
     const $ = (id) => document.getElementById(id);
 
@@ -1963,6 +2025,7 @@
     const monthlyTopCategory = $('monthlyTopCategory');
     const monthlyAverageExpense = $('monthlyAverageExpense');
     const monthlyActiveFilterLabel = $('monthlyActiveFilterLabel');
+    const recentEntriesContainer = $('recentEntriesContainer'); // --NEW
     const entryCountLabel = $('entryCountLabel');
     const entriesContainer = $('entriesContainer');
     const floatingBackBtn = $('floatingBackBtn');
@@ -2097,6 +2160,12 @@
       'income','salary','bonus','commission','refund','allowance','payday',
       'เงินเดือน','โบนัส','รายรับ','รายได้','คืนเงิน','ค่าคอม','คอมมิชชั่น','เบี้ยเลี้ยง'
     ];
+    const QUICK_ADD_CATEGORY_RULES = [ // --NEW
+      { keywords:['grab','taxi'], category:'เดินทาง' },
+      { keywords:['ข้าว','กิน','อาหาร'], category:'ของกิน' },
+      { keywords:['น้ำมัน'], category:'ค่าน้ำมัน' }
+    ];
+    const QUICK_ADD_RECENT_LIMIT = 8; // --NEW
 
     function formatMoney(value){
       return new Intl.NumberFormat('th-TH',{style:'currency',currency:'THB',maximumFractionDigits:2}).format(Number(value||0));
@@ -2778,6 +2847,33 @@
       const seconds = String(date.getSeconds()).padStart(2, '0');
       return `${year}-${month}-${day}-${hours}-${minutes}-${seconds}`;
     }
+    function getDateOffset(days){ // --NEW
+      const date = new Date();
+      date.setDate(date.getDate() + Number(days || 0));
+      return date.toISOString().slice(0,10);
+    }
+    function focusQuickAddInput(){ // --NEW
+      if(!quickAddInput) return;
+      window.setTimeout(() => {
+        quickAddInput.focus();
+        quickAddInput.select();
+      }, 40);
+    }
+    function queueEntryHighlight(entryId){ // --NEW
+      pendingEntryHighlightId = entryId || '';
+    }
+    function applyPendingEntryHighlight(){ // --NEW
+      if(!pendingEntryHighlightId || !entriesContainer) return;
+      const row = entriesContainer.querySelector(`[data-entry-id="${pendingEntryHighlightId}"]`);
+      if(!row) return;
+      pendingEntryHighlightId = '';
+      if(entryHighlightTimer) window.clearTimeout(entryHighlightTimer);
+      row.classList.add('entry-row-highlight');
+      row.scrollIntoView({ behavior:'smooth', block:'center' });
+      entryHighlightTimer = window.setTimeout(() => {
+        row.classList.remove('entry-row-highlight');
+      }, 2200);
+    }
     function setQuickAddStatus(message, tone = ''){
       if(!quickAddStatus) return;
       quickAddStatus.textContent = message || '';
@@ -2787,24 +2883,23 @@
       const normalizedTitle = String(title || '').trim().toLowerCase();
       return QUICK_ADD_INCOME_KEYWORDS.some(keyword => normalizedTitle.includes(keyword)) ? 'income' : 'expense';
     }
-    function getQuickAddEntryDate(){
-      const start = rangeStartMonth.value || currentMonth();
-      const end = rangeEndMonth.value || start;
-      const fixedStart = start <= end ? start : end;
-      const fixedEnd = start <= end ? end : start;
-      const todayMonth = currentMonth();
-      const targetMonth = todayMonth >= fixedStart && todayMonth <= fixedEnd ? todayMonth : fixedEnd;
-      const todayDay = Number(currentDate().slice(8,10));
-      return safeDateFromMonth(targetMonth, todayDay);
+    function detectQuickAddCategory(title){ // --NEW
+      const normalizedTitle = String(title || '').trim().toLowerCase();
+      const matchedRule = QUICK_ADD_CATEGORY_RULES.find(rule => rule.keywords.some(keyword => normalizedTitle.includes(keyword)));
+      return matchedRule ? matchedRule.category : 'อื่นๆ';
+    }
+    function getQuickAddEntryDate(rawText = ''){ // --CHANGED
+      return String(rawText || '').includes('เมื่อวาน') ? getDateOffset(-1) : currentDate();
     }
     function parseQuickAddInput(rawText){
       const compact = String(rawText || '').trim().replace(/^\+\s*/, '');
       if(!compact) return { ok:false, message:'พิมพ์อย่างน้อยชื่อรายการและจำนวนเงิน เช่น + ข้าว 80' };
-      const amountMatch = compact.match(/(-?\d[\d,]*(?:\.\d{1,2})?)\s*$/);
+      const normalized = compact.replace(/เมื่อวาน/gi, ' ').replace(/\s{2,}/g, ' ').trim(); // --NEW
+      const amountMatch = normalized.match(/(-?\d[\d,]*(?:\.\d{1,2})?)\s*$/); // --CHANGED
       if(!amountMatch) return { ok:false, message:'ยังหาเลขท้ายบรรทัดไม่เจอ ลองรูปแบบเช่น + taxi 120' };
 
       const amount = Number(amountMatch[1].replace(/,/g, ''));
-      const title = compact.slice(0, amountMatch.index).trim().replace(/\s{2,}/g, ' ');
+      const title = normalized.slice(0, amountMatch.index).trim().replace(/\s{2,}/g, ' '); // --CHANGED
       if(!title) return { ok:false, message:'ยังไม่มีชื่อรายการก่อนจำนวนเงิน' };
       if(!Number.isFinite(amount) || amount <= 0) return { ok:false, message:'จำนวนเงินต้องมากกว่า 0' };
 
@@ -2813,8 +2908,8 @@
         entry: {
           id: crypto.randomUUID(),
           type: detectQuickAddType(title),
-          date: getQuickAddEntryDate(),
-          category: 'อื่นๆ',
+          date: getQuickAddEntryDate(compact), // --CHANGED
+          category: detectQuickAddCategory(title), // --CHANGED
           title,
           amount,
           note: '',
@@ -2824,8 +2919,14 @@
     }
     function initPickers(){
       const cm = currentMonth();
-      rangeStartMonth.value = rangeStartMonth.value || cm;
-      rangeEndMonth.value = rangeEndMonth.value || cm;
+      if(!hasInitializedMonthlyRange){ // --CHANGED
+        rangeStartMonth.value = cm;
+        rangeEndMonth.value = cm;
+        hasInitializedMonthlyRange = true;
+      }else{
+        rangeStartMonth.value = rangeStartMonth.value || cm;
+        rangeEndMonth.value = rangeEndMonth.value || cm;
+      }
       entryDate.value = entryDate.value || currentDate();
       loanStartMonth.value = loanStartMonth.value || cm;
       tripStartDate.value = tripStartDate.value || currentDate();
@@ -3057,16 +3158,57 @@
       if(!item?.startMonth || !Number(item?.totalMonths || 0)) return [];
       return Array.from({length:Number(item.totalMonths || 0)}, (_, index) => addMonths(item.startMonth, index));
     }
+    function getNormalizedInstallmentPaidMonthKeys(item){
+      const schedule = getInstallmentScheduleMonths(item);
+      const paidMonthKeys = Array.isArray(item?.paidMonthKeys)
+        ? Array.from(new Set(item.paidMonthKeys.filter(monthKey => schedule.includes(monthKey))))
+        : [];
+      if(paidMonthKeys.length){
+        const paidKeySet = new Set(paidMonthKeys);
+        return schedule.filter(monthKey => paidKeySet.has(monthKey));
+      }
+      const paidMonths = Math.max(0, Math.min(schedule.length, Number(item?.paidMonths || 0)));
+      return schedule.slice(0, paidMonths);
+    }
     function syncInstallmentPaidMonths(item){
       if(!item) return;
-      const schedule = getInstallmentScheduleMonths(item);
-      const paidKeys = new Set((item.paidMonthKeys || []).filter(monthKey => schedule.includes(monthKey)));
-      item.paidMonthKeys = schedule.filter(monthKey => paidKeys.has(monthKey));
+      item.paidMonthKeys = getNormalizedInstallmentPaidMonthKeys(item);
       item.paidMonths = item.paidMonthKeys.length;
+    }
+    function applyInstallmentPaidMonthKeys(item, paidMonthKeys, options = {}){
+      if(!item) return;
+      const previousPaidCount = getNormalizedInstallmentPaidMonthKeys(item).length;
+      item.paidMonthKeys = Array.isArray(paidMonthKeys) ? paidMonthKeys.slice() : [];
+      syncInstallmentPaidMonths(item);
+      if(options.adjustRemainingOverride && item.remainingOverride !== '' && item.remainingOverride != null){
+        const paidDelta = item.paidMonths - previousPaidCount;
+        if(paidDelta){
+          item.remainingOverride = round2(Math.max(0, Number(item.remainingOverride || 0) - (paidDelta * Number(item.monthlyAmount || 0))));
+        }
+      }
+    }
+    function setInstallmentPaidMonths(item, targetPaidMonths, options = {}){
+      if(!item) return;
+      const schedule = getInstallmentScheduleMonths(item);
+      const currentPaidKeys = getNormalizedInstallmentPaidMonthKeys(item);
+      const target = Math.max(0, Math.min(schedule.length, Number(targetPaidMonths || 0)));
+      let nextPaidKeys = currentPaidKeys.slice(0, target);
+      if(target > currentPaidKeys.length){
+        const paidKeySet = new Set(currentPaidKeys);
+        nextPaidKeys = currentPaidKeys.slice();
+        schedule.forEach(monthKey => {
+          if(nextPaidKeys.length >= target) return;
+          if(!paidKeySet.has(monthKey)){
+            nextPaidKeys.push(monthKey);
+            paidKeySet.add(monthKey);
+          }
+        });
+      }
+      applyInstallmentPaidMonthKeys(item, nextPaidKeys, options);
     }
     function isInstallmentMonthPaid(item, monthKey){
       if(!item || !monthKey) return false;
-      const paidMonthKeys = Array.isArray(item.paidMonthKeys) ? item.paidMonthKeys : [];
+      const paidMonthKeys = getNormalizedInstallmentPaidMonthKeys(item);
       if(paidMonthKeys.length) return paidMonthKeys.includes(monthKey);
       const schedule = getInstallmentScheduleMonths(item);
       const index = schedule.indexOf(monthKey);
@@ -3252,7 +3394,65 @@
       }).join('');
     }
 
-    
+    function getRecentEntryGroups(){ // --NEW
+      const grouped = new Map();
+      appData.entries.forEach(item => {
+        if(!item?.title || !Number(item.amount || 0)) return;
+        const key = `${String(item.title || '').trim().toLowerCase()}__${Number(item.amount || 0)}`;
+        const previous = grouped.get(key);
+        if(!previous){
+          grouped.set(key, { item, count:1, lastDate:item.date || '' });
+          return;
+        }
+        previous.count += 1;
+        if(String(item.date || '') >= String(previous.lastDate || '')){
+          previous.item = item;
+          previous.lastDate = item.date || '';
+        }
+      });
+      return Array.from(grouped.values())
+        .sort((a,b) => b.count - a.count || String(b.lastDate || '').localeCompare(String(a.lastDate || '')) || String(a.item.title || '').localeCompare(String(b.item.title || ''), 'th'))
+        .slice(0, QUICK_ADD_RECENT_LIMIT);
+    }
+    function renderRecentEntries(){ // --NEW
+      if(!recentEntriesContainer) return;
+      const groups = getRecentEntryGroups();
+      if(!groups.length){
+        recentEntriesContainer.innerHTML = '<div class="empty">ยังไม่มีรายการที่ใช้บ่อยพอให้กดซ้ำได้</div>';
+        return;
+      }
+      recentEntriesContainer.innerHTML = `
+        <div class="frequent-entry-grid">
+          ${groups.map(group => `
+            <button class="frequent-entry-btn" onclick="createRecentEntry('${group.item.id}')">
+              <strong>${escapeHtml(group.item.title || '-')}</strong>
+              <div class="frequent-entry-amount">${formatMoney(group.item.amount)}</div>
+              <div class="meta">
+                <span class="pill">${group.item.type === 'income' ? 'รายรับ' : 'รายจ่าย'}</span>
+                <span class="pill">${escapeHtml(formatCategoryLabel(group.item.category || 'อื่นๆ'))}</span>
+                <span class="pill">ใช้ ${group.count} ครั้ง</span>
+              </div>
+            </button>
+          `).join('')}
+        </div>
+      `;
+    }
+    function createEntryFromTemplate(item){ // --NEW
+      if(!item) return;
+      const entry = {
+        ...item,
+        id: crypto.randomUUID(),
+        date: currentDate(),
+        isPaid: item.type === 'expense' ? !!item.isPaid : true
+      };
+      appData.entries.push(entry);
+      yearlyYearPicker.value = String(new Date(entry.date).getFullYear());
+      rangeStartMonth.value = getMonthKeyFromDate(entry.date);
+      rangeEndMonth.value = getMonthKeyFromDate(entry.date);
+      queueEntryHighlight(entry.id);
+      renderAll();
+    }
+
     function renderMonthly(){
       const start = rangeStartMonth.value;
       const end = rangeEndMonth.value;
@@ -3324,7 +3524,7 @@
                   </thead>
                   <tbody>
                     ${group.items.map(item => `
-                      <tr>
+                      <tr data-entry-id="${escapeHtml(item.id || '')}">
                         <td>${escapeHtml(item.date || '-')}</td>
                         <td>
                           <span class="badge ${item.sourceType === 'installment' || item.sourceType === 'trip' ? 'badge-installment' : (item.type === 'income' ? 'badge-income' : 'badge-expense')}">
@@ -3365,7 +3565,7 @@
                                   <span>${item.isPaid ? 'จ่ายแล้ว' : 'ยังไม่จ่าย'}</span>
                                 </button>
                               ` : ''}
-                              <button class="btn-light btn-sm" onclick="duplicateEntry('${item.id}')">📄 คัดลอก</button>
+                              <button class="btn-light btn-sm" onclick="duplicateEntry('${item.id}')">📄 Duplicate</button>
                               <button class="btn-light btn-sm" onclick="editEntry('${item.id}')">แก้ไข</button>
                               <button class="btn-danger btn-sm" onclick="deleteEntry('${item.id}')">ลบ</button>
                             </div>
@@ -3380,6 +3580,7 @@
           `).join('')}
         </div>
       `;
+      applyPendingEntryHighlight(); // --NEW
     }
 
     
@@ -3679,6 +3880,7 @@
             <div class="small-actions">
               <button class="btn-light btn-sm" onclick="editLoan('${item.id}')">แก้ไข</button>
               <button class="btn-success btn-sm" onclick="markPaidOneMonth('${item.id}')">+ จ่ายเพิ่ม 1 เดือน</button>
+              <button class="btn-light btn-sm" onclick="markUnpaidOneMonth('${item.id}')">- จ่ายย้อน 1 เดือน</button>
               <button class="btn-danger btn-sm" onclick="deleteInstallment('${item.id}')">ลบ</button>
             </div>
           </div>
@@ -4101,6 +4303,7 @@
     function openEntryModal(){
       setQuickAddStatus('');
       setModalOpen(entryModal, true);
+      focusQuickAddInput(); // --NEW
     }
 
     function closeEntryModal(){
@@ -4373,6 +4576,7 @@
         note: entryNote.value.trim(),
         isPaid: entryType.value === 'expense' ? entryIsPaid.checked : true
       };
+      let highlightedEntryId = editingEntryId; // --NEW
 
       if(editingEntryId){
         appData.entries = appData.entries.map(x => x.id === editingEntryId ? { ...base, id: editingEntryId } : x);
@@ -4382,11 +4586,13 @@
         const startMonth = getMonthKeyFromDate(entryDate.value);
         for(let i=0; i<totalMonths; i++){
           const monthKey = addMonths(startMonth, i);
-          appData.entries.push({
+          const createdEntry = { // --CHANGED
             ...base,
             id: crypto.randomUUID(),
             date: i === 0 ? entryDate.value : safeDateFromMonth(monthKey, day)
-          });
+          };
+          if(!highlightedEntryId) highlightedEntryId = createdEntry.id; // --NEW
+          appData.entries.push(createdEntry);
         }
       }
 
@@ -4395,6 +4601,7 @@
       rangeEndMonth.value = repeatEnabled.checked && !editingEntryId
         ? addMonths(getMonthKeyFromDate(entryDate.value), Math.max(1, Number(repeatCount.value || 1)) - 1)
         : getMonthKeyFromDate(entryDate.value);
+      queueEntryHighlight(highlightedEntryId); // --NEW
 
       clearEntryForm();
       closeEntryModal();
@@ -4412,15 +4619,14 @@
       const entry = parsed.entry;
       appData.entries.push(entry);
       yearlyYearPicker.value = String(new Date(entry.date).getFullYear());
-      if(rangeStartMonth.value === rangeEndMonth.value){
-        rangeStartMonth.value = getMonthKeyFromDate(entry.date);
-        rangeEndMonth.value = getMonthKeyFromDate(entry.date);
-      }
+      rangeStartMonth.value = getMonthKeyFromDate(entry.date); // --CHANGED
+      rangeEndMonth.value = getMonthKeyFromDate(entry.date); // --CHANGED
 
       quickAddInput.value = '';
       setQuickAddStatus(`บันทึก ${entry.type === 'income' ? 'รายรับ' : 'รายจ่าย'}: ${entry.title} ${formatMoney(entry.amount)}`, 'success');
+      queueEntryHighlight(entry.id); // --NEW
       renderAll();
-      quickAddInput.focus();
+      focusQuickAddInput(); // --CHANGED
     }
 
     function addOrUpdateInstallment(){
@@ -4441,13 +4647,19 @@
       loanInterestType.value = draft.interestType;
       loanInterestRate.value = draft.interestRate === '' ? '' : String(draft.interestRate);
 
+      const existingInstallment = editingLoanId ? appData.installments.find(x => x.id === editingLoanId) : null;
+      const shouldAutoAdjustOverride = !!existingInstallment
+        && draft.remainingOverride !== ''
+        && existingInstallment.remainingOverride !== ''
+        && existingInstallment.remainingOverride != null
+        && Number(draft.remainingOverride) === Number(existingInstallment.remainingOverride);
       const payload = {
         id: editingLoanId || crypto.randomUUID(),
         name: loanName.value.trim(),
         category: loanCategory.value,
         monthlyAmount: draft.monthlyAmount,
         totalMonths: draft.totalMonths,
-        paidMonths: draft.paidMonths,
+        paidMonths: 0,
         startMonth: loanStartMonth.value || '',
         principal: draft.principal,
         remainingOverride: draft.remainingOverride,
@@ -4455,14 +4667,9 @@
         interestType: draft.interestType,
         interestRate: draft.interestRate,
         interestNote: loanInterestNote.value.trim(),
-        paidMonthKeys: editingLoanId
-          ? (appData.installments.find(x => x.id === editingLoanId)?.paidMonthKeys || []).filter(monthKey => getInstallmentScheduleMonths({
-            startMonth: loanStartMonth.value || '',
-            totalMonths: draft.totalMonths
-          }).includes(monthKey))
-          : Array.from({length:draft.paidMonths}, (_, index) => addMonths(loanStartMonth.value || '', index)).filter(Boolean)
+        paidMonthKeys: existingInstallment ? getNormalizedInstallmentPaidMonthKeys(existingInstallment) : []
       };
-      syncInstallmentPaidMonths(payload);
+      setInstallmentPaidMonths(payload, draft.paidMonths, { adjustRemainingOverride: shouldAutoAdjustOverride });
 
       if(editingLoanId){
         appData.installments = appData.installments.map(x => x.id === editingLoanId ? payload : x);
@@ -4631,6 +4838,7 @@
       refreshTripOptions();
       refreshAllEnhancedSelects();
       updateFileStatus();
+      renderRecentEntries(); // --NEW
       renderMonthly();
       renderYearly();
       renderTrips();
@@ -4665,8 +4873,15 @@
       if(!item) return;
       currentView = 'monthly';
       updateView();
-      fillEntryForm(item, { duplicate:true });
+      fillEntryForm({ ...item, id:crypto.randomUUID(), date:currentDate() }, { duplicate:true }); // --CHANGED
       openEntryModal();
+    };
+    window.createRecentEntry = function(id){ // --NEW
+      const item = appData.entries.find(x => x.id === id);
+      if(!item) return;
+      currentView = 'monthly';
+      updateView();
+      createEntryFromTemplate(item);
     };
 
     window.deleteEntry = function(id){
@@ -4803,13 +5018,18 @@
         alert('รายการนี้จ่ายครบแล้ว');
         return;
       }
-      const nextMonthKey = getInstallmentScheduleMonths(item).find(monthKey => !isInstallmentMonthPaid(item, monthKey));
-      item.paidMonthKeys = Array.isArray(item.paidMonthKeys) ? item.paidMonthKeys.slice() : [];
-      if(nextMonthKey && !item.paidMonthKeys.includes(nextMonthKey)) item.paidMonthKeys.push(nextMonthKey);
-      syncInstallmentPaidMonths(item);
-      if(item.remainingOverride !== '' && item.remainingOverride != null){
-        item.remainingOverride = Math.max(0, Number(item.remainingOverride) - Number(item.monthlyAmount || 0));
+      setInstallmentPaidMonths(item, Number(item.paidMonths || 0) + 1, { adjustRemainingOverride: true });
+      renderAll();
+    };
+
+    window.markUnpaidOneMonth = function(id){
+      const item = appData.installments.find(x => x.id === id);
+      if(!item) return;
+      if(Number(item.paidMonths) <= 0){
+        alert('ยังไม่มีเดือนที่จ่ายแล้ว');
+        return;
       }
+      setInstallmentPaidMonths(item, Number(item.paidMonths || 0) - 1, { adjustRemainingOverride: true });
       renderAll();
     };
 
@@ -4817,21 +5037,18 @@
       const item = appData.entries.find(x => x.id === id);
       if(!item || item.type !== 'expense') return;
       item.isPaid = !item.isPaid;
+      queueEntryHighlight(id); // --NEW
       renderAll();
     };
 
     window.toggleInstallmentMonthPaid = function(id, monthKey){
       const item = appData.installments.find(x => x.id === id);
       if(!item || !monthKey) return;
-      item.paidMonthKeys = Array.isArray(item.paidMonthKeys) ? item.paidMonthKeys.slice() : [];
-      if(item.paidMonthKeys.includes(monthKey)){
-        item.paidMonthKeys = item.paidMonthKeys.filter(value => value !== monthKey);
+      const paidMonthKeys = getNormalizedInstallmentPaidMonthKeys(item);
+      if(paidMonthKeys.includes(monthKey)){
+        applyInstallmentPaidMonthKeys(item, paidMonthKeys.filter(value => value !== monthKey), { adjustRemainingOverride: true });
       }else{
-        item.paidMonthKeys.push(monthKey);
-      }
-      syncInstallmentPaidMonths(item);
-      if(item.remainingOverride !== '' && item.remainingOverride != null){
-        item.remainingOverride = round2(Math.max(0, (Number(item.totalMonths || 0) - item.paidMonthKeys.length) * Number(item.monthlyAmount || 0)));
+        applyInstallmentPaidMonthKeys(item, [...paidMonthKeys, monthKey], { adjustRemainingOverride: true });
       }
       renderAll();
     };
@@ -4986,6 +5203,12 @@
         if(!repeatEnabled.checked) repeatCount.value = 1;
       });
       bind(entryType, 'change', updateEntryPaidVisibility);
+      bind(entryModal, 'keydown', (e) => { // --NEW
+        if(e.key !== 'Enter' || e.defaultPrevented) return;
+        if(e.target === quickAddInput || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT' || e.target.closest('button')) return;
+        e.preventDefault();
+        addOrUpdateEntry();
+      });
 
       bind(saveEntryBtn, 'click', addOrUpdateEntry);
       bind(clearEntryBtn, 'click', clearEntryForm);
