@@ -683,13 +683,11 @@
     .quick-add-status.success{color:var(--green)}
     .quick-add-status.error{color:var(--red)}
     .quick-add-submit{min-height:46px; white-space:nowrap}
-    /* --NEW */
     .frequent-entry-grid{
       display:grid;
       grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
       gap:10px;
     }
-    /* --NEW */
     .frequent-entry-btn{
       width:100%;
       padding:14px 16px;
@@ -704,25 +702,21 @@
       text-align:left;
       align-content:start;
     }
-    /* --NEW */
     .frequent-entry-btn:hover{
       border-color:#93c5fd;
       box-shadow:0 12px 26px rgba(37,99,235,.12);
     }
-    /* --NEW */
     .frequent-entry-btn .meta{
       display:flex;
       gap:8px;
       flex-wrap:wrap;
       align-items:center;
     }
-    /* --NEW */
     .frequent-entry-amount{
       font-size:18px;
       font-weight:800;
       color:#1d4ed8;
     }
-    /* --NEW */
     .entry-row-highlight td{
       background:#eff6ff;
       transition:background-color .25s ease;
@@ -735,29 +729,29 @@
     .compact-filter-actions{display:flex; gap:8px; align-items:center; justify-content:flex-end; flex-wrap:wrap}
     .quick-actions{display:flex; justify-content:space-between; gap:12px; align-items:center; flex-wrap:wrap}
     .quick-actions .small-actions{display:flex; gap:8px; flex-wrap:wrap}
-    .monthly-insight-grid{display:grid; grid-template-columns:1.15fr .85fr; gap:16px} /* --NEW */
-    .mini-summary-grid{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin-bottom:12px} /* --NEW */
-    .mini-summary-card{padding:12px 14px; border:1px solid var(--line); border-radius:14px; background:#fff; display:grid; gap:4px} /* --NEW */
-    .mini-summary-card .label{font-size:12px; font-weight:800; color:var(--muted); text-transform:uppercase; letter-spacing:.04em} /* --NEW */
-    .mini-summary-card .value{font-size:22px; font-weight:800} /* --NEW */
-    .mini-summary-card.expense-soft{background:var(--red-soft); border-color:#fecdd3} /* --NEW */
-    .mini-summary-card.expense-soft .value{color:var(--red)} /* --NEW */
-    .mini-summary-card.income-soft{background:var(--green-soft); border-color:#bbf7d0} /* --NEW */
-    .mini-summary-card.income-soft .value{color:var(--green)} /* --NEW */
-    .mini-summary-card.balance-soft{background:var(--primary-soft); border-color:#bfd5ff} /* --NEW */
-    .mini-summary-card.balance-soft .value{color:var(--primary)} /* --NEW */
-    .insight-list{display:grid; gap:10px} /* --NEW */
-    .insight-item{display:flex; justify-content:space-between; gap:12px; align-items:flex-start; padding:12px 14px; border:1px solid var(--line); border-radius:14px; background:#fff} /* --NEW */
-    .insight-item-main{min-width:0; display:grid; gap:4px} /* --NEW */
-    .insight-item-title{font-weight:800; word-break:break-word} /* --NEW */
-    .insight-item-amount{font-weight:800; white-space:nowrap} /* --NEW */
-    .action-item-alert{border-color:#fde68a; background:linear-gradient(180deg,#fffdf5,#fffbeb)} /* --NEW */
-    .quick-filter-bar{display:grid; gap:12px; margin-bottom:14px} /* --NEW */
-    .quick-chip-row{display:flex; gap:8px; flex-wrap:wrap} /* --NEW */
-    .quick-chip-stat{background:#f8fbff} /* --NEW */
-    .chip-btn{background:#fff; color:#334155; border:1px solid var(--line)} /* --NEW */
-    .chip-btn.is-active{background:var(--primary-soft); color:var(--primary); border-color:#bfd5ff} /* --NEW */
-    .chip-btn.is-unpaid{background:var(--red-soft); color:var(--red); border-color:#fecdd3} /* --NEW */
+    .monthly-insight-grid{display:grid; grid-template-columns:1.15fr .85fr; gap:16px}
+    .mini-summary-grid{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin-bottom:12px}
+    .mini-summary-card{padding:12px 14px; border:1px solid var(--line); border-radius:14px; background:#fff; display:grid; gap:4px}
+    .mini-summary-card .label{font-size:12px; font-weight:800; color:var(--muted); text-transform:uppercase; letter-spacing:.04em}
+    .mini-summary-card .value{font-size:22px; font-weight:800}
+    .mini-summary-card.expense-soft{background:var(--red-soft); border-color:#fecdd3}
+    .mini-summary-card.expense-soft .value{color:var(--red)}
+    .mini-summary-card.income-soft{background:var(--green-soft); border-color:#bbf7d0}
+    .mini-summary-card.income-soft .value{color:var(--green)}
+    .mini-summary-card.balance-soft{background:var(--primary-soft); border-color:#bfd5ff}
+    .mini-summary-card.balance-soft .value{color:var(--primary)}
+    .insight-list{display:grid; gap:10px}
+    .insight-item{display:flex; justify-content:space-between; gap:12px; align-items:flex-start; padding:12px 14px; border:1px solid var(--line); border-radius:14px; background:#fff}
+    .insight-item-main{min-width:0; display:grid; gap:4px}
+    .insight-item-title{font-weight:800; word-break:break-word}
+    .insight-item-amount{font-weight:800; white-space:nowrap}
+    .action-item-alert{border-color:#fde68a; background:linear-gradient(180deg,#fffdf5,#fffbeb)}
+    .quick-filter-bar{display:grid; gap:12px; margin-bottom:14px}
+    .quick-chip-row{display:flex; gap:8px; flex-wrap:wrap}
+    .quick-chip-stat{background:#f8fbff}
+    .chip-btn{background:#fff; color:#334155; border:1px solid var(--line)}
+    .chip-btn.is-active{background:var(--primary-soft); color:var(--primary); border-color:#bfd5ff}
+    .chip-btn.is-unpaid{background:var(--red-soft); color:var(--red); border-color:#fecdd3}
     .year-nav{display:flex; gap:8px; flex-wrap:wrap; align-items:center}
     .trip-shell{display:grid; grid-template-columns:1fr; gap:18px; align-items:start}
     .trip-shell.trip-shell-list{
@@ -1045,7 +1039,7 @@
       .app{padding:12px}
       .layout{grid-template-columns:1fr}
       .sidebar{position:static}
-    .toolbar-inline,.year-grid,.form-grid,.year-grid.year-grid-enhanced,.monthly-insight-grid,.mini-summary-grid{grid-template-columns:1fr 1fr} /* --CHANGED */
+    .toolbar-inline,.year-grid,.form-grid,.year-grid.year-grid-enhanced,.monthly-insight-grid,.mini-summary-grid{grid-template-columns:1fr 1fr}
       .compact-filter-bar,.compact-filter-row,.trip-inline-filters,.trip-stat-grid{grid-template-columns:1fr 1fr}
       .quick-add-bar{grid-template-columns:1fr}
       .installment-filters,.calendar-grid{grid-template-columns:1fr 1fr}
@@ -1089,7 +1083,7 @@
         height:58px;
       }
       .floating-back-btn .floating-back-label{display:none}
-    .toolbar-inline,.year-grid,.form-grid,.year-grid.year-grid-enhanced,.compact-filter-bar,.compact-filter-row,.installment-filters,.calendar-grid,.installment-kv,.trip-inline-filters,.trip-stat-grid,.trip-detail-grid,.quick-add-bar,.monthly-insight-grid,.mini-summary-grid{grid-template-columns:1fr} /* --CHANGED */
+    .toolbar-inline,.year-grid,.form-grid,.year-grid.year-grid-enhanced,.compact-filter-bar,.compact-filter-row,.installment-filters,.calendar-grid,.installment-kv,.trip-inline-filters,.trip-stat-grid,.trip-detail-grid,.quick-add-bar,.monthly-insight-grid,.mini-summary-grid{grid-template-columns:1fr}
       .trip-card-footer,.trip-detail-top,.trip-section-title{align-items:flex-start}
       .trip-item-card{grid-template-columns:1fr}
       .trip-item-actions{justify-content:flex-start}
@@ -1224,7 +1218,6 @@
         </div>
         <div id="authError" class="hint auth-error hidden"></div>
       </div>
-      <!-- REMOVED DEAD UI: welcomeActions was hidden and never shown in the auth-only flow -->
       <input type="file" id="startupJsonFile" accept="application/json" class="hidden">
     </div>
   </div>
@@ -1268,9 +1261,7 @@
       <div id="mainMenuPanel" class="header-menu" aria-hidden="false">
         <div class="menu-title">เมนูหลัก</div>
         <div class="menu">
-          <!-- --CHANGED -->
           <button class="menu-btn active" data-view="monthly">🗓️ รายเดือน</button>
-          <!-- --CHANGED -->
           <button class="menu-btn" data-view="yearly">🌤️ ภาพรวมทั้งปี</button>
           <button class="menu-btn" data-view="trips">✈️ ทริป</button>
           <button class="menu-btn" data-view="installments">💳 ยอดผ่อน</button>
@@ -1281,7 +1272,6 @@
     <div class="layout">
       <main class="content">
 
-        <!-- --CHANGED -->
         <section id="view-monthly" class="view">
           <div class="panel card">
             <div class="section-header">
@@ -1305,7 +1295,7 @@
                 </div>
                 <div>
                   <label for="monthlyKeyword">ค้นหา</label>
-                  <input type="text" id="monthlyKeyword" placeholder="เช่น ยังไม่จ่าย, ของกิน เกิน 100, เดือนนี้"> <!-- --CHANGED -->
+                  <input type="text" id="monthlyKeyword" placeholder="เช่น ยังไม่จ่าย, ของกิน เกิน 100, เดือนนี้">
                 </div>
                 <div>
                   <label for="monthlySort">เรียง</label>
@@ -1350,7 +1340,7 @@
             </div>
           </div>
 
-          <div class="monthly-insight-grid"> <!-- --NEW -->
+          <div class="monthly-insight-grid">
             <div class="panel card">
               <div class="section-header">
                 <div>
@@ -1393,7 +1383,6 @@
             </div>
           </div>
 
-          <!-- --NEW -->
           <div class="panel card">
             <div class="section-header">
               <div>
@@ -1426,14 +1415,13 @@
                 <div id="entryCountLabel" class="meta"></div>
               </div>
             </div>
-            <div id="monthlyQuickFilterBar"></div> <!-- --NEW -->
+            <div id="monthlyQuickFilterBar"></div>
             <div class="notice-box" style="margin-bottom:14px">รายการที่มีป้าย <strong>ยอดผ่อน</strong> หรือ <strong>ทริป</strong> เป็นรายการอ่านอย่างเดียว ต้องกลับไปแก้ไขที่หน้าต้นทาง</div>
             <div id="entriesContainer"></div>
           </div>
         </section>
 
         
-        <!-- --CHANGED -->
         <section id="view-yearly" class="view hidden">
           <div class="panel card">
             <div class="section-header">
@@ -1689,7 +1677,7 @@
           <div class="quick-add-input-wrap">
             <div>
               <label for="quickAddInput">⚡ Quick Add</label>
-                <input type="text" id="quickAddInput" placeholder="+ ค่าไฟ 1200 ยังไม่จ่าย, โบนัส 5000, grab ไป office 180"> <!-- --CHANGED -->
+                  <input type="text" id="quickAddInput" placeholder="+ ค่าไฟ 1200 ยังไม่จ่าย, โบนัส 5000, grab ไป office 180">
               <div class="meta">พิมพ์ชื่อรายการกับจำนวนเงินในช่องเดียว แล้วกด Enter เพื่อบันทึกทันที รายการที่มีคำว่า เงินเดือน, โบนัส, income จะถูกมองเป็นรายรับอัตโนมัติ</div>
             </div>
             <div id="quickAddStatus" class="quick-add-status" aria-live="polite"></div>
@@ -1999,7 +1987,7 @@
     };
 
     let appData = { entries: [], installments: [], trips: [] };
-    let currentView = 'monthly'; // --CHANGED
+    let currentView = 'monthly';
     let databasePromise = null;
     let loadedFileName = '';
     let lastImportAt = '';
@@ -2023,13 +2011,13 @@
     let saveStatus = 'idle';
     let lastSaveError = '';
     let saveStatusResetTimer = null;
-    let hasInitializedMonthlyRange = false; // --NEW
-    let pendingEntryHighlightId = ''; // --NEW
-    let entryHighlightTimer = null; // --NEW
-    let lastManualEntryType = 'expense'; // --NEW
-    let lastManualEntryCategoryByType = { income:'เงินเดือน', expense:'อื่นๆ' }; // --NEW
-    let monthlyQuickFilterMode = ''; // --NEW
-    let monthlyQuickFilterSnapshot = null; // --NEW
+    let hasInitializedMonthlyRange = false;
+    let pendingEntryHighlightId = '';
+    let entryHighlightTimer = null;
+    let lastManualEntryType = 'expense';
+    let lastManualEntryCategoryByType = { income:'เงินเดือน', expense:'อื่นๆ' };
+    let monthlyQuickFilterMode = '';
+    let monthlyQuickFilterSnapshot = null;
     let lastPersistedDataFingerprint = '';
     let lastCloudSavedFingerprint = '';
 
@@ -2106,11 +2094,11 @@
     const monthlyTopCategory = $('monthlyTopCategory');
     const monthlyAverageExpense = $('monthlyAverageExpense');
     const monthlyActiveFilterLabel = $('monthlyActiveFilterLabel');
-    const dailyDashboardContainer = $('dailyDashboardContainer'); // --NEW
-    const actionNeededContainer = $('actionNeededContainer'); // --NEW
-    const recentEntriesContainer = $('recentEntriesContainer'); // --NEW
+    const dailyDashboardContainer = $('dailyDashboardContainer');
+    const actionNeededContainer = $('actionNeededContainer');
+    const recentEntriesContainer = $('recentEntriesContainer');
     const entryCountLabel = $('entryCountLabel');
-    const monthlyQuickFilterBar = $('monthlyQuickFilterBar'); // --NEW
+    const monthlyQuickFilterBar = $('monthlyQuickFilterBar');
     const entriesContainer = $('entriesContainer');
     const floatingBackBtn = $('floatingBackBtn');
     const backFromMonthlyBtn = $('backFromMonthlyBtn');
@@ -2244,7 +2232,7 @@
       'income','salary','bonus','commission','refund','allowance','payday',
       'เงินเดือน','โบนัส','รายรับ','รายได้','คืนเงิน','ค่าคอม','คอมมิชชั่น','เบี้ยเลี้ยง'
     ];
-    const SMART_CATEGORY_RULES = [ // --NEW
+    const SMART_CATEGORY_RULES = [
       { keywords:['ของกิน','ข้าว','กิน','อาหาร','food'], category:'ของกิน' },
       { keywords:['เดินทาง','grab','taxi','แท็กซี่','รถเมล์','รถไฟฟ้า'], category:'เดินทาง' },
       { keywords:['ค่าน้ำมัน','น้ำมัน','fuel','gas'], category:'ค่าน้ำมัน' },
@@ -2253,9 +2241,8 @@
       { keywords:['ค่าไฟ','ไฟฟ้า'], category:'ไฟฟ้า' },
       { keywords:['โบนัส','bonus'], category:'โบนัส' }
     ];
-    const QUICK_ADD_CATEGORY_RULES = SMART_CATEGORY_RULES; // --CHANGED
-    const QUICK_ADD_RECENT_LIMIT = 8; // --NEW
-    const ACTION_NEEDED_TRIP_THRESHOLD = 3000; // --NEW
+    const QUICK_ADD_RECENT_LIMIT = 8;
+    const ACTION_NEEDED_TRIP_THRESHOLD = 3000;
 
     function formatMoney(value){
       return new Intl.NumberFormat('th-TH',{style:'currency',currency:'THB',maximumFractionDigits:2}).format(Number(value||0));
@@ -2794,50 +2781,6 @@
           exportedAt: null
         }
       });
-    }
-
-    function getTransactionsByMonth(dataOrTransactions, monthKey, options = {}){
-      const transactions = Array.isArray(dataOrTransactions)
-        ? dataOrTransactions
-        : ensureV2Data(dataOrTransactions).transactions;
-      return transactions
-        .filter(item => {
-          const itemMonth = item.monthKey || getMonthKeyFromDate(item.date);
-          if(monthKey && itemMonth !== monthKey) return false;
-          if(options.type && item.type !== options.type) return false;
-          if(options.status && item.status !== options.status) return false;
-          if(options.tripId && item.tripId !== options.tripId) return false;
-          if(options.installmentPlanId && item.installmentPlanId !== options.installmentPlanId) return false;
-          if(options.goalId && item.goalId !== options.goalId) return false;
-          return true;
-        })
-        .sort((a, b) =>
-          String(a.date || '').localeCompare(String(b.date || ''))
-          || String(a.id || '').localeCompare(String(b.id || '')));
-    }
-
-    function getMonthlyCategoryTotals(dataOrTransactions, monthKey, options = {}){
-      const transactions = getTransactionsByMonth(dataOrTransactions, monthKey, options);
-      const categoryMap = new Map();
-      transactions.forEach(item => {
-        const categoryId = item.categoryId || DEFAULT_CATEGORY_ID;
-        const bucket = categoryMap.get(categoryId) || {
-          categoryId,
-          income: 0,
-          expense: 0,
-          total: 0,
-          count: 0
-        };
-        if(item.type === 'income') bucket.income += Number(item.amount || 0);
-        else bucket.expense += Number(item.amount || 0);
-        bucket.total += Number(item.amount || 0);
-        bucket.count += 1;
-        categoryMap.set(categoryId, bucket);
-      });
-      return Array.from(categoryMap.values()).sort((a, b) =>
-        b.total - a.total
-        || b.count - a.count
-        || String(a.categoryId || '').localeCompare(String(b.categoryId || ''), 'th'));
     }
 
     function getInstallmentPlanStatus(planOrId, v2Input = null){
@@ -3800,22 +3743,22 @@
       const seconds = String(date.getSeconds()).padStart(2, '0');
       return `${year}-${month}-${day}-${hours}-${minutes}-${seconds}`;
     }
-    function getDateOffset(days){ // --NEW
+    function getDateOffset(days){
       const date = new Date();
       date.setDate(date.getDate() + Number(days || 0));
       return formatLocalDateValue(date);
     }
-    function focusQuickAddInput(){ // --NEW
+    function focusQuickAddInput(){
       if(!quickAddInput) return;
       window.setTimeout(() => {
         quickAddInput.focus();
         quickAddInput.select();
       }, 40);
     }
-    function queueEntryHighlight(entryId){ // --NEW
+    function queueEntryHighlight(entryId){
       pendingEntryHighlightId = entryId || '';
     }
-    function applyPendingEntryHighlight(){ // --NEW
+    function applyPendingEntryHighlight(){
       if(!pendingEntryHighlightId || !entriesContainer) return;
       const row = entriesContainer.querySelector(`[data-entry-id="${pendingEntryHighlightId}"]`);
       if(!row) return;
@@ -3832,25 +3775,25 @@
       quickAddStatus.textContent = message || '';
       quickAddStatus.className = `quick-add-status${tone ? ` ${tone}` : ''}`;
     }
-    function detectQuickAddType(title){ // --CHANGED
+    function detectQuickAddType(title){
       const normalizedTitle = normalizeLooseText(title);
       return QUICK_ADD_INCOME_KEYWORDS.some(keyword => normalizedTitle.includes(keyword)) ? 'income' : 'expense';
     }
-    function detectQuickAddCategory(title){ // --NEW
-      const normalizedTitle = normalizeLooseText(title); // --CHANGED
-      const matchedRule = QUICK_ADD_CATEGORY_RULES.find(rule => rule.keywords.some(keyword => normalizedTitle.includes(keyword)));
+    function detectQuickAddCategory(title){
+      const normalizedTitle = normalizeLooseText(title);
+      const matchedRule = SMART_CATEGORY_RULES.find(rule => rule.keywords.some(keyword => normalizedTitle.includes(keyword)));
       return matchedRule ? matchedRule.category : 'อื่นๆ';
     }
-    function getQuickAddEntryDate(rawText = ''){ // --CHANGED
+    function getQuickAddEntryDate(rawText = ''){
       const normalizedText = normalizeLooseText(rawText);
       if(normalizedText.includes('เมื่อวาน')) return getDateOffset(-1);
       if(normalizedText.includes('พรุ่งนี้')) return getDateOffset(1);
       return currentDate();
     }
-    function getQuickAddPaymentState(rawText = ''){ // --NEW
+    function getQuickAddPaymentState(rawText = ''){
       return !/(ยังไม่จ่าย|ค้างจ่าย)/i.test(String(rawText || ''));
     }
-    function cleanQuickAddTitle(rawTitle = ''){ // --NEW
+    function cleanQuickAddTitle(rawTitle = ''){
       return String(rawTitle || '')
         .replace(/เมื่อวาน|วันนี้|พรุ่งนี้|ยังไม่จ่าย|ค้างจ่าย|จ่ายแล้ว/gi, ' ')
         .replace(/(^|\s)ไป(\s|$)/gi, ' ')
@@ -3861,34 +3804,34 @@
     function parseQuickAddInput(rawText){
       const compact = String(rawText || '').trim().replace(/^\+\s*/, '');
       if(!compact) return { ok:false, message:'พิมพ์อย่างน้อยชื่อรายการและจำนวนเงิน เช่น + ข้าว 80' };
-      const amountMatches = Array.from(compact.matchAll(/-?\d[\d,]*(?:\.\d{1,2})?/g)); // --NEW
-      const amountMatch = amountMatches[amountMatches.length - 1]; // --CHANGED
-      if(!amountMatch) return { ok:false, message:'ยังหาเลขจำนวนเงินไม่เจอ ลองรูปแบบเช่น + taxi 120' }; // --CHANGED
+      const amountMatches = Array.from(compact.matchAll(/-?\d[\d,]*(?:\.\d{1,2})?/g));
+      const amountMatch = amountMatches[amountMatches.length - 1];
+      if(!amountMatch) return { ok:false, message:'ยังหาเลขจำนวนเงินไม่เจอ ลองรูปแบบเช่น + taxi 120' };
 
-      const amount = Number(String(amountMatch[0] || '').replace(/,/g, '')); // --CHANGED
-      const titleSource = `${compact.slice(0, amountMatch.index)} ${compact.slice((amountMatch.index || 0) + amountMatch[0].length)}`; // --NEW
-      const title = cleanQuickAddTitle(titleSource); // --CHANGED
+      const amount = Number(String(amountMatch[0] || '').replace(/,/g, ''));
+      const titleSource = `${compact.slice(0, amountMatch.index)} ${compact.slice((amountMatch.index || 0) + amountMatch[0].length)}`;
+      const title = cleanQuickAddTitle(titleSource);
       if(!title) return { ok:false, message:'ยังไม่มีชื่อรายการก่อนจำนวนเงิน' };
       if(!Number.isFinite(amount) || amount <= 0) return { ok:false, message:'จำนวนเงินต้องมากกว่า 0' };
-      const type = detectQuickAddType(titleSource); // --NEW
+      const type = detectQuickAddType(titleSource);
 
       return {
         ok: true,
         entry: {
           id: crypto.randomUUID(),
-          type, // --CHANGED
-          date: getQuickAddEntryDate(compact), // --CHANGED
-          category: detectQuickAddCategory(`${titleSource} ${title}`), // --CHANGED
+          type,
+          date: getQuickAddEntryDate(compact),
+          category: detectQuickAddCategory(`${titleSource} ${title}`),
           title,
           amount,
           note: '',
-          isPaid: type === 'expense' ? getQuickAddPaymentState(compact) : true // --CHANGED
+          isPaid: type === 'expense' ? getQuickAddPaymentState(compact) : true
         }
       };
     }
     function initPickers(){
       const cm = currentMonth();
-      if(!hasInitializedMonthlyRange){ // --CHANGED
+      if(!hasInitializedMonthlyRange){
         rangeStartMonth.value = cm;
         rangeEndMonth.value = cm;
         hasInitializedMonthlyRange = true;
@@ -4262,18 +4205,18 @@
         .filter(x => x.sourceType === 'trip')
         .reduce((sum, x) => sum + Number(x.amount || 0), 0);
     }
-    function normalizeLooseText(value){ // --NEW
+    function normalizeLooseText(value){
       return String(value || '').toLowerCase().replace(/\s+/g, ' ').trim();
     }
-    function removeLooseKeyword(value, keyword){ // --NEW
+    function removeLooseKeyword(value, keyword){
       if(!keyword) return value;
       return String(value || '').split(keyword).join(' ');
     }
-    function getSmartCategoryRule(text){ // --NEW
+    function getSmartCategoryRule(text){
       const normalizedText = normalizeLooseText(text);
       return SMART_CATEGORY_RULES.find(rule => rule.keywords.some(keyword => normalizedText.includes(keyword))) || null;
     }
-    function calculateMonthlyTotalsByCategory(monthKey = currentMonth(), options = {}){ // --NEW
+    function calculateMonthlyTotalsByCategory(monthKey = currentMonth(), options = {}){
       const includeReadonly = options.includeReadonly !== false;
       const items = getCombinedMonthItems(monthKey).filter(item => includeReadonly || item.sourceType === 'entry');
       const categoryMap = new Map();
@@ -4289,7 +4232,7 @@
       });
       return Array.from(categoryMap.values()).sort((a,b) => b.total - a.total || b.count - a.count || String(a.category || '').localeCompare(String(b.category || ''), 'th'));
     }
-    function getCurrentMonthTotalsSummary(monthKey = currentMonth(), options = {}){ // --NEW
+    function getCurrentMonthTotalsSummary(monthKey = currentMonth(), options = {}){
       const includeReadonly = options.includeReadonly !== false;
       const items = getCombinedMonthItems(monthKey).filter(item => includeReadonly || item.sourceType === 'entry');
       const summary = summarizeEntries(items);
@@ -4306,7 +4249,7 @@
         categoryTotals: calculateMonthlyTotalsByCategory(monthKey, options)
       };
     }
-    function parseMonthlySmartKeyword(rawKeyword = ''){ // --NEW
+    function parseMonthlySmartKeyword(rawKeyword = ''){
       const raw = normalizeLooseText(rawKeyword);
       let working = raw;
       const parsed = {
@@ -4380,8 +4323,8 @@
 
     function monthlyFilterState(){
       return {
-        keyword: (monthlyKeyword.value || '').trim().toLowerCase(), // --CHANGED
-        smartKeyword: parseMonthlySmartKeyword(monthlyKeyword.value || ''), // --NEW
+        keyword: (monthlyKeyword.value || '').trim().toLowerCase(),
+        smartKeyword: parseMonthlySmartKeyword(monthlyKeyword.value || ''),
         type: monthlyTypeFilter.value || '',
         category: monthlyCategoryFilter.value || '',
         minAmount: monthlyMinAmount.value === '' ? null : Number(monthlyMinAmount.value),
@@ -4391,18 +4334,18 @@
     }
     function monthlyItemMatch(item){
       const f = monthlyFilterState();
-      const smart = f.smartKeyword || {}; // --NEW
+      const smart = f.smartKeyword || {};
       const haystack = `${item.title} ${item.category} ${item.note || ''} ${item.date || ''}`.toLowerCase();
-      if(smart.textTokens?.length && !smart.textTokens.every(token => haystack.includes(token))) return false; // --CHANGED
-      if(smart.type && item.type !== smart.type) return false; // --NEW
-      if(smart.category && item.category !== smart.category) return false; // --NEW
-      if(smart.monthKey && getMonthKeyFromDate(item.date) !== smart.monthKey) return false; // --NEW
+      if(smart.textTokens?.length && !smart.textTokens.every(token => haystack.includes(token))) return false;
+      if(smart.type && item.type !== smart.type) return false;
+      if(smart.category && item.category !== smart.category) return false;
+      if(smart.monthKey && getMonthKeyFromDate(item.date) !== smart.monthKey) return false;
       if(smart.isPaid != null){
         if(item.type !== 'expense') return false;
         if(!!item.isPaid !== smart.isPaid) return false;
       }
-      if(smart.minExclusive != null && Number(item.amount || 0) <= smart.minExclusive) return false; // --NEW
-      if(smart.maxExclusive != null && Number(item.amount || 0) >= smart.maxExclusive) return false; // --NEW
+      if(smart.minExclusive != null && Number(item.amount || 0) <= smart.minExclusive) return false;
+      if(smart.maxExclusive != null && Number(item.amount || 0) >= smart.maxExclusive) return false;
       if(f.type && item.type !== f.type) return false;
       if(f.category && item.category !== f.category) return false;
       if(f.minAmount != null && Number(item.amount||0) < f.minAmount) return false;
@@ -4421,13 +4364,13 @@
     }
     function getActiveMonthlyFilterText(){
       const f = monthlyFilterState();
-      const smart = f.smartKeyword || {}; // --NEW
+      const smart = f.smartKeyword || {};
       const parts = [];
-      if(smart.labels?.length) parts.push(`ค้นหาอัจฉริยะ: ${smart.labels.join(' • ')}`); // --CHANGED
-      if(smart.textKeyword) parts.push(`คำค้น: ${smart.textKeyword}`); // --NEW
-      if(f.type === 'income' && smart.type !== 'income') parts.push('เฉพาะรายรับ'); // --CHANGED
-      if(f.type === 'expense' && smart.type !== 'expense') parts.push('เฉพาะรายจ่าย'); // --CHANGED
-      if(f.category && smart.category !== f.category) parts.push(`หมวด: ${f.category}`); // --CHANGED
+      if(smart.labels?.length) parts.push(`ค้นหาอัจฉริยะ: ${smart.labels.join(' • ')}`);
+      if(smart.textKeyword) parts.push(`คำค้น: ${smart.textKeyword}`);
+      if(f.type === 'income' && smart.type !== 'income') parts.push('เฉพาะรายรับ');
+      if(f.type === 'expense' && smart.type !== 'expense') parts.push('เฉพาะรายจ่าย');
+      if(f.category && smart.category !== f.category) parts.push(`หมวด: ${f.category}`);
       if(f.minAmount != null) parts.push(`ขั้นต่ำ ${formatMoney(f.minAmount)}`);
       if(f.maxAmount != null) parts.push(`สูงสุด ${formatMoney(f.maxAmount)}`);
       return parts.length ? parts.join(' • ') : 'ยังไม่ได้ใช้ตัวกรองเพิ่มเติม';
@@ -4491,7 +4434,7 @@
       }).join('');
     }
 
-    function getRecentEntryGroups(){ // --NEW
+    function getRecentEntryGroups(){
       const grouped = new Map();
       appData.entries.forEach(item => {
         if(!item?.title || !Number(item.amount || 0)) return;
@@ -4511,7 +4454,7 @@
         .sort((a,b) => b.count - a.count || String(b.lastDate || '').localeCompare(String(a.lastDate || '')) || String(a.item.title || '').localeCompare(String(b.item.title || ''), 'th'))
         .slice(0, QUICK_ADD_RECENT_LIMIT);
     }
-    function renderRecentEntries(){ // --NEW
+    function renderRecentEntries(){
       if(!recentEntriesContainer) return;
       const groups = getRecentEntryGroups();
       if(!groups.length){
@@ -4534,7 +4477,7 @@
         </div>
       `;
     }
-    function createEntryFromTemplate(item){ // --NEW
+    function createEntryFromTemplate(item){
       if(!item) return;
       const entry = {
         ...item,
@@ -4549,16 +4492,16 @@
       queueEntryHighlight(entry.id);
       renderAll();
     }
-    function rememberLastManualEntryDefaults(entry){ // --NEW
+    function rememberLastManualEntryDefaults(entry){
       if(!entry?.type) return;
       lastManualEntryType = entry.type;
       if(entry.category) lastManualEntryCategoryByType[entry.type] = entry.category;
     }
-    function getSmartDefaultCategory(type){ // --NEW
+    function getSmartDefaultCategory(type){
       const normalizedType = type === 'income' ? 'income' : 'expense';
       return lastManualEntryCategoryByType[normalizedType] || (normalizedType === 'income' ? 'เงินเดือน' : 'อื่นๆ');
     }
-    function clearMonthlyQuickFilter(shouldRender = true){ // --NEW
+    function clearMonthlyQuickFilter(shouldRender = true){
       if(monthlyQuickFilterSnapshot){
         monthlyKeyword.value = monthlyQuickFilterSnapshot.keyword;
         monthlyTypeFilter.value = monthlyQuickFilterSnapshot.type;
@@ -4568,11 +4511,11 @@
       refreshAllEnhancedSelects();
       if(shouldRender) renderMonthly();
     }
-    function renderMonthlyQuickFilterChips(items = []){ // --NEW
+    function renderMonthlyQuickFilterChips(items = []){
       if(!monthlyQuickFilterBar) return;
-      if(monthlyQuickFilterMode === 'unpaid' && !(monthlyTypeFilter.value === 'expense' && normalizeLooseText(monthlyKeyword.value) === 'ยังไม่จ่าย')) monthlyQuickFilterMode = ''; // --NEW
-      if(monthlyQuickFilterMode === 'income' && monthlyTypeFilter.value !== 'income') monthlyQuickFilterMode = ''; // --NEW
-      if(monthlyQuickFilterMode === 'expense' && monthlyTypeFilter.value !== 'expense') monthlyQuickFilterMode = ''; // --NEW
+      if(monthlyQuickFilterMode === 'unpaid' && !(monthlyTypeFilter.value === 'expense' && normalizeLooseText(monthlyKeyword.value) === 'ยังไม่จ่าย')) monthlyQuickFilterMode = '';
+      if(monthlyQuickFilterMode === 'income' && monthlyTypeFilter.value !== 'income') monthlyQuickFilterMode = '';
+      if(monthlyQuickFilterMode === 'expense' && monthlyTypeFilter.value !== 'expense') monthlyQuickFilterMode = '';
       const unpaidCount = items.filter(item => item.type === 'expense' && !item.isPaid).length;
       const incomeCount = items.filter(item => item.type === 'income').length;
       const expenseCount = items.filter(item => item.type === 'expense').length;
@@ -4592,9 +4535,9 @@
         </div>
       `;
     }
-    function renderDailyDashboard(){ // --NEW
+    function renderDailyDashboard(){
       if(!dailyDashboardContainer) return;
-      const currentMonthSummary = getCurrentMonthTotalsSummary(currentMonth()); // --NEW
+      const currentMonthSummary = getCurrentMonthTotalsSummary(currentMonth());
       const todayItems = currentMonthSummary.items.filter(item => item.date === currentDate());
       const summary = summarizeEntries(todayItems);
       const recentItems = todayItems.slice().sort((a,b) => String(b.date || '').localeCompare(String(a.date || '')) || Number(b.amount || 0) - Number(a.amount || 0)).slice(0, 5);
@@ -4628,7 +4571,7 @@
         ` : '<div class="empty">วันนี้ยังไม่มีรายการในเดือนปัจจุบัน</div>'}
       `;
     }
-    function getUpcomingActionItems(){ // --NEW
+    function getUpcomingActionItems(){
       const monthKey = currentMonth();
       const today = currentDate();
       const todayDay = Number(today.slice(8,10) || 0);
@@ -4640,11 +4583,11 @@
       const unpaidEntries = getCombinedMonthItems(monthKey)
         .filter(item => item.type === 'expense' && !item.isPaid)
         .sort((a,b) => String(a.date || '').localeCompare(String(b.date || '')) || Number(b.amount || 0) - Number(a.amount || 0));
-      const unpaidInstallmentIds = new Set(); // --NEW
-      const unpaidTripItemIds = new Set(); // --NEW
+      const unpaidInstallmentIds = new Set();
+      const unpaidTripItemIds = new Set();
       unpaidEntries.forEach(item => {
-        if(item.sourceType === 'installment' && item.sourceId) unpaidInstallmentIds.add(item.sourceId); // --NEW
-        if(item.sourceType === 'trip' && item.tripItemId) unpaidTripItemIds.add(item.tripItemId); // --NEW
+        if(item.sourceType === 'installment' && item.sourceId) unpaidInstallmentIds.add(item.sourceId);
+        if(item.sourceType === 'trip' && item.tripItemId) unpaidTripItemIds.add(item.tripItemId);
         items.push({
           priority: 0,
           label: 'ค้างจ่าย',
@@ -4663,7 +4606,7 @@
         if(monthKey < item.startMonth || monthKey > endMonth) return;
         if(dueDay < todayDay || dueDay > dueWindowEnd) return;
         if(calcLoanRemaining(item).remainingMonths === 0) return;
-        if(unpaidInstallmentIds.has(item.id)) return; // --NEW
+        if(unpaidInstallmentIds.has(item.id)) return;
         items.push({
           priority: 1,
           label: 'ยอดผ่อนใกล้ถึงกำหนด',
@@ -4678,7 +4621,7 @@
       getTripVirtualEntries(monthKey)
         .filter(item => item.type === 'expense' && Number(item.amount || 0) >= ACTION_NEEDED_TRIP_THRESHOLD)
         .forEach(item => {
-          if(unpaidTripItemIds.has(item.tripItemId)) return; // --NEW
+        if(unpaidTripItemIds.has(item.tripItemId)) return;
           items.push({
             priority: 2,
             label: 'ทริปยอดสูง',
@@ -4700,7 +4643,7 @@
         })
         .slice(0, 5);
     }
-    function renderActionNeeded(){ // --NEW
+    function renderActionNeeded(){
       if(!actionNeededContainer) return;
       const items = getUpcomingActionItems();
       actionNeededContainer.innerHTML = items.length ? `
@@ -4742,9 +4685,9 @@
       const topCategory = Array.from(categoryMap.entries()).sort((a,b) => b[1] - a[1])[0];
       const expenseItems = allItems.filter(x => x.type === 'expense');
       const avgExpense = expenseItems.length ? expenseItems.reduce((s,x) => s + Number(x.amount||0), 0) / expenseItems.length : 0;
-      renderDailyDashboard(); // --NEW
-      renderActionNeeded(); // --NEW
-      renderMonthlyQuickFilterChips(allItems); // --NEW
+      renderDailyDashboard();
+      renderActionNeeded();
+      renderMonthlyQuickFilterChips(allItems);
 
       monthlySummaryLabel.textContent = `${formatMonthThai(fixedStart)} - ${formatMonthThai(fixedEnd)}`;
       monthlyIncomeTotal.textContent = formatMoney(sum.income);
@@ -4849,7 +4792,7 @@
           `).join('')}
         </div>
       `;
-      applyPendingEntryHighlight(); // --NEW
+      applyPendingEntryHighlight();
     }
 
     
@@ -5561,7 +5504,6 @@
       mobileMenuToggle.classList.remove('is-active');
       mobileMenuToggle.setAttribute('aria-expanded', 'false');
     }
-    // REFACTOR: centralize shared modal open/close state.
     function setModalOpen(modal, isOpen){
       if(!modal) return;
       modal.classList.toggle('hidden', !isOpen);
@@ -5572,7 +5514,7 @@
     function openEntryModal(){
       setQuickAddStatus('');
       setModalOpen(entryModal, true);
-      focusQuickAddInput(); // --NEW
+      focusQuickAddInput();
     }
 
     function closeEntryModal(){
@@ -5742,9 +5684,9 @@
       entryFormTitle.textContent = DEFAULT_ENTRY_FORM_TITLE;
       entryEditBadge.classList.add('hidden');
       saveEntryBtn.textContent = DEFAULT_SAVE_ENTRY_TEXT;
-      entryType.value = lastManualEntryType || 'expense'; // --CHANGED
+      entryType.value = lastManualEntryType || 'expense';
       entryDate.value = currentDate();
-      entryCategory.value = getSmartDefaultCategory(entryType.value); // --CHANGED
+      entryCategory.value = getSmartDefaultCategory(entryType.value);
       entryAmount.value = '';
       entryTitle.value = '';
       entryNote.value = '';
@@ -5845,8 +5787,8 @@
         note: entryNote.value.trim(),
         isPaid: entryType.value === 'expense' ? entryIsPaid.checked : true
       };
-      rememberLastManualEntryDefaults(base); // --NEW
-      let highlightedEntryId = editingEntryId; // --NEW
+      rememberLastManualEntryDefaults(base);
+      let highlightedEntryId = editingEntryId;
 
       if(editingEntryId){
         appData.entries = appData.entries.map(x => x.id === editingEntryId ? { ...base, id: editingEntryId } : x);
@@ -5856,12 +5798,12 @@
         const startMonth = getMonthKeyFromDate(entryDate.value);
         for(let i=0; i<totalMonths; i++){
           const monthKey = addMonths(startMonth, i);
-          const createdEntry = { // --CHANGED
+          const createdEntry = {
             ...base,
             id: crypto.randomUUID(),
             date: i === 0 ? entryDate.value : safeDateFromMonth(monthKey, day)
           };
-          if(!highlightedEntryId) highlightedEntryId = createdEntry.id; // --NEW
+          if(!highlightedEntryId) highlightedEntryId = createdEntry.id;
           appData.entries.push(createdEntry);
         }
       }
@@ -5871,7 +5813,7 @@
       rangeEndMonth.value = repeatEnabled.checked && !editingEntryId
         ? addMonths(getMonthKeyFromDate(entryDate.value), Math.max(1, Number(repeatCount.value || 1)) - 1)
         : getMonthKeyFromDate(entryDate.value);
-      queueEntryHighlight(highlightedEntryId); // --NEW
+      queueEntryHighlight(highlightedEntryId);
 
       clearEntryForm();
       closeEntryModal();
@@ -5889,14 +5831,14 @@
       const entry = parsed.entry;
       appData.entries.push(entry);
       yearlyYearPicker.value = String(new Date(entry.date).getFullYear());
-      rangeStartMonth.value = getMonthKeyFromDate(entry.date); // --CHANGED
-      rangeEndMonth.value = getMonthKeyFromDate(entry.date); // --CHANGED
+      rangeStartMonth.value = getMonthKeyFromDate(entry.date);
+      rangeEndMonth.value = getMonthKeyFromDate(entry.date);
 
       quickAddInput.value = '';
       setQuickAddStatus(`บันทึก ${entry.type === 'income' ? 'รายรับ' : 'รายจ่าย'}: ${entry.title} ${formatMoney(entry.amount)}`, 'success');
-      queueEntryHighlight(entry.id); // --NEW
+      queueEntryHighlight(entry.id);
       renderAll();
-      focusQuickAddInput(); // --CHANGED
+      focusQuickAddInput();
     }
 
     function addOrUpdateInstallment(){
@@ -6022,7 +5964,6 @@
       closeTripItemModal();
       renderAll();
     }
-    // MERGED DUPLICATE ACTION: single import/export flow keeps file-handle overwrite when available.
     async function importJsonText(jsonText, fileName, handle = null){
       const parsed = JSON.parse(jsonText);
       const importedData = parseImportedV2Data(parsed);
@@ -6094,7 +6035,6 @@
     }
 
     async function saveJsonFile(){
-      // MERGED DUPLICATE ACTION: previous Export and Backup JSON now share one safe export path.
       const exportData = buildExportDataV2(appData);
       const jsonText = JSON.stringify(exportData, null, 2);
       if(fileHandle){
@@ -6124,7 +6064,7 @@
       refreshTripOptions();
       refreshAllEnhancedSelects();
       updateFileStatus();
-      renderRecentEntries(); // --NEW
+      renderRecentEntries();
       renderMonthly();
       renderYearly();
       renderTrips();
@@ -6135,8 +6075,8 @@
     }
 
     function resetMonthlyFilters(){
-      monthlyQuickFilterMode = ''; // --NEW
-      monthlyQuickFilterSnapshot = null; // --NEW
+      monthlyQuickFilterMode = '';
+      monthlyQuickFilterSnapshot = null;
       monthlyKeyword.value = '';
       monthlyTypeFilter.value = '';
       monthlyCategoryFilter.value = '';
@@ -6146,7 +6086,7 @@
       refreshAllEnhancedSelects();
       renderMonthly();
     }
-    window.setMonthlyQuickFilter = function(mode){ // --NEW
+    window.setMonthlyQuickFilter = function(mode){
       if(mode === 'clear'){
         clearMonthlyQuickFilter(true);
         return;
@@ -6183,10 +6123,10 @@
       if(!item) return;
       currentView = 'monthly';
       updateView();
-      fillEntryForm({ ...item, id:crypto.randomUUID(), date:currentDate() }, { duplicate:true }); // --CHANGED
+      fillEntryForm({ ...item, id:crypto.randomUUID(), date:currentDate() }, { duplicate:true });
       openEntryModal();
     };
-    window.createRecentEntry = function(id){ // --NEW
+    window.createRecentEntry = function(id){
       const item = appData.entries.find(x => x.id === id);
       if(!item) return;
       currentView = 'monthly';
@@ -6347,7 +6287,7 @@
       const item = appData.entries.find(x => x.id === id);
       if(!item || item.type !== 'expense') return;
       item.isPaid = !item.isPaid;
-      queueEntryHighlight(id); // --NEW
+      queueEntryHighlight(id);
       renderAll();
     };
 
@@ -6405,8 +6345,6 @@
       });
     }
     function bindEvents(){
-      // REMOVED DEAD EVENT: old welcome-screen import/create button bindings were removed with dead welcome UI.
-      // REFACTOR: normalize repeated event binding patterns in one place.
       const bind = (element, events, handler) => {
         if(!element) return;
         (Array.isArray(events) ? events : [events]).forEach(eventName => {
@@ -6518,7 +6456,7 @@
         if(!repeatEnabled.checked) repeatCount.value = 1;
       });
       bind(entryType, 'change', updateEntryPaidVisibility);
-      bind(entryModal, 'keydown', (e) => { // --NEW
+      bind(entryModal, 'keydown', (e) => {
         if(e.key !== 'Enter' || e.defaultPrevented) return;
         if(e.target === quickAddInput || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT' || e.target.closest('button')) return;
         e.preventDefault();
