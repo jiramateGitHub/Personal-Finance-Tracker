@@ -314,6 +314,68 @@
     .meta{color:var(--muted); font-size:13px}
     .toolbar-inline{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px}
     .stack-grid{display:grid; gap:16px}
+    /* // --NEW */
+    .monthly-subnav-wrap{
+      position:sticky;
+      top:12px;
+      z-index:8;
+      padding:8px;
+      border:1px solid rgba(219,227,239,.95);
+      border-radius:16px;
+      background:rgba(255,255,255,.94);
+      box-shadow:0 14px 32px rgba(15,23,42,.08);
+      backdrop-filter:blur(10px);
+    }
+    .monthly-subnav{
+      display:flex;
+      gap:8px;
+      overflow:auto;
+      scrollbar-width:none;
+    }
+    .monthly-subnav::-webkit-scrollbar{display:none}
+    .monthly-subtab{
+      flex:0 0 auto;
+      min-height:44px;
+      padding:10px 14px;
+      border-radius:12px;
+      border:1px solid transparent;
+      background:transparent;
+      color:#475569;
+      font-weight:800;
+      white-space:nowrap;
+      transform:none;
+    }
+    .monthly-subtab:hover{
+      background:#f8fbff;
+      border-color:#dbe3ef;
+      color:#1e293b;
+    }
+    .monthly-subtab.active{
+      background:var(--primary-soft);
+      border-color:#bfd5ff;
+      color:var(--primary);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.8);
+    }
+    .monthly-subpanel{display:grid; gap:16px}
+    .monthly-workspace-grid{display:grid; grid-template-columns:1.08fr .92fr; gap:16px}
+    .monthly-helper-note{
+      padding:12px 14px;
+      border-radius:14px;
+      border:1px solid var(--line);
+      background:#f8fbff;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.5;
+    }
+    .monthly-table-note{
+      margin-bottom:12px;
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid var(--line);
+      background:#f8fafc;
+      color:var(--muted);
+      font-size:13px;
+    }
     .form-grid{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:14px}
     .form-grid .span-2{grid-column:span 2}
     .form-grid .full{grid-column:1 / -1}
@@ -746,6 +808,55 @@
     .insight-item-title{font-weight:800; word-break:break-word}
     .insight-item-amount{font-weight:800; white-space:nowrap}
     .action-item-alert{border-color:#fde68a; background:linear-gradient(180deg,#fffdf5,#fffbeb)}
+    /* --NEW */
+    .monthly-budget-grid{display:grid; grid-template-columns:1.1fr .9fr; gap:16px}
+    .soft-insight-list{display:grid; gap:10px}
+    .soft-insight-item{
+      padding:12px 14px; border:1px solid #dbeafe; border-radius:14px;
+      background:linear-gradient(180deg,#f8fbff,#ffffff);
+      color:#1e3a8a;
+    }
+    .soft-insight-item.warning{border-color:#fde68a; background:linear-gradient(180deg,#fffdf5,#fffbeb); color:#92400e}
+    .soft-insight-item.danger{border-color:#fecdd3; background:linear-gradient(180deg,#fff1f2,#fff7f7); color:#b91c1c}
+    .soft-insight-item.success{border-color:#bbf7d0; background:linear-gradient(180deg,#f0fdf4,#ffffff); color:#166534}
+    .budget-list,.goal-list{display:grid; gap:12px}
+    .budget-card,.goal-card{
+      border:1px solid #dbe3ef; border-radius:18px; padding:16px;
+      background:linear-gradient(180deg,#ffffff,#fbfdff);
+      display:grid; gap:12px;
+    }
+    .budget-card.is-near-limit{border-color:#fde68a; background:linear-gradient(180deg,#fffdf5,#ffffff)}
+    .budget-card.is-over-budget{border-color:#fecdd3; background:linear-gradient(180deg,#fff1f2,#ffffff)}
+    .goal-card.is-completed{border-color:#bbf7d0; background:linear-gradient(180deg,#f0fdf4,#ffffff)}
+    .goal-card.is-paused{border-color:#d8e2ef; background:linear-gradient(180deg,#f8fafc,#ffffff)}
+    .budget-card-head,.goal-card-head{display:flex; justify-content:space-between; gap:10px; align-items:flex-start; flex-wrap:wrap}
+    .budget-card-title,.goal-card-title{display:grid; gap:4px}
+    .budget-card-title h4,.goal-card-title h4{margin:0}
+    .budget-stat-grid,.goal-stat-grid{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px}
+    .budget-stat,.goal-stat{
+      padding:10px 12px; border-radius:14px; background:#fff; border:1px solid #e2e8f0; display:grid; gap:4px;
+    }
+    .budget-stat .label,.goal-stat .label{font-size:12px; font-weight:800; color:var(--muted); text-transform:uppercase; letter-spacing:.04em}
+    .budget-stat .value,.goal-stat .value{font-weight:800}
+    .budget-progress-row,.goal-progress-row{display:grid; gap:8px}
+    .budget-progress-meta,.goal-progress-meta{display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; color:var(--muted); font-size:13px}
+    .budget-progress-bar > div.safe{background:linear-gradient(90deg,#16a34a,#4ade80)}
+    .budget-progress-bar > div.near-limit{background:linear-gradient(90deg,#f59e0b,#facc15)}
+    .budget-progress-bar > div.over-budget{background:linear-gradient(90deg,#ef4444,#fb7185)}
+    .goal-progress-bar > div.completed{background:linear-gradient(90deg,#16a34a,#4ade80)}
+    .goal-progress-bar > div.paused{background:linear-gradient(90deg,#94a3b8,#cbd5e1)}
+    .status-pill{
+      display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px;
+      font-size:12px; font-weight:800; border:1px solid #dbeafe; background:#eff6ff; color:#1d4ed8;
+    }
+    .status-pill.safe{background:#eff6ff; border-color:#bfdbfe; color:#1d4ed8}
+    .status-pill.near-limit{background:#fff7ed; border-color:#fed7aa; color:#c2410c}
+    .status-pill.over-budget{background:#fff1f2; border-color:#fecdd3; color:#be123c}
+    .status-pill.active{background:#eff6ff; border-color:#bfdbfe; color:#1d4ed8}
+    .status-pill.paused{background:#f8fafc; border-color:#dbe3ef; color:#475569}
+    .status-pill.completed{background:#f0fdf4; border-color:#bbf7d0; color:#166534}
+    .budget-negative{color:#b91c1c}
+    .budget-empty-state,.goal-empty-state{display:grid; gap:12px}
     .quick-filter-bar{display:grid; gap:12px; margin-bottom:14px}
     .quick-chip-row{display:flex; gap:8px; flex-wrap:wrap}
     .quick-chip-stat{background:#f8fbff}
@@ -1039,7 +1150,7 @@
       .app{padding:12px}
       .layout{grid-template-columns:1fr}
       .sidebar{position:static}
-    .toolbar-inline,.year-grid,.form-grid,.year-grid.year-grid-enhanced,.monthly-insight-grid,.mini-summary-grid{grid-template-columns:1fr 1fr}
+    .toolbar-inline,.year-grid,.form-grid,.year-grid.year-grid-enhanced,.monthly-insight-grid,.mini-summary-grid,.monthly-budget-grid,.monthly-workspace-grid{grid-template-columns:1fr 1fr}
       .compact-filter-bar,.compact-filter-row,.trip-inline-filters,.trip-stat-grid{grid-template-columns:1fr 1fr}
       .quick-add-bar{grid-template-columns:1fr}
       .installment-filters,.calendar-grid{grid-template-columns:1fr 1fr}
@@ -1083,7 +1194,7 @@
         height:58px;
       }
       .floating-back-btn .floating-back-label{display:none}
-    .toolbar-inline,.year-grid,.form-grid,.year-grid.year-grid-enhanced,.compact-filter-bar,.compact-filter-row,.installment-filters,.calendar-grid,.installment-kv,.trip-inline-filters,.trip-stat-grid,.trip-detail-grid,.quick-add-bar,.monthly-insight-grid,.mini-summary-grid{grid-template-columns:1fr}
+    .toolbar-inline,.year-grid,.form-grid,.year-grid.year-grid-enhanced,.compact-filter-bar,.compact-filter-row,.installment-filters,.calendar-grid,.installment-kv,.trip-inline-filters,.trip-stat-grid,.trip-detail-grid,.quick-add-bar,.monthly-insight-grid,.mini-summary-grid,.monthly-budget-grid,.budget-stat-grid,.goal-stat-grid,.monthly-workspace-grid{grid-template-columns:1fr}
       .trip-card-footer,.trip-detail-top,.trip-section-title{align-items:flex-start}
       .trip-item-card{grid-template-columns:1fr}
       .trip-item-actions{justify-content:flex-start}
@@ -1168,6 +1279,17 @@
         padding:14px;
       }
       .small-actions button{width:100%}
+      .monthly-subnav-wrap{
+        top:8px;
+        padding:6px;
+      }
+      .monthly-subnav{
+        gap:6px;
+      }
+      .monthly-subtab{
+        min-height:42px;
+        padding:10px 12px;
+      }
     }
 
     html,body{min-height:100%}
@@ -1380,6 +1502,46 @@
               <div class="notice-box"><strong id="monthlyMonthCount">0 เดือน</strong><br><span class="meta">จำนวนเดือนที่แสดง</span></div>
               <div class="notice-box"><strong id="monthlyTopCategory">-</strong><br><span class="meta">หมวดที่พบมากสุด</span></div>
               <div class="notice-box"><strong id="monthlyAverageExpense">฿0.00</strong><br><span class="meta">เฉลี่ยต่อรายการจ่าย</span></div>
+            </div>
+          </div>
+
+          <!-- --NEW -->
+          <div class="panel card">
+            <div class="section-header">
+              <div>
+                <h3>Budget / Goal Insight</h3>
+                <div class="meta">สรุปเตือนเบา ๆ จากงบของเดือนนี้และ goal ที่คืบหน้าแล้ว</div>
+              </div>
+            </div>
+            <div id="monthlySoftInsightContainer" class="soft-insight-list"></div>
+          </div>
+
+          <!-- --NEW -->
+          <div class="monthly-budget-grid">
+            <div class="panel card">
+              <div class="section-header">
+                <div>
+                  <h3>Budget เดือนนี้</h3>
+                  <div id="monthlyBudgetSummary" class="meta"></div>
+                </div>
+                <div class="small-actions">
+                  <button id="openBudgetModalBtn" class="btn-primary">＋ เพิ่มงบ</button>
+                </div>
+              </div>
+              <div id="monthlyBudgetContainer"></div>
+            </div>
+
+            <div class="panel card">
+              <div class="section-header">
+                <div>
+                  <h3>Goal</h3>
+                  <div class="meta">เก็บเป้าหมายง่าย ๆ และอัปเดตยอดด้วยมือได้ทันที</div>
+                </div>
+                <div class="small-actions">
+                  <button id="openGoalModalBtn" class="btn-light">＋ เพิ่ม Goal</button>
+                </div>
+              </div>
+              <div id="monthlyGoalContainer"></div>
             </div>
           </div>
 
@@ -1921,6 +2083,98 @@
     </div>
   </div>
 
+  <!-- --NEW -->
+  <div id="budgetModal" class="modal-backdrop hidden" aria-hidden="true">
+    <div class="modal-dialog card" role="dialog" aria-modal="true" aria-labelledby="budgetFormTitle">
+      <div class="modal-header">
+        <div>
+          <h3 id="budgetFormTitle" style="margin:0">➕ เพิ่ม Budget รายเดือน</h3>
+          <div class="meta">1 หมวด ต่อ 1 เดือน ถ้ามีอยู่แล้วระบบจะอัปเดตรายการเดิมให้</div>
+        </div>
+        <div class="small-actions">
+          <div id="budgetEditBadge" class="badge hidden">✏️ กำลังแก้ไข</div>
+          <button id="closeBudgetModalBtn" class="btn-light modal-close">✕ ปิด</button>
+        </div>
+      </div>
+      <div class="modal-body">
+        <div class="form-grid">
+          <div>
+            <label for="budgetMonth">เดือน</label>
+            <input type="month" id="budgetMonth">
+          </div>
+          <div>
+            <label for="budgetCategory">หมวดหมู่</label>
+            <select id="budgetCategory"></select>
+          </div>
+          <div>
+            <label for="budgetAmount">งบประมาณ (บาท)</label>
+            <input type="number" id="budgetAmount" min="0" step="0.01" placeholder="0.00">
+          </div>
+          <div>
+            <label for="budgetNote">หมายเหตุ (ถ้ามี)</label>
+            <input type="text" id="budgetNote" placeholder="เช่น กินข้าว + กาแฟ">
+          </div>
+          <div class="full small-actions">
+            <button id="saveBudgetBtn" class="btn-primary">💾 บันทึก Budget</button>
+            <button id="clearBudgetBtn" class="btn-light">✕ ล้างฟอร์ม</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- --NEW -->
+  <div id="goalModal" class="modal-backdrop hidden" aria-hidden="true">
+    <div class="modal-dialog card" role="dialog" aria-modal="true" aria-labelledby="goalFormTitle">
+      <div class="modal-header">
+        <div>
+          <h3 id="goalFormTitle" style="margin:0">➕ เพิ่ม Goal</h3>
+          <div class="meta">เป้าหมายเก็บเงินแบบง่าย ๆ พร้อมอัปเดตยอดเองได้</div>
+        </div>
+        <div class="small-actions">
+          <div id="goalEditBadge" class="badge hidden">✏️ กำลังแก้ไข</div>
+          <button id="closeGoalModalBtn" class="btn-light modal-close">✕ ปิด</button>
+        </div>
+      </div>
+      <div class="modal-body">
+        <div class="form-grid">
+          <div>
+            <label for="goalName">ชื่อ Goal</label>
+            <input type="text" id="goalName" placeholder="เช่น เที่ยวญี่ปุ่น">
+          </div>
+          <div>
+            <label for="goalTargetAmount">เป้าหมาย (บาท)</label>
+            <input type="number" id="goalTargetAmount" min="0" step="0.01" placeholder="0.00">
+          </div>
+          <div>
+            <label for="goalCurrentAmount">ยอดปัจจุบัน</label>
+            <input type="number" id="goalCurrentAmount" min="0" step="0.01" placeholder="0.00">
+          </div>
+          <div>
+            <label for="goalTargetDate">วันเป้าหมาย</label>
+            <input type="date" id="goalTargetDate">
+          </div>
+          <div>
+            <label for="goalStatus">สถานะ</label>
+            <select id="goalStatus">
+              <option value="active">Active</option>
+              <option value="paused">Paused</option>
+              <option value="completed">Completed</option>
+            </select>
+          </div>
+          <div>
+            <label for="goalNote">หมายเหตุ (ถ้ามี)</label>
+            <input type="text" id="goalNote" placeholder="เช่น เก็บจากโบนัสและเงินเหลือปลายเดือน">
+          </div>
+          <div class="full small-actions">
+            <button id="saveGoalBtn" class="btn-primary">💾 บันทึก Goal</button>
+            <button id="clearGoalBtn" class="btn-light">✕ ล้างฟอร์ม</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/th.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/index.js"></script>
@@ -1986,7 +2240,7 @@
       'อื่นๆ':'🗂️'
     };
 
-    let appData = { entries: [], installments: [], trips: [] };
+    let appData = { entries: [], installments: [], trips: [], budgets: [], goals: [] }; // --CHANGED
     let currentView = 'monthly';
     let databasePromise = null;
     let loadedFileName = '';
@@ -1995,6 +2249,8 @@
     let editingLoanId = null;
     let editingTripId = null;
     let editingTripItemId = null;
+    let editingBudgetId = null; // --NEW
+    let editingGoalId = null; // --NEW
     let activeTripId = null;
     let installmentViewMode = 'list';
     let tripViewMode = 'list';
@@ -2016,6 +2272,7 @@
     let entryHighlightTimer = null;
     let lastManualEntryType = 'expense';
     let lastManualEntryCategoryByType = { income:'เงินเดือน', expense:'อื่นๆ' };
+    let monthlySubView = 'entries'; // --NEW
     let monthlyQuickFilterMode = '';
     let monthlyQuickFilterSnapshot = null;
     let lastPersistedDataFingerprint = '';
@@ -2094,6 +2351,10 @@
     const monthlyTopCategory = $('monthlyTopCategory');
     const monthlyAverageExpense = $('monthlyAverageExpense');
     const monthlyActiveFilterLabel = $('monthlyActiveFilterLabel');
+    const monthlySoftInsightContainer = $('monthlySoftInsightContainer'); // --NEW
+    const monthlyBudgetSummary = $('monthlyBudgetSummary'); // --NEW
+    const monthlyBudgetContainer = $('monthlyBudgetContainer'); // --NEW
+    const monthlyGoalContainer = $('monthlyGoalContainer'); // --NEW
     const dailyDashboardContainer = $('dailyDashboardContainer');
     const actionNeededContainer = $('actionNeededContainer');
     const recentEntriesContainer = $('recentEntriesContainer');
@@ -2107,6 +2368,12 @@
     const openEntryModalBtnSecondary = $('openEntryModalBtnSecondary');
     const entryModal = $('entryModal');
     const closeEntryModalBtn = $('closeEntryModalBtn');
+    const budgetModal = $('budgetModal'); // --NEW
+    const openBudgetModalBtn = $('openBudgetModalBtn'); // --NEW
+    const closeBudgetModalBtn = $('closeBudgetModalBtn'); // --NEW
+    const goalModal = $('goalModal'); // --NEW
+    const openGoalModalBtn = $('openGoalModalBtn'); // --NEW
+    const closeGoalModalBtn = $('closeGoalModalBtn'); // --NEW
     const loanModal = $('loanModal');
     const openLoanModalBtn = $('openLoanModalBtn');
     const closeLoanModalBtn = $('closeLoanModalBtn');
@@ -2127,6 +2394,24 @@
     const repeatCount = $('repeatCount');
     const saveEntryBtn = $('saveEntryBtn');
     const clearEntryBtn = $('clearEntryBtn');
+    const budgetFormTitle = $('budgetFormTitle'); // --NEW
+    const budgetEditBadge = $('budgetEditBadge'); // --NEW
+    const budgetMonth = $('budgetMonth'); // --NEW
+    const budgetCategory = $('budgetCategory'); // --NEW
+    const budgetAmount = $('budgetAmount'); // --NEW
+    const budgetNote = $('budgetNote'); // --NEW
+    const saveBudgetBtn = $('saveBudgetBtn'); // --NEW
+    const clearBudgetBtn = $('clearBudgetBtn'); // --NEW
+    const goalFormTitle = $('goalFormTitle'); // --NEW
+    const goalEditBadge = $('goalEditBadge'); // --NEW
+    const goalName = $('goalName'); // --NEW
+    const goalTargetAmount = $('goalTargetAmount'); // --NEW
+    const goalCurrentAmount = $('goalCurrentAmount'); // --NEW
+    const goalTargetDate = $('goalTargetDate'); // --NEW
+    const goalStatus = $('goalStatus'); // --NEW
+    const goalNote = $('goalNote'); // --NEW
+    const saveGoalBtn = $('saveGoalBtn'); // --NEW
+    const clearGoalBtn = $('clearGoalBtn'); // --NEW
 
     const yearlyYearPicker = $('yearlyYearPicker');
     const yearlyScreenLabel = $('yearlyScreenLabel');
@@ -2220,6 +2505,10 @@
     const tripCalendarViewBtn = $('tripCalendarViewBtn');
     const DEFAULT_ENTRY_FORM_TITLE = entryFormTitle?.textContent || '';
     const DEFAULT_SAVE_ENTRY_TEXT = saveEntryBtn?.textContent || '';
+    const DEFAULT_BUDGET_FORM_TITLE = budgetFormTitle?.textContent || ''; // --NEW
+    const DEFAULT_SAVE_BUDGET_TEXT = saveBudgetBtn?.textContent || ''; // --NEW
+    const DEFAULT_GOAL_FORM_TITLE = goalFormTitle?.textContent || ''; // --NEW
+    const DEFAULT_SAVE_GOAL_TEXT = saveGoalBtn?.textContent || ''; // --NEW
     const DEFAULT_LOAN_FORM_TITLE = loanFormTitle?.textContent || '';
     const DEFAULT_SAVE_LOAN_TEXT = saveLoanBtn?.textContent || '';
     const DEFAULT_TRIP_FORM_TITLE = tripFormTitle?.textContent || '';
@@ -2364,12 +2653,14 @@
             installmentId: item.installmentId || '',
             isPaid: item.isPaid == null ? true : !!item.isPaid
           })) : []
-        })) : []
+        })) : [],
+        budgets: Array.isArray(parsed.budgets) ? parsed.budgets.map(item => normalizeBudgetRecord(item)).filter(item => item.amount > 0 && !!item.categoryId && !!item.month) : [], // --CHANGED
+        goals: Array.isArray(parsed.goals) ? parsed.goals.map(item => normalizeGoalRecord(item)).filter(item => item.targetAmount > 0 && !!item.name) : [] // --CHANGED
       };
     }
 
     function getEmptyAppData(){
-      return normalizeData({ entries: [], installments: [], trips: [] });
+      return normalizeData({ entries: [], installments: [], trips: [], budgets: [], goals: [] }); // --CHANGED
     }
 
     function createIsoTimestamp(value = new Date()){
@@ -2554,35 +2845,57 @@
     function validateBudget(input = {}){
       const now = createIsoTimestamp();
       const scope = normalizeEnumValue(input.scope, BUDGET_SCOPES, 'monthly');
-      const lines = (Array.isArray(input.lines) ? input.lines : [])
-        .map(line => normalizeBudgetLine(line, scope === 'trip' ? DEFAULT_TRIP_CATEGORY_ID : DEFAULT_CATEGORY_ID))
+      const fallbackMonthlyCategoryId = normalizeNullableText(input.categoryId ?? input.category) || '';
+      const monthlyLineSeed = scope === 'monthly' && (input.amount != null || input.categoryId != null || input.category != null)
+        ? [{ id: normalizeRequiredText(input.lineId, crypto.randomUUID()), categoryId: fallbackMonthlyCategoryId, amount: input.amount }]
+        : [];
+      const rawLines = (Array.isArray(input.lines) && input.lines.length ? input.lines : monthlyLineSeed);
+      const lines = rawLines
+        .map(line => normalizeBudgetLine(line, scope === 'trip' ? DEFAULT_TRIP_CATEGORY_ID : ''))
         .filter(line => line.amount > 0 && !!line.categoryId);
+      const primaryLine = lines[0] || null;
+      const alertThresholds = (Array.isArray(input.alertThresholds) ? input.alertThresholds : [0.8, 1])
+        .map(value => Number(value))
+        .filter(value => Number.isFinite(value) && value > 0)
+        .sort((a, b) => a - b);
       const value = {
         id: normalizeRequiredText(input.id, crypto.randomUUID()),
         scope,
         name: normalizeRequiredText(input.name, scope === 'trip' ? 'Trip Budget' : 'Monthly Budget'),
         month: scope === 'monthly' ? normalizeMonthKeyValue(input.month) : null,
         tripId: scope === 'trip' ? normalizeNullableText(input.tripId) : null,
+        categoryId: scope === 'monthly' ? normalizeRequiredText(input.categoryId ?? input.category ?? primaryLine?.categoryId, '') : null,
+        amount: scope === 'monthly' ? normalizePositiveNumberValue(input.amount ?? primaryLine?.amount, 0) : round2(lines.reduce((sum, line) => sum + Number(line.amount || 0), 0)),
+        alertThresholds: alertThresholds.length ? alertThresholds : [0.8, 1],
+        enabled: input.enabled !== false,
         note: normalizeNullableText(input.note),
-        lines,
+        lines: scope === 'monthly' && primaryLine
+          ? [{ id: primaryLine.id || crypto.randomUUID(), categoryId: primaryLine.categoryId, amount: primaryLine.amount }]
+          : lines,
         createdAt: normalizeIsoTimestamp(input.createdAt, now),
         updatedAt: normalizeIsoTimestamp(input.updatedAt, now)
       };
       const errors = [];
       if(scope === 'monthly' && !value.month) errors.push('month is required for monthly budgets');
       if(scope === 'trip' && !value.tripId) errors.push('tripId is required for trip budgets');
-      if(!lines.length) errors.push('at least one budget line is required');
+      if(scope === 'monthly' && !value.categoryId) errors.push('categoryId is required for monthly budgets');
+      if(scope === 'monthly' && value.amount <= 0) errors.push('amount must be greater than 0');
+      if(!value.lines.length) errors.push('at least one budget line is required');
       return { ok: errors.length === 0, errors, value };
     }
 
     function validateGoal(input = {}){
       const now = createIsoTimestamp();
       const targetAmount = normalizePositiveNumberValue(input.targetAmount, 0);
+      const type = normalizeEnumValue(input.type ?? input.kind ?? input.goalType, GOAL_TYPES, 'savings');
+      const currentAmountRaw = normalizeNullableNumber(input.currentAmount);
       const value = {
         id: normalizeRequiredText(input.id, crypto.randomUUID()),
         name: normalizeRequiredText(input.name, ''),
-        kind: normalizeEnumValue(input.kind ?? input.goalType, GOAL_TYPES, 'savings'),
+        type,
+        kind: type,
         targetAmount,
+        currentAmount: currentAmountRaw == null ? null : Math.max(0, currentAmountRaw),
         targetDate: normalizeDateValue(input.targetDate),
         linkedCategoryId: normalizeNullableText(input.linkedCategoryId),
         note: normalizeNullableText(input.note),
@@ -2594,6 +2907,36 @@
       if(!value.name) errors.push('name is required');
       if(targetAmount <= 0) errors.push('targetAmount must be greater than 0');
       return { ok: errors.length === 0, errors, value };
+    }
+
+    function normalizeBudgetRecord(input = {}){ // --NEW
+      const normalized = validateBudget({
+        ...input,
+        scope: 'monthly',
+        month: normalizeMonthKeyValue(input.month) || currentMonth(),
+        name: normalizeRequiredText(input.name, normalizeRequiredText(input.categoryId ?? input.category, 'Monthly Budget')),
+        categoryId: normalizeRequiredText(input.categoryId ?? input.category ?? input.lines?.[0]?.categoryId, ''),
+        amount: normalizePositiveNumberValue(input.amount ?? input.lines?.[0]?.amount, 0),
+        lines: [{
+          id: normalizeRequiredText(input.lineId ?? input.lines?.[0]?.id, crypto.randomUUID()),
+          categoryId: normalizeRequiredText(input.categoryId ?? input.category ?? input.lines?.[0]?.categoryId, ''),
+          amount: normalizePositiveNumberValue(input.amount ?? input.lines?.[0]?.amount, 0)
+        }],
+        alertThresholds: Array.isArray(input.alertThresholds) ? input.alertThresholds : [0.8, 1],
+        enabled: input.enabled !== false
+      }).value;
+      return {
+        ...normalized,
+        lineId: normalized.lines[0]?.id || crypto.randomUUID()
+      };
+    }
+
+    function normalizeGoalRecord(input = {}){ // --NEW
+      return validateGoal({
+        ...input,
+        type: input.type ?? input.kind ?? input.goalType ?? 'savings',
+        currentAmount: input.currentAmount == null ? null : Number(input.currentAmount)
+      }).value;
     }
 
     function normalizeRecurringRuleV2(input = {}){
@@ -2900,6 +3243,15 @@
           updatedAt
         }).value)).filter(item => item.amount > 0 && !!item.title);
 
+      const monthlyBudgets = runtime.budgets // --NEW
+        .map(item => validateBudget({
+          ...item,
+          scope: 'monthly',
+          createdAt: item.createdAt || updatedAt,
+          updatedAt
+        }).value)
+        .filter(item => item.scope === 'monthly' && !!item.month && item.lines.length > 0);
+
       const tripBudgets = [];
       const trips = runtime.trips.map(trip => {
         const budgetAmount = trip.budget === '' || trip.budget == null ? null : Number(trip.budget);
@@ -2958,8 +3310,8 @@
         recurringRules: Array.isArray(options.recurringRules) ? options.recurringRules : [],
         installmentPlans,
         trips,
-        budgets: tripBudgets,
-        goals: Array.isArray(options.goals) ? options.goals : [],
+        budgets: [...monthlyBudgets, ...tripBudgets], // --CHANGED
+        goals: runtime.goals.map(item => validateGoal({ ...item, updatedAt }).value), // --CHANGED
         meta: {
           createdAt,
           updatedAt,
@@ -3054,7 +3406,17 @@
         };
       });
 
-      return normalizeData({ entries, installments, trips });
+      const budgets = data.budgets // --NEW
+        .filter(item => item.scope === 'monthly' && !!item.month)
+        .map(item => normalizeBudgetRecord({
+          ...item,
+          categoryId: item.categoryId ?? item.lines?.[0]?.categoryId,
+          amount: item.amount ?? item.lines?.[0]?.amount
+        }));
+
+      const goals = data.goals.map(item => normalizeGoalRecord(item)); // --NEW
+
+      return normalizeData({ entries, installments, trips, budgets, goals }); // --CHANGED
     }
 
     function parseImportedV2Data(parsed){
@@ -3651,11 +4013,12 @@
     function populateCategoryDropdowns(){
       const options = CATEGORY_OPTIONS.map(x => `<option value="${x}">${escapeHtml(formatCategoryLabel(x))}</option>`).join('');
       entryCategory.innerHTML = options;
+      budgetCategory.innerHTML = options; // --NEW
       loanCategory.innerHTML = options;
       tripItemCategory.innerHTML = options;
       monthlyCategoryFilter.innerHTML = '<option value="">ทุกหมวดหมู่</option>' + options;
       tripCategoryFilter.innerHTML = '<option value="">ทุกหมวดหมู่</option>' + options;
-      [entryCategory, loanCategory, tripItemCategory, monthlyCategoryFilter, tripCategoryFilter, tripYearFilter, tripMonthFilter].forEach(refreshEnhancedSelect);
+      [entryCategory, budgetCategory, goalStatus, loanCategory, tripItemCategory, monthlyCategoryFilter, tripCategoryFilter, tripYearFilter, tripMonthFilter].forEach(refreshEnhancedSelect); // --CHANGED
       refreshTripOptions();
     }
     function refreshTripOptions(){
@@ -3987,7 +4350,8 @@
           category: monthlyCategoryFilter.value,
           minAmount: monthlyMinAmount.value,
           maxAmount: monthlyMaxAmount.value,
-          sort: monthlySort.value
+          sort: monthlySort.value,
+          subView: monthlySubView // --NEW
         },
         yearly: {
           year: yearlyYearPicker.value
@@ -4034,6 +4398,7 @@
       monthlyMinAmount.value = snapshot.monthly?.minAmount || '';
       monthlyMaxAmount.value = snapshot.monthly?.maxAmount || '';
       monthlySort.value = snapshot.monthly?.sort || 'date-asc';
+      monthlySubView = normalizeMonthlySubView(snapshot.monthly?.subView); // --NEW
 
       if(snapshot.yearly?.year){
         const year = String(snapshot.yearly.year);
@@ -4248,6 +4613,276 @@
         tripTotal: getTripTotalFromItems(items),
         categoryTotals: calculateMonthlyTotalsByCategory(monthKey, options)
       };
+    }
+
+    function getBudgetFocusMonthKey(){ // --NEW
+      const start = rangeStartMonth.value || currentMonth();
+      const end = rangeEndMonth.value || start;
+      return start <= end ? start : end;
+    }
+
+    function getBudgetAmountValue(budgetRecord){
+      return round2(Number(budgetRecord?.amount ?? budgetRecord?.lines?.[0]?.amount ?? 0));
+    }
+
+    function getBudgetCategoryIdValue(budgetRecord){
+      return normalizeRequiredText(budgetRecord?.categoryId ?? budgetRecord?.lines?.[0]?.categoryId, '');
+    }
+
+    function getBudgetsByMonth(monthKey){ // --NEW
+      return normalizeData(appData).budgets
+        .filter(item => item.enabled !== false && item.month === monthKey)
+        .sort((a, b) => String(a.name || '').localeCompare(String(b.name || ''), 'th') || String(a.id || '').localeCompare(String(b.id || '')));
+    }
+
+    function getBudgetActualSpent(monthKey, categoryId){ // --NEW
+      return round2(getCombinedMonthItems(monthKey)
+        .filter(item => item.type === 'expense')
+        .filter(item => (item.category || '') === categoryId)
+        .reduce((sum, item) => sum + Number(item.amount || 0), 0));
+    }
+
+    function getBudgetStatus(budgetRecord){ // --NEW
+      const amount = getBudgetAmountValue(budgetRecord);
+      const categoryId = getBudgetCategoryIdValue(budgetRecord);
+      const spent = getBudgetActualSpent(budgetRecord?.month || currentMonth(), categoryId);
+      const remaining = round2(amount - spent);
+      const ratio = amount > 0 ? spent / amount : 0;
+      const thresholds = Array.isArray(budgetRecord?.alertThresholds) && budgetRecord.alertThresholds.length
+        ? budgetRecord.alertThresholds.map(value => Number(value)).filter(value => Number.isFinite(value) && value > 0).sort((a, b) => a - b)
+        : [0.8, 1];
+      let key = 'safe';
+      let label = 'Safe';
+      if(ratio > (thresholds[1] || 1)){
+        key = 'over-budget';
+        label = 'Over Budget';
+      }else if(ratio >= (thresholds[0] || 0.8)){
+        key = 'near-limit';
+        label = 'Near Limit';
+      }
+      return {
+        key,
+        label,
+        categoryId,
+        amount,
+        spent,
+        remaining,
+        usageRatio: ratio,
+        usagePercent: amount > 0 ? Math.round(ratio * 100) : 0
+      };
+    }
+
+    function summarizeBudgetUsageForMonth(monthKey){ // --NEW
+      const items = getBudgetsByMonth(monthKey).map(budget => ({ budget, status: getBudgetStatus(budget) }));
+      const totalBudget = round2(items.reduce((sum, item) => sum + item.status.amount, 0));
+      const totalSpent = round2(items.reduce((sum, item) => sum + item.status.spent, 0));
+      return {
+        monthKey,
+        items,
+        totalBudget,
+        totalSpent,
+        totalRemaining: round2(totalBudget - totalSpent),
+        nearLimitCount: items.filter(item => item.status.key === 'near-limit').length,
+        overBudgetCount: items.filter(item => item.status.key === 'over-budget').length
+      };
+    }
+
+    function getGoalProgress(goal){ // --NEW
+      const targetAmount = round2(Number(goal?.targetAmount || 0));
+      const currentAmount = round2(Math.max(0, Number(goal?.currentAmount || 0)));
+      const ratio = targetAmount > 0 ? currentAmount / targetAmount : 0;
+      return {
+        targetAmount,
+        currentAmount,
+        ratio,
+        percent: targetAmount > 0 ? Math.min(100, Math.round(ratio * 100)) : 0,
+        isCompleted: targetAmount > 0 && currentAmount >= targetAmount
+      };
+    }
+
+    function getGoalRemaining(goal){ // --NEW
+      const progress = getGoalProgress(goal);
+      return round2(Math.max(0, progress.targetAmount - progress.currentAmount));
+    }
+
+    function getGoalDisplayStatus(goal){
+      const progress = getGoalProgress(goal);
+      if(progress.isCompleted) return 'completed';
+      return normalizeEnumValue(goal?.status, GOAL_STATUSES, 'active') === 'paused' ? 'paused' : 'active';
+    }
+
+    function getGoalStatusLabel(status){
+      if(status === 'completed') return 'Completed';
+      if(status === 'paused') return 'Paused';
+      return 'Active';
+    }
+
+    function getGoalStatusClass(status){
+      return status === 'completed' ? 'completed' : (status === 'paused' ? 'paused' : 'active');
+    }
+
+    function renderMonthlySoftInsights(monthKey){ // --NEW
+      if(!monthlySoftInsightContainer) return;
+      const budgetSummary = summarizeBudgetUsageForMonth(monthKey);
+      const items = [];
+      budgetSummary.items.forEach(({ status }) => {
+        const categoryLabel = formatCategoryLabel(status.categoryId);
+        if(status.key === 'over-budget'){
+          items.push({
+            tone: 'danger',
+            text: `หมวด${categoryLabel}เกินงบแล้ว ${formatMoney(Math.abs(status.remaining))}`
+          });
+        }else if(status.key === 'near-limit'){
+          items.push({
+            tone: 'warning',
+            text: `หมวด${categoryLabel}ใช้ไปแล้ว ${status.usagePercent}% ของงบเดือนนี้`
+          });
+        }
+      });
+      normalizeData(appData).goals.forEach(goal => {
+        const progress = getGoalProgress(goal);
+        if(progress.isCompleted){
+          items.push({
+            tone: 'success',
+            text: `Goal ${goal.name}ครบแล้ว`
+          });
+        }
+      });
+      monthlySoftInsightContainer.innerHTML = items.length
+        ? items.map(item => `<div class="soft-insight-item ${item.tone}">${escapeHtml(item.text)}</div>`).join('')
+        : '<div class="empty">เดือนนี้ยังไม่มีสัญญาณ budget หรือ goal ที่ต้องจับตา</div>';
+    }
+
+    function renderMonthlyBudgetSection(monthKey){ // --NEW
+      if(!monthlyBudgetContainer) return;
+      const summary = summarizeBudgetUsageForMonth(monthKey);
+      const cards = summary.items;
+      if(monthlyBudgetSummary){
+        monthlyBudgetSummary.textContent = `${formatMonthThai(monthKey)} · ${cards.length} budget`;
+      }
+      if(!cards.length){
+        monthlyBudgetContainer.innerHTML = `
+          <div class="budget-empty-state">
+            <div class="empty">ยังไม่มี budget สำหรับเดือนนี้</div>
+          </div>
+        `;
+        return;
+      }
+      monthlyBudgetContainer.innerHTML = `
+        <div class="mini-summary-grid">
+          <div class="mini-summary-card balance-soft">
+            <div class="label">Budget รวม</div>
+            <div class="value">${formatMoney(summary.totalBudget)}</div>
+          </div>
+          <div class="mini-summary-card expense-soft">
+            <div class="label">ใช้ไปแล้ว</div>
+            <div class="value">${formatMoney(summary.totalSpent)}</div>
+          </div>
+          <div class="mini-summary-card ${summary.totalRemaining < 0 ? 'expense-soft' : 'income-soft'}">
+            <div class="label">คงเหลือ</div>
+            <div class="value">${formatMoney(summary.totalRemaining)}</div>
+          </div>
+        </div>
+        <div class="budget-list">
+          ${cards.map(({ budget, status }) => {
+            const width = Math.min(100, Math.max(0, status.usagePercent));
+            return `
+              <div class="budget-card ${status.key === 'near-limit' ? 'is-near-limit' : status.key === 'over-budget' ? 'is-over-budget' : ''}">
+                <div class="budget-card-head">
+                  <div class="budget-card-title">
+                    <h4>${escapeHtml(formatCategoryLabel(status.categoryId))}</h4>
+                    <div class="meta">${escapeHtml(budget.note || 'Budget รายเดือนแบบเบา ๆ')}</div>
+                  </div>
+                  <div class="small-actions">
+                    <span class="status-pill ${status.key}">${escapeHtml(status.label)}</span>
+                    <button class="btn-light btn-sm" onclick="editBudget('${escapeHtml(budget.id)}')">แก้ไข</button>
+                    <button class="btn-danger btn-sm" onclick="deleteBudget('${escapeHtml(budget.id)}')">ลบ</button>
+                  </div>
+                </div>
+                <div class="budget-stat-grid">
+                  <div class="budget-stat">
+                    <div class="label">Budget</div>
+                    <div class="value">${formatMoney(status.amount)}</div>
+                  </div>
+                  <div class="budget-stat">
+                    <div class="label">Actual</div>
+                    <div class="value">${formatMoney(status.spent)}</div>
+                  </div>
+                  <div class="budget-stat">
+                    <div class="label">Remaining</div>
+                    <div class="value ${status.remaining < 0 ? 'budget-negative' : ''}">${formatMoney(status.remaining)}</div>
+                  </div>
+                </div>
+                <div class="budget-progress-row">
+                  <div class="budget-progress-meta">
+                    <span>ใช้ไป ${status.usagePercent}%</span>
+                    <span>${escapeHtml(formatMonthThai(monthKey))}</span>
+                  </div>
+                  <div class="progress budget-progress-bar"><div class="${status.key}" style="width:${width}%"></div></div>
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      `;
+    }
+
+    function renderMonthlyGoalSection(){ // --NEW
+      if(!monthlyGoalContainer) return;
+      const goals = normalizeData(appData).goals
+        .slice()
+        .sort((a, b) => String(a.name || '').localeCompare(String(b.name || ''), 'th') || String(a.id || '').localeCompare(String(b.id || '')));
+      if(!goals.length){
+        monthlyGoalContainer.innerHTML = '<div class="empty">ยังไม่มี goal ลองเพิ่มเป้าหมายที่อยากเก็บเงินไว้ก่อน</div>';
+        return;
+      }
+      monthlyGoalContainer.innerHTML = `
+        <div class="goal-list">
+          ${goals.map(goal => {
+            const progress = getGoalProgress(goal);
+            const displayStatus = getGoalDisplayStatus(goal);
+            const width = Math.min(100, Math.max(0, progress.percent));
+            const remaining = getGoalRemaining(goal);
+            return `
+              <div class="goal-card ${displayStatus === 'completed' ? 'is-completed' : displayStatus === 'paused' ? 'is-paused' : ''}">
+                <div class="goal-card-head">
+                  <div class="goal-card-title">
+                    <h4>${escapeHtml(goal.name)}</h4>
+                    <div class="meta">${goal.targetDate ? `เป้าหมาย ${escapeHtml(goal.targetDate)}` : 'ยังไม่ได้กำหนดวันเป้าหมาย'}</div>
+                  </div>
+                  <div class="small-actions">
+                    <span class="status-pill ${getGoalStatusClass(displayStatus)}">${escapeHtml(getGoalStatusLabel(displayStatus))}</span>
+                    <button class="btn-light btn-sm" onclick="quickUpdateGoalProgress('${escapeHtml(goal.id)}')">อัปเดตยอด</button>
+                    <button class="btn-light btn-sm" onclick="editGoal('${escapeHtml(goal.id)}')">แก้ไข</button>
+                    <button class="btn-danger btn-sm" onclick="deleteGoal('${escapeHtml(goal.id)}')">ลบ</button>
+                  </div>
+                </div>
+                <div class="goal-stat-grid">
+                  <div class="goal-stat">
+                    <div class="label">Target</div>
+                    <div class="value">${formatMoney(progress.targetAmount)}</div>
+                  </div>
+                  <div class="goal-stat">
+                    <div class="label">Current</div>
+                    <div class="value">${formatMoney(progress.currentAmount)}</div>
+                  </div>
+                  <div class="goal-stat">
+                    <div class="label">Remaining</div>
+                    <div class="value">${formatMoney(remaining)}</div>
+                  </div>
+                </div>
+                <div class="goal-progress-row">
+                  <div class="goal-progress-meta">
+                    <span>คืบหน้า ${progress.percent}%</span>
+                    <span>${goal.note ? escapeHtml(goal.note) : (displayStatus === 'completed' ? 'ครบแล้ว' : 'กำลังเก็บอยู่')}</span>
+                  </div>
+                  <div class="progress goal-progress-bar"><div class="${displayStatus}" style="width:${width}%"></div></div>
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      `;
     }
     function parseMonthlySmartKeyword(rawKeyword = ''){
       const raw = normalizeLooseText(rawKeyword);
@@ -4662,6 +5297,133 @@
       ` : '<div class="empty">ตอนนี้ยังไม่มีรายการเร่งด่วนในเดือนนี้</div>';
     }
 
+    function normalizeMonthlySubView(value){ // --NEW
+      return ['entries','summary','budget'].includes(value) ? value : 'entries';
+    }
+    function updateMonthlySubViewUi(){ // --NEW
+      const tabs = Array.from(document.querySelectorAll('[data-monthly-subview]'));
+      const panelMap = {
+        entries: $('monthlyTabEntries'),
+        summary: $('monthlyTabSummary'),
+        budget: $('monthlyTabBudget')
+      };
+      monthlySubView = normalizeMonthlySubView(monthlySubView);
+      tabs.forEach(button => {
+        const isActive = button.dataset.monthlySubview === monthlySubView;
+        button.classList.toggle('active', isActive);
+        button.setAttribute('aria-selected', isActive ? 'true' : 'false');
+        button.setAttribute('tabindex', isActive ? '0' : '-1');
+      });
+      Object.entries(panelMap).forEach(([view, panel]) => {
+        if(!panel) return;
+        const isActive = view === monthlySubView;
+        panel.classList.toggle('hidden', !isActive);
+        panel.setAttribute('aria-hidden', isActive ? 'false' : 'true');
+      });
+    }
+    function setMonthlySubView(view){ // --NEW
+      monthlySubView = normalizeMonthlySubView(view);
+      updateMonthlySubViewUi();
+    }
+    function setupMonthlySubViewLayout(){ // --NEW
+      const monthlyView = $('view-monthly');
+      if(!monthlyView || $('monthlySubViewBar')) return;
+
+      const monthlyHeaderPanel = rangeStartMonth?.closest('.panel.card');
+      const entryControlsBlock = monthlyHeaderPanel?.querySelector(':scope > .stack-grid');
+      const insightGrid = dailyDashboardContainer?.closest('.monthly-insight-grid');
+      const summaryPanel = monthlySummaryLabel?.closest('.panel.card');
+      const softInsightPanel = monthlySoftInsightContainer?.closest('.panel.card');
+      const budgetGrid = monthlyBudgetContainer?.closest('.monthly-budget-grid');
+      const recentPanel = recentEntriesContainer?.closest('.panel.card');
+      const managePanel = openEntryModalBtnSecondary?.closest('.panel.card');
+      const tablePanel = entriesContainer?.closest('.table-card.card');
+
+      if(!monthlyHeaderPanel || !entryControlsBlock || !insightGrid || !summaryPanel || !softInsightPanel || !budgetGrid || !recentPanel || !managePanel || !tablePanel) return;
+
+      const headerMeta = monthlyHeaderPanel.querySelector('.section-header .meta');
+      if(headerMeta) headerMeta.textContent = 'เลือกโหมดทำงานให้เหมาะกับสิ่งที่กำลังจะทำ';
+
+      const entryControlsPanel = document.createElement('div');
+      entryControlsPanel.id = 'monthlyEntryControlsPanel';
+      entryControlsPanel.className = 'panel card';
+      entryControlsPanel.innerHTML = `
+        <div class="section-header">
+          <div>
+            <h3>รายการประจำวัน</h3>
+            <div class="meta">เพิ่ม ค้นหา และกรองรายการได้ไวในจุดเดียว</div>
+          </div>
+        </div>
+      `;
+      entryControlsPanel.appendChild(entryControlsBlock);
+
+      const recentMeta = recentPanel.querySelector('.section-header .meta');
+      if(recentMeta) recentMeta.textContent = 'กดซ้ำจากรายการที่ใช้บ่อยได้ทันที';
+
+      const manageMeta = managePanel.querySelector('.section-header .meta');
+      if(manageMeta) manageMeta.textContent = 'เพิ่มใหม่หรือแก้ไขจากตารางด้านล่าง';
+      const manageNotice = managePanel.querySelector('.notice-box');
+      if(manageNotice){
+        manageNotice.className = 'monthly-helper-note';
+        manageNotice.innerHTML = 'กดเพิ่มรายการเพื่อสร้างรายการใหม่ และใช้ปุ่ม <strong>แก้ไข</strong> หรือ <strong>Duplicate</strong> จากตารางด้านล่างได้เลย';
+      }
+
+      const tableNotice = tablePanel.querySelector('.notice-box');
+      if(tableNotice){
+        tableNotice.className = 'monthly-table-note';
+        tableNotice.textContent = 'รายการที่ติดป้าย ยอดผ่อน หรือ ทริป จะเป็นแบบ readonly และแก้ไขได้จากหน้าต้นทาง';
+      }
+
+      const summaryMeta = insightGrid.querySelector('.panel.card .section-header .meta');
+      if(summaryMeta) summaryMeta.textContent = 'ดูภาพรวมวันนี้ได้ทันที';
+      const actionMeta = actionNeededContainer?.closest('.panel.card')?.querySelector('.section-header .meta');
+      if(actionMeta) actionMeta.textContent = 'รายการที่ควรตามต่อในเดือนนี้';
+      const softInsightMeta = softInsightPanel.querySelector('.section-header .meta');
+      if(softInsightMeta) softInsightMeta.textContent = 'สรุปสั้น ๆ จากงบและเป้าหมายของเดือนนี้';
+      const goalMeta = monthlyGoalContainer?.closest('.panel.card')?.querySelector('.section-header .meta');
+      if(goalMeta) goalMeta.textContent = 'จัดระดับเป้าหมายและอัปเดตยอดได้เลย';
+
+      const subnavWrap = document.createElement('div');
+      subnavWrap.id = 'monthlySubViewBar';
+      subnavWrap.className = 'monthly-subnav-wrap';
+      subnavWrap.innerHTML = `
+        <div class="monthly-subnav" role="tablist" aria-label="Monthly sub navigation">
+          <button id="monthlyEntriesTabBtn" class="monthly-subtab active" type="button" role="tab" aria-selected="true" aria-controls="monthlyTabEntries" data-monthly-subview="entries">รายการ</button>
+          <button id="monthlySummaryTabBtn" class="monthly-subtab" type="button" role="tab" aria-selected="false" aria-controls="monthlyTabSummary" data-monthly-subview="summary">สรุป</button>
+          <button id="monthlyBudgetTabBtn" class="monthly-subtab" type="button" role="tab" aria-selected="false" aria-controls="monthlyTabBudget" data-monthly-subview="budget">Budget / Goal</button>
+        </div>
+      `;
+
+      const entriesPanel = document.createElement('div');
+      entriesPanel.id = 'monthlyTabEntries';
+      entriesPanel.className = 'monthly-subpanel';
+      entriesPanel.setAttribute('role', 'tabpanel');
+      entriesPanel.setAttribute('aria-labelledby', 'monthlyEntriesTabBtn');
+
+      const summaryPanelWrap = document.createElement('div');
+      summaryPanelWrap.id = 'monthlyTabSummary';
+      summaryPanelWrap.className = 'monthly-subpanel hidden';
+      summaryPanelWrap.setAttribute('role', 'tabpanel');
+      summaryPanelWrap.setAttribute('aria-labelledby', 'monthlySummaryTabBtn');
+
+      const budgetPanelWrap = document.createElement('div');
+      budgetPanelWrap.id = 'monthlyTabBudget';
+      budgetPanelWrap.className = 'monthly-subpanel hidden';
+      budgetPanelWrap.setAttribute('role', 'tabpanel');
+      budgetPanelWrap.setAttribute('aria-labelledby', 'monthlyBudgetTabBtn');
+
+      const workspaceGrid = document.createElement('div');
+      workspaceGrid.className = 'monthly-workspace-grid';
+      workspaceGrid.append(recentPanel, managePanel);
+
+      entriesPanel.append(entryControlsPanel, workspaceGrid, tablePanel);
+      summaryPanelWrap.append(insightGrid, summaryPanel, softInsightPanel);
+      budgetPanelWrap.append(budgetGrid);
+
+      monthlyView.append(subnavWrap, entriesPanel, summaryPanelWrap, budgetPanelWrap);
+      updateMonthlySubViewUi();
+    }
+
     function renderMonthly(){
       const start = rangeStartMonth.value;
       const end = rangeEndMonth.value;
@@ -4688,6 +5450,9 @@
       renderDailyDashboard();
       renderActionNeeded();
       renderMonthlyQuickFilterChips(allItems);
+      renderMonthlySoftInsights(fixedStart); // --NEW
+      renderMonthlyBudgetSection(fixedStart); // --NEW
+      renderMonthlyGoalSection(); // --NEW
 
       monthlySummaryLabel.textContent = `${formatMonthThai(fixedStart)} - ${formatMonthThai(fixedEnd)}`;
       monthlyIncomeTotal.textContent = formatMoney(sum.income);
@@ -4701,6 +5466,7 @@
       monthlyActiveFilterLabel.textContent = getActiveMonthlyFilterText();
       entryCountLabel.textContent = `ทั้งหมด ${sum.count} รายการ ใน ${months.length} เดือน`;
 
+      updateMonthlySubViewUi(); // --NEW
       if(!allItems.length){
         entriesContainer.innerHTML = '<div class="empty">ยังไม่มีรายการที่ตรงกับช่วงเดือนและตัวกรองที่เลือก</div>';
         return;
@@ -5472,6 +6238,7 @@
       document.querySelectorAll('.view').forEach(el => el.classList.add('hidden'));
       document.getElementById(`view-${currentView}`).classList.remove('hidden');
       document.querySelectorAll('.menu-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.view === currentView));
+      updateMonthlySubViewUi(); // --NEW
       updateBackButtons();
     }
 
@@ -5519,6 +6286,22 @@
 
     function closeEntryModal(){
       setModalOpen(entryModal, false);
+    }
+
+    function openBudgetModal(){ // --NEW
+      setModalOpen(budgetModal, true);
+    }
+
+    function closeBudgetModal(){ // --NEW
+      setModalOpen(budgetModal, false);
+    }
+
+    function openGoalModal(){ // --NEW
+      setModalOpen(goalModal, true);
+    }
+
+    function closeGoalModal(){ // --NEW
+      setModalOpen(goalModal, false);
     }
 
     function openLoanModal(){
@@ -5627,7 +6410,7 @@
     }
 
     function syncAllPickerValues(){
-      [entryDate, rangeStartMonth, rangeEndMonth, loanStartMonth, loanFilterStartMonth, loanFilterEndMonth, tripStartDate, tripEndDate, tripItemDate]
+      [entryDate, rangeStartMonth, rangeEndMonth, budgetMonth, loanStartMonth, loanFilterStartMonth, loanFilterEndMonth, tripStartDate, tripEndDate, tripItemDate] // --CHANGED
         .forEach(syncPickerValue);
     }
 
@@ -5636,6 +6419,7 @@
       createPicker(entryDate, 'date');
       createPicker(rangeStartMonth, 'month');
       createPicker(rangeEndMonth, 'month');
+      createPicker(budgetMonth, 'month'); // --NEW
       createPicker(loanStartMonth, 'month');
       createPicker(loanFilterStartMonth, 'month');
       createPicker(loanFilterEndMonth, 'month');
@@ -5677,6 +6461,64 @@
         header.appendChild(toggle);
         card.dataset.collapsibleReady = '1';
       });
+    }
+
+    function clearBudgetForm(){ // --NEW
+      editingBudgetId = null;
+      budgetFormTitle.textContent = DEFAULT_BUDGET_FORM_TITLE;
+      budgetEditBadge.classList.add('hidden');
+      saveBudgetBtn.textContent = DEFAULT_SAVE_BUDGET_TEXT;
+      budgetMonth.value = getBudgetFocusMonthKey();
+      budgetCategory.value = CATEGORY_OPTIONS.includes(DEFAULT_CATEGORY_ID) ? DEFAULT_CATEGORY_ID : (CATEGORY_OPTIONS[0] || '');
+      budgetAmount.value = '';
+      budgetNote.value = '';
+      syncPickerValue(budgetMonth);
+      refreshAllEnhancedSelects();
+    }
+
+    function fillBudgetForm(item){ // --NEW
+      const budget = normalizeBudgetRecord(item);
+      editingBudgetId = budget.id;
+      budgetFormTitle.textContent = '✏️ แก้ไข Budget รายเดือน';
+      budgetEditBadge.classList.remove('hidden');
+      saveBudgetBtn.textContent = '💾 บันทึกการแก้ไข';
+      budgetMonth.value = budget.month || getBudgetFocusMonthKey();
+      budgetCategory.value = budget.categoryId || DEFAULT_CATEGORY_ID;
+      budgetAmount.value = budget.amount;
+      budgetNote.value = budget.note || '';
+      syncPickerValue(budgetMonth);
+      refreshAllEnhancedSelects();
+    }
+
+    function clearGoalForm(){ // --NEW
+      editingGoalId = null;
+      goalFormTitle.textContent = DEFAULT_GOAL_FORM_TITLE;
+      goalEditBadge.classList.add('hidden');
+      saveGoalBtn.textContent = DEFAULT_SAVE_GOAL_TEXT;
+      goalName.value = '';
+      goalTargetAmount.value = '';
+      goalCurrentAmount.value = '';
+      goalTargetDate.value = '';
+      goalStatus.value = 'active';
+      goalNote.value = '';
+      syncPickerValue(goalTargetDate);
+      refreshAllEnhancedSelects();
+    }
+
+    function fillGoalForm(item){ // --NEW
+      const goal = normalizeGoalRecord(item);
+      editingGoalId = goal.id;
+      goalFormTitle.textContent = '✏️ แก้ไข Goal';
+      goalEditBadge.classList.remove('hidden');
+      saveGoalBtn.textContent = '💾 บันทึกการแก้ไข';
+      goalName.value = goal.name || '';
+      goalTargetAmount.value = goal.targetAmount || '';
+      goalCurrentAmount.value = goal.currentAmount == null ? '' : goal.currentAmount;
+      goalTargetDate.value = goal.targetDate || '';
+      goalStatus.value = normalizeEnumValue(goal.status, GOAL_STATUSES, 'active');
+      goalNote.value = goal.note || '';
+      syncPickerValue(goalTargetDate);
+      refreshAllEnhancedSelects();
     }
 
     function clearEntryForm(){
@@ -5817,6 +6659,82 @@
 
       clearEntryForm();
       closeEntryModal();
+      renderAll();
+    }
+
+    function addOrUpdateBudget(){ // --NEW
+      if(!budgetMonth.value || !budgetCategory.value || budgetAmount.value === ''){
+        alert('กรุณากรอกเดือน หมวดหมู่ และงบประมาณ');
+        return;
+      }
+      if(Number(budgetAmount.value) <= 0){
+        alert('งบประมาณต้องมากกว่า 0');
+        return;
+      }
+      const existingByMonthCategory = appData.budgets.find(item =>
+        item.month === budgetMonth.value
+        && item.categoryId === budgetCategory.value
+        && item.id !== editingBudgetId);
+      const existingEditingBudget = editingBudgetId ? appData.budgets.find(item => item.id === editingBudgetId) : null;
+      const targetBudget = existingByMonthCategory || existingEditingBudget || null;
+      const payload = normalizeBudgetRecord({
+        id: targetBudget?.id || editingBudgetId || crypto.randomUUID(),
+        name: budgetCategory.value,
+        month: budgetMonth.value,
+        categoryId: budgetCategory.value,
+        amount: Number(budgetAmount.value),
+        note: budgetNote.value.trim(),
+        alertThresholds: targetBudget?.alertThresholds || [0.8, 1],
+        enabled: targetBudget?.enabled !== false,
+        createdAt: targetBudget?.createdAt || createIsoTimestamp(),
+        updatedAt: createIsoTimestamp()
+      });
+
+      appData.budgets = appData.budgets.filter(item => item.id !== payload.id);
+      if(existingByMonthCategory && editingBudgetId && editingBudgetId !== existingByMonthCategory.id){
+        appData.budgets = appData.budgets.filter(item => item.id !== editingBudgetId);
+      }
+      appData.budgets.push(payload);
+      appData.budgets = normalizeData(appData).budgets;
+      rangeStartMonth.value = payload.month;
+      rangeEndMonth.value = payload.month;
+      syncPickerValue(rangeStartMonth);
+      syncPickerValue(rangeEndMonth);
+      clearBudgetForm();
+      closeBudgetModal();
+      renderAll();
+    }
+
+    function addOrUpdateGoal(){ // --NEW
+      if(!goalName.value.trim() || goalTargetAmount.value === ''){
+        alert('กรุณากรอกชื่อ goal และยอดเป้าหมาย');
+        return;
+      }
+      if(Number(goalTargetAmount.value) <= 0){
+        alert('ยอดเป้าหมายต้องมากกว่า 0');
+        return;
+      }
+      const existingGoal = editingGoalId ? appData.goals.find(item => item.id === editingGoalId) : null;
+      const payload = normalizeGoalRecord({
+        id: editingGoalId || crypto.randomUUID(),
+        name: goalName.value.trim(),
+        type: 'savings',
+        targetAmount: Number(goalTargetAmount.value),
+        currentAmount: goalCurrentAmount.value === '' ? null : Number(goalCurrentAmount.value),
+        targetDate: goalTargetDate.value || null,
+        status: goalStatus.value || 'active',
+        note: goalNote.value.trim(),
+        createdAt: existingGoal?.createdAt || createIsoTimestamp(),
+        updatedAt: createIsoTimestamp()
+      });
+      if(editingGoalId){
+        appData.goals = appData.goals.map(item => item.id === editingGoalId ? payload : item);
+      }else{
+        appData.goals.push(payload);
+      }
+      appData.goals = normalizeData(appData).goals;
+      clearGoalForm();
+      closeGoalModal();
       renderAll();
     }
 
@@ -6141,6 +7059,56 @@
       renderAll();
     };
 
+    window.editBudget = function(id){ // --NEW
+      const item = appData.budgets.find(x => x.id === id);
+      if(!item) return;
+      currentView = 'monthly';
+      updateView();
+      fillBudgetForm(item);
+      openBudgetModal();
+    };
+
+    window.deleteBudget = function(id){ // --NEW
+      if(!confirm('ลบ budget นี้ใช่ไหม?')) return;
+      appData.budgets = appData.budgets.filter(x => x.id !== id);
+      if(editingBudgetId === id) clearBudgetForm();
+      renderAll();
+    };
+
+    window.editGoal = function(id){ // --NEW
+      const item = appData.goals.find(x => x.id === id);
+      if(!item) return;
+      currentView = 'monthly';
+      updateView();
+      fillGoalForm(item);
+      openGoalModal();
+    };
+
+    window.deleteGoal = function(id){ // --NEW
+      if(!confirm('ลบ goal นี้ใช่ไหม?')) return;
+      appData.goals = appData.goals.filter(x => x.id !== id);
+      if(editingGoalId === id) clearGoalForm();
+      renderAll();
+    };
+
+    window.quickUpdateGoalProgress = function(id){ // --NEW
+      const goal = appData.goals.find(x => x.id === id);
+      if(!goal) return;
+      const nextValue = prompt(`อัปเดตยอดปัจจุบันของ ${goal.name}`, String(goal.currentAmount == null ? 0 : goal.currentAmount));
+      if(nextValue == null) return;
+      const amount = Number(nextValue);
+      if(!Number.isFinite(amount) || amount < 0){
+        alert('ยอดปัจจุบันต้องเป็นตัวเลขตั้งแต่ 0 ขึ้นไป');
+        return;
+      }
+      appData.goals = appData.goals.map(item => item.id === id ? normalizeGoalRecord({
+        ...item,
+        currentAmount: amount,
+        updatedAt: createIsoTimestamp()
+      }) : item);
+      renderAll();
+    };
+
     window.goToInstallments = function(id, monthKey = ''){
       applyInstallmentNavigation(id, { monthKey });
     };
@@ -6317,12 +7285,15 @@
     }
 
     async function boot(){
+      setupMonthlySubViewLayout(); // --NEW
       bindEvents();
       syncResponsiveMenu();
       initializeEnhancedSelects();
       populateCategoryDropdowns();
 
       clearEntryForm();
+      clearBudgetForm(); // --NEW
+      clearGoalForm(); // --NEW
       clearLoanForm();
       clearTripForm();
       clearTripItemForm();
@@ -6439,9 +7410,14 @@
       bind(quickAddSubmitBtn, 'click', submitQuickAdd);
       bind(resetMonthlyFiltersBtn, 'click', resetMonthlyFilters);
       [backFromMonthlyBtn, backFromTripsBtn, backFromInstallmentsBtn, floatingBackBtn].forEach(button => bind(button, 'click', goBackToPreviousView));
+      document.querySelectorAll('[data-monthly-subview]').forEach(button => bind(button, 'click', () => setMonthlySubView(button.dataset.monthlySubview))); // --NEW
 
       bindModalTrigger([openEntryModalBtn, openEntryModalBtnSecondary], clearEntryForm, openEntryModal);
       bindModalDismiss(entryModal, closeEntryModalBtn, closeEntryModal);
+      bindModalTrigger([openBudgetModalBtn], clearBudgetForm, openBudgetModal); // --NEW
+      bindModalDismiss(budgetModal, closeBudgetModalBtn, closeBudgetModal); // --NEW
+      bindModalTrigger([openGoalModalBtn], clearGoalForm, openGoalModal); // --NEW
+      bindModalDismiss(goalModal, closeGoalModalBtn, closeGoalModal); // --NEW
       bindModalTrigger([openLoanModalBtn], clearLoanForm, openLoanModal);
       bindModalDismiss(loanModal, closeLoanModalBtn, closeLoanModal);
       bindModalTrigger([openTripModalBtn], clearTripForm, openTripModal);
@@ -6462,9 +7438,25 @@
         e.preventDefault();
         addOrUpdateEntry();
       });
+      bind(budgetModal, 'keydown', (e) => { // --NEW
+        if(e.key !== 'Enter' || e.defaultPrevented) return;
+        if(e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT' || e.target.closest('button')) return;
+        e.preventDefault();
+        addOrUpdateBudget();
+      });
+      bind(goalModal, 'keydown', (e) => { // --NEW
+        if(e.key !== 'Enter' || e.defaultPrevented) return;
+        if(e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT' || e.target.closest('button')) return;
+        e.preventDefault();
+        addOrUpdateGoal();
+      });
 
       bind(saveEntryBtn, 'click', addOrUpdateEntry);
       bind(clearEntryBtn, 'click', clearEntryForm);
+      bind(saveBudgetBtn, 'click', addOrUpdateBudget); // --NEW
+      bind(clearBudgetBtn, 'click', clearBudgetForm); // --NEW
+      bind(saveGoalBtn, 'click', addOrUpdateGoal); // --NEW
+      bind(clearGoalBtn, 'click', clearGoalForm); // --NEW
       bind(saveLoanBtn, 'click', addOrUpdateInstallment);
       bind(clearLoanBtn, 'click', clearLoanForm);
       bind(saveTripBtn, 'click', addOrUpdateTrip);
@@ -6507,6 +7499,8 @@
       bind(document, 'keydown', (e) => {
         if(e.key !== 'Escape') return;
         if(!entryModal.classList.contains('hidden')) closeEntryModal();
+        if(!budgetModal.classList.contains('hidden')) closeBudgetModal(); // --NEW
+        if(!goalModal.classList.contains('hidden')) closeGoalModal(); // --NEW
         if(!loanModal.classList.contains('hidden')) closeLoanModal();
         if(!tripModal.classList.contains('hidden')) closeTripModal();
         if(!tripItemModal.classList.contains('hidden')) closeTripItemModal();
