@@ -2250,10 +2250,6 @@
   <script src="https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/11.7.1/firebase-app-check-compat.js"></script>
   <script>
-    const DB_NAME = 'finance_tracker_db';
-    const DB_VERSION = 1;
-    const DB_STORE_NAME = 'app_state';
-    const DB_RECORD_KEY = 'primary';
     const firebaseConfig = {
         apiKey: "AIzaSyBRh2xp1ZkBBoThN1QuwkFqkTddxoCfk1Y",
         authDomain: "finance-tracker-game-bf874.firebaseapp.com",
@@ -2309,7 +2305,6 @@
 
     let appData = { entries: [], installments: [], trips: [], budgets: [], goals: [] }; // --CHANGED
     let currentView = 'monthly';
-    let databasePromise = null;
     let loadedFileName = '';
     let lastImportAt = '';
     let editingEntryId = null;
@@ -2637,55 +2632,6 @@
       const name = String(category || 'อื่นๆ').trim() || 'อื่นๆ';
       return `${getCategoryIcon(name)} ${name}`;
     }
-    function openAppDatabase(){
-      if(databasePromise) return databasePromise;
-      databasePromise = new Promise((resolve, reject) => {
-        const request = indexedDB.open(DB_NAME, DB_VERSION);
-        request.onupgradeneeded = () => {
-          const db = request.result;
-          if(!db.objectStoreNames.contains(DB_STORE_NAME)){
-            db.createObjectStore(DB_STORE_NAME);
-          }
-        };
-        request.onsuccess = () => resolve(request.result);
-        request.onerror = () => reject(request.error || new Error('IndexedDB open failed'));
-      });
-      return databasePromise;
-    }
-
-    async function readAppDataFromDb(recordKey = DB_RECORD_KEY){
-      const db = await openAppDatabase();
-      return await new Promise((resolve, reject) => {
-        const tx = db.transaction(DB_STORE_NAME, 'readonly');
-        const request = tx.objectStore(DB_STORE_NAME).get(recordKey);
-        request.onsuccess = () => resolve(request.result || null);
-        request.onerror = () => reject(request.error || new Error('IndexedDB read failed'));
-      });
-    }
-
-    async function writeAppDataToDb(data, meta = {}, recordKey = getLocalCacheKey()){
-      const db = await openAppDatabase();
-      const normalizedV2Data = ensureV2Data(data, {
-        updatedAt: createIsoTimestamp()
-      });
-      const payload = {
-        data: normalizedV2Data,
-        meta: {
-          loadedFileName: meta.loadedFileName ?? loadedFileName,
-          lastImportAt: meta.lastImportAt ?? lastImportAt,
-          updatedAt: normalizedV2Data.meta.updatedAt
-        }
-      };
-      await new Promise((resolve, reject) => {
-        const tx = db.transaction(DB_STORE_NAME, 'readwrite');
-        tx.oncomplete = () => resolve();
-        tx.onerror = () => reject(tx.error || new Error('IndexedDB write failed'));
-        tx.objectStore(DB_STORE_NAME).put(payload, recordKey);
-      });
-      loadedFileName = payload.meta.loadedFileName || '';
-      lastImportAt = payload.meta.lastImportAt || '';
-    }
-
     function normalizeData(parsed){
       return {
         entries: Array.isArray(parsed.entries) ? parsed.entries.map(x => ({
@@ -3631,10 +3577,6 @@
       };
     }
 
-    function getLocalCacheKey(uid = currentUser?.uid){
-      return uid ? `${DB_RECORD_KEY}:${uid}` : DB_RECORD_KEY;
-    }
-
     function isFirebaseConfigReady(){
       return Object.values(firebaseConfig).every(value => String(value || '').trim() && !String(value).includes('TODO'));
     }
@@ -3755,12 +3697,6 @@
       return payload;
     }
 
-    async function getBestLocalSeedState(uid){
-      const userCache = await readAppDataFromDb(getLocalCacheKey(uid));
-      if(userCache?.data) return userCache;
-      return await readAppDataFromDb(DB_RECORD_KEY);
-    }
-
     function initializeFirebaseServices() {
       if (typeof firebase === 'undefined') {
         setAuthError('โหลดระบบเข้าสู่ระบบไม่สำเร็จ');
@@ -3791,11 +3727,11 @@
       return true;
     }
 
-    async function createDefaultUserDocIfMissing(uid, seedData = getEmptyAppDataV2()){
+    async function createDefaultUserDocIfMissing(uid){
       const metaRef = getUserFinanceItemDocRef(uid, FIRESTORE_V2_COLLECTIONS.meta, FIRESTORE_V2_META_DOC_ID);
       const snapshot = await metaRef.get();
       if(snapshot.exists) return snapshot.data();
-      const safeData = ensureV2Data(seedData || getEmptyAppDataV2(), {
+      const safeData = ensureV2Data(getEmptyAppDataV2(), {
         updatedAt: createIsoTimestamp()
       });
       await writeUserDataToCloudV2(uid, safeData);
@@ -3977,9 +3913,8 @@
       setAuthError('');
       setSaveStatus('idle');
       setAuthBusy(true, 'กำลังโหลดข้อมูล...');
-      const localSeedState = await getBestLocalSeedState(user.uid);
       try{
-        await createDefaultUserDocIfMissing(user.uid, localSeedState?.data || getEmptyAppDataV2());
+        await createDefaultUserDocIfMissing(user.uid);
         isApplyingCloudState = true;
         await loadUserDataFromCloud(user.uid);
         enterApp();
@@ -3987,8 +3922,9 @@
         setAuthStatus('เข้าสู่ระบบแล้ว');
       }catch(error){
         console.error(error);
-        appData = buildCurrentAppDataFromV2(localSeedState?.data || getEmptyAppDataV2());
-        lastPersistedDataFingerprint = getV2DataFingerprint(localSeedState?.data || getEmptyAppDataV2());
+        const fallbackV2Data = ensureV2Data(appData, { updatedAt: createIsoTimestamp() });
+        appData = buildCurrentAppDataFromV2(fallbackV2Data || getEmptyAppDataV2());
+        lastPersistedDataFingerprint = getV2DataFingerprint(fallbackV2Data || getEmptyAppDataV2());
         isApplyingCloudState = true;
         enterApp();
         setSaveStatus('idle');
@@ -7571,10 +7507,6 @@
       loadedFileName = fileName || '';
       lastImportAt = createIsoTimestamp();
       lastPersistedDataFingerprint = getV2DataFingerprint(importedData);
-      await writeAppDataToDb(importedData, {
-        loadedFileName,
-        lastImportAt
-      }, getLocalCacheKey());
       if(currentUser && firestoreDb){
         lastCloudSavedFingerprint = '';
         try{
@@ -8007,15 +7939,12 @@
     };
 
     function persistCurrentData(meta = {}){
+      if(meta.loadedFileName !== undefined) loadedFileName = meta.loadedFileName || '';
+      if(meta.lastImportAt !== undefined) lastImportAt = meta.lastImportAt || '';
       const v2Data = ensureV2Data(appData, { updatedAt: createIsoTimestamp() });
       const fingerprint = getV2DataFingerprint(v2Data);
-      const hasMetaOnlyChanges = meta.loadedFileName !== undefined || meta.lastImportAt !== undefined;
-      if(!hasMetaOnlyChanges && fingerprint === lastPersistedDataFingerprint) return;
+      if(fingerprint === lastPersistedDataFingerprint) return;
       lastPersistedDataFingerprint = fingerprint;
-      writeAppDataToDb(v2Data, meta, getLocalCacheKey()).catch(error => {
-        console.error(error);
-        alert('บันทึกข้อมูลในอุปกรณ์นี้ไม่สำเร็จ');
-      });
       scheduleCloudSave();
     }
 
