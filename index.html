@@ -2388,11 +2388,9 @@
   <div id="welcomeScreen" class="welcome">
     <div class="welcome-box card">
       <h1>ระบบรายรับ – รายจ่าย</h1>
-      <p>โหลดไฟล์ JSON เดิม หรือสร้างไฟล์ใหม่ จากนั้นจัดการรายรับ รายจ่าย ภาพรวมทั้งปี และยอดผ่อนในไฟล์เดียว</p>
       <div class="action-tile auth-card">
         <div>
           <h3>เข้าสู่ระบบ</h3>
-          <p>ลงชื่อเข้าใช้ด้วย Email และ Password เพื่อใช้งานข้อมูลของคุณ</p>
         </div>
         <div class="form-grid auth-grid">
           <div>
@@ -2404,9 +2402,9 @@
             <input type="password" id="authPassword" placeholder="Password" autocomplete="current-password">
           </div>
           <div class="full auth-actions">
+		    <button id="resetPasswordBtn" class="auth-link-btn" type="button">ลืมรหัสผ่าน?</button>
             <div class="small-actions">
               <button id="loginBtn" class="btn-primary" type="button">Login</button>
-              <button id="resetPasswordBtn" class="auth-link-btn" type="button">ลืมรหัสผ่าน?</button>
             </div>
             <div id="authStatus" class="auth-status">กรุณาเข้าสู่ระบบเพื่อใช้งาน</div>
           </div>
@@ -2956,19 +2954,19 @@
 
     <nav id="bottomNav" class="bottom-nav" aria-label="Primary navigation">
       <button class="bottom-nav-btn active" type="button" data-destination="home">
-        <span class="bottom-nav-icon" aria-hidden="true">⌂</span>
+        <span class="bottom-nav-icon" aria-hidden="true">🛖</span>
         <span class="bottom-nav-label">หน้าหลัก</span>
       </button>
       <button class="bottom-nav-btn" type="button" data-destination="entries">
-        <span class="bottom-nav-icon" aria-hidden="true">≡</span>
+        <span class="bottom-nav-icon" aria-hidden="true">📋</span>
         <span class="bottom-nav-label">รายการ</span>
       </button>
       <button class="bottom-nav-btn" type="button" data-destination="installments">
-        <span class="bottom-nav-icon" aria-hidden="true">◔</span>
+        <span class="bottom-nav-icon" aria-hidden="true">💸</span>
         <span class="bottom-nav-label">ผ่อน</span>
       </button>
       <button class="bottom-nav-btn" type="button" data-destination="trips">
-        <span class="bottom-nav-icon" aria-hidden="true">✈</span>
+        <span class="bottom-nav-icon" aria-hidden="true">✈️</span>
         <span class="bottom-nav-label">ทริป</span>
       </button>
       <button class="bottom-nav-btn" type="button" data-destination="more">
@@ -3065,7 +3063,7 @@
       <div class="modal-header">
         <div>
           <h3 id="loanFormTitle" style="margin:0">➕ เพิ่มยอดผ่อน</h3>
-          <div class="meta">กรอกข้อมูลยอดผ่อน ระบบจะคำนวณและบันทึกลงรายการหลักอัตโนมัติ</div>
+          <div class="meta">กรอกข้อมูลยอดผ่อน</div>
         </div>
         <div class="small-actions">
           <div id="loanEditBadge" class="badge hidden">✏️ กำลังแก้ไข</div>
@@ -8053,7 +8051,12 @@
       setResponsivePanelState(targetId, panel.classList.contains('is-collapsed'));
     }
     function syncResponsivePanels(){
-      ['monthlyFilterStack','tripFiltersPanel','installmentFiltersPanel'].forEach(targetId => setResponsivePanelState(targetId, false));
+      ['monthlyFilterStack','tripFiltersPanel','installmentFiltersPanel'].forEach(targetId => {
+        const panel = $(targetId);
+        if(!panel) return;
+        const shouldKeepOpenOnMobile = !panel.classList.contains('is-collapsed');
+        setResponsivePanelState(targetId, shouldKeepOpenOnMobile);
+      });
     }
     function openEntryModalForType(type){
       clearEntryForm();
