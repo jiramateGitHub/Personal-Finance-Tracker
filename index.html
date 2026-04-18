@@ -9,14 +9,18 @@
   <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root{
-      --bg:#eef3f8;
+      --bg:#f4f7fb;
       --card:#ffffff;
       --text:#0f172a;
-      --muted:#64748b;
-      --line:#dbe3ef;
+      --text-soft:#334155;
+      --muted:#5b6b82;
+      --line:#d7e2ef;
+      --line-strong:#c3d4e7;
       --primary:#2563eb;
+      --primary-strong:#1d4ed8;
       --primary-soft:#eff6ff;
-      --green:#16a34a;
+      --primary-softer:#f8fbff;
+      --green:#15803d;
       --green-soft:#f0fdf4;
       --red:#dc2626;
       --red-soft:#fff1f2;
@@ -25,9 +29,19 @@
       --violet:#7c3aed;
       --violet-soft:#f5f3ff;
       --shadow:0 12px 30px rgba(15,23,42,.08), 0 2px 8px rgba(15,23,42,.04);
+      --shadow-sm:0 8px 18px rgba(15,23,42,.06);
       --radius:18px;
       --radius-sm:12px;
       --radius-xs:10px;
+      --font-size-xs:12px;
+      --font-size-sm:13px;
+      --font-size-md:15px;
+      --font-size-base:16px;
+      --font-size-lg:18px;
+      --font-size-xl:20px;
+      --control-height:46px;
+      --button-height:46px;
+      --focus-ring:0 0 0 3px rgba(37,99,235,.12);
     }
     *{box-sizing:border-box}
     html{
@@ -39,9 +53,11 @@
     body{
       margin:0;
       font-family:'Sarabun',sans-serif;
+      font-size:var(--font-size-base);
       background:var(--bg);
       color:var(--text);
-      line-height:1.55;
+      line-height:1.6;
+      letter-spacing:.01em;
       width:100%;
       max-width:100%;
       overflow-x:hidden;
@@ -71,36 +87,42 @@
     .small-actions > *{min-width:0; max-width:100%}
     .small-actions button{width:auto}
     button{
-      border:none;
-      border-radius:12px;
+      border:1px solid transparent;
+      border-radius:14px;
+      min-height:var(--button-height);
       padding:11px 16px;
       font:inherit;
+      font-size:var(--font-size-md);
       font-weight:700;
+      line-height:1.25;
       cursor:pointer;
-      transition:.18s ease;
+      transition:background-color .18s ease,border-color .18s ease,color .18s ease,box-shadow .18s ease,transform .18s ease;
       max-width:100%;
     }
     button:hover{transform:translateY(-1px)}
+    button:focus-visible{outline:none; box-shadow:var(--focus-ring)}
     .btn-primary{
-      background:linear-gradient(180deg,#2563eb,#1d4ed8);
+      background:linear-gradient(180deg,var(--primary),var(--primary-strong));
       color:#fff;
+      border-color:rgba(29,78,216,.22);
       box-shadow:0 12px 24px rgba(37,99,235,.18);
     }
     .btn-light{
-      background:linear-gradient(180deg,#ffffff,#f8fbff);
-      color:var(--primary);
-      border:1px solid #bfd5ff;
-      box-shadow:0 8px 18px rgba(15,23,42,.05);
+      background:linear-gradient(180deg,#ffffff,var(--primary-softer));
+      color:var(--primary-strong);
+      border:1px solid var(--line-strong);
+      box-shadow:var(--shadow-sm);
     }
-    .btn-success{background:var(--green-soft); color:var(--green); border:1px solid #bbf7d0}
+    .btn-success{background:var(--green-soft); color:var(--green); border:1px solid #bbf7d0; box-shadow:var(--shadow-sm)}
     .btn-danger{
       background:linear-gradient(180deg,#fff1f2,#fff7f8);
       color:var(--red);
       border:1px solid #fecdd3;
+      box-shadow:var(--shadow-sm);
     }
-    .btn-dark{background:#0f172a; color:#fff}
-    .btn-ghost{background:rgba(255,255,255,.16); color:#fff; border:1px solid rgba(255,255,255,.25)}
-    .btn-sm{padding:9px 12px; font-size:13px; line-height:1.2}
+    .btn-dark{background:#0f172a; color:#fff; border-color:#0f172a; box-shadow:var(--shadow-sm)}
+    .btn-ghost{background:rgba(255,255,255,.16); color:#fff; border:1px solid rgba(255,255,255,.25); box-shadow:none}
+    .btn-sm{min-height:40px; padding:8px 12px; font-size:var(--font-size-sm); line-height:1.2}
     .hint{
       margin-top:12px; padding:12px 14px; background:#f8fbff; border:1px solid var(--line);
       border-radius:12px; color:var(--muted); font-size:13px
@@ -108,14 +130,14 @@
     .auth-card{display:grid; gap:16px; margin-bottom:18px}
     .auth-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
     .auth-actions{display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap}
-    .auth-status{font-size:13px; color:var(--muted)}
+    .auth-status{font-size:var(--font-size-sm); color:var(--muted)}
     .auth-link-btn{
       padding:0;
       border:none;
       background:transparent;
       color:var(--primary);
       font:inherit;
-      font-size:13px;
+      font-size:var(--font-size-sm);
       font-weight:700;
       cursor:pointer;
       text-decoration:underline;
@@ -162,7 +184,7 @@
     .header-title p{
       margin:4px 0 0;
       opacity:.88;
-      font-size:13px;
+      font-size:var(--font-size-sm);
       line-height:1.45;
     }
     .header-right{
@@ -224,7 +246,7 @@
     .panel,.form-card,.monthly-entry-panel{padding:20px}
     .section-header{display:flex; justify-content:space-between; align-items:flex-start; gap:12px; margin-bottom:14px; flex-wrap:wrap}
     .section-header h2,.section-header h3{margin:0; font-size:20px}
-    .meta{color:var(--muted); font-size:13px}
+    .meta{color:var(--muted); font-size:var(--font-size-sm); line-height:1.5}
     .toolbar-inline{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px}
     .stack-grid{display:grid; gap:16px}
     /* // --NEW */
@@ -277,7 +299,7 @@
       border:1px solid var(--line);
       background:#f8fbff;
       color:var(--muted);
-      font-size:13px;
+      font-size:var(--font-size-sm);
       line-height:1.5;
     }
     .monthly-table-note{
@@ -287,20 +309,20 @@
       border:1px solid var(--line);
       background:#f8fafc;
       color:var(--muted);
-      font-size:13px;
+      font-size:var(--font-size-sm);
     }
     .form-grid{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:14px}
     .form-grid .span-2{grid-column:span 2}
     .form-grid .full{grid-column:1 / -1}
     label{
-      display:block; margin-bottom:7px; font-size:12px; text-transform:uppercase; letter-spacing:.05em;
+      display:block; margin-bottom:7px; font-size:var(--font-size-xs); text-transform:uppercase; letter-spacing:.05em;
       color:var(--muted); font-weight:800
     }
     input,select,textarea{
-      width:100%; padding:11px 13px; border-radius:12px; border:1.5px solid var(--line);
-      font:inherit; color:var(--text); background:#fff; outline:none
+      width:100%; min-height:var(--control-height); padding:11px 13px; border-radius:14px; border:1.5px solid var(--line);
+      font:inherit; font-size:var(--font-size-base); color:var(--text); background:#fff; outline:none
     }
-    input:focus,select:focus,textarea:focus{border-color:var(--primary); box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+    input:focus,select:focus,textarea:focus{border-color:var(--primary); box-shadow:var(--focus-ring)}
     textarea{min-height:92px; resize:vertical}
     .summary-grid{
       display:flex;
@@ -334,10 +356,10 @@
       opacity:.95;
     }
     .summary-card .name{
-      font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:.05em; opacity:.78;
+      font-size:var(--font-size-xs); font-weight:800; text-transform:uppercase; letter-spacing:.05em; opacity:.9;
       padding-right:52px;
     }
-    .summary-card .value{font-size:25px; font-weight:800; padding-right:52px}
+    .summary-card .value{font-size:24px; font-weight:800; padding-right:52px; line-height:1.15}
     .income{background:var(--green-soft); border-color:#bbf7d0}
     .income .name,.income .value{color:var(--green)}
     .expense{background:var(--red-soft); border-color:#fecdd3}
@@ -407,8 +429,8 @@
       line-height:1.2
     }
     table{width:100%; border-collapse:collapse}
-    th,td{padding:11px 10px; border-bottom:1px solid var(--line); text-align:left; vertical-align:top}
-    th{font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); font-weight:800; background:#fbfdff}
+    th,td{padding:11px 10px; border-bottom:1px solid var(--line); text-align:left; vertical-align:top; font-size:var(--font-size-sm)}
+    th{font-size:var(--font-size-xs); text-transform:uppercase; letter-spacing:.06em; color:var(--muted); font-weight:800; background:#fbfdff}
     tr:last-child td{border-bottom:none}
     .amount-income{color:var(--green); font-weight:800}
     .amount-expense{color:var(--red); font-weight:800}
@@ -474,7 +496,7 @@
     }
     .calendar-list{display:grid; gap:7px}
     .calendar-item{
-      display:flex; justify-content:space-between; gap:8px; font-size:13px;
+      display:flex; justify-content:space-between; gap:8px; font-size:var(--font-size-sm);
       border-top:1px dashed #dbe7ff; padding-top:7px;
       background:#ffffffcc;
       border-radius:10px;
@@ -487,7 +509,7 @@
     .progress > div{height:100%; background:linear-gradient(90deg,#2563eb,#60a5fa)}
     .empty{padding:32px 18px; text-align:center; color:var(--muted); border:2px dashed var(--line); border-radius:16px; background:#fbfcfe}
     .notice-box{
-      padding:14px 16px; background:#f8fbff; border:1px solid #d7e7ff; border-radius:14px; color:#1e40af
+      padding:14px 16px; background:#f8fbff; border:1px solid #d7e7ff; border-radius:14px; color:#1e40af; font-size:var(--font-size-sm); line-height:1.55
     }
     .checkbox-inline{display:flex; align-items:center; gap:10px; background:#f8fbff; border:1px solid var(--line); border-radius:12px; padding:10px 12px}
     .checkbox-inline input{width:auto; margin:0}
@@ -528,8 +550,8 @@
     }
     input,select,textarea,button{font-family:inherit}
     input[type="date"],input[type="month"],select{
-      min-height:46px;
-      background:linear-gradient(180deg,#ffffff,#f8fbff);
+      min-height:var(--control-height);
+      background:linear-gradient(180deg,#ffffff,var(--primary-softer));
       border-color:#cfd9ea;
       box-shadow:inset 0 1px 0 rgba(255,255,255,.8), 0 1px 2px rgba(15,23,42,.03);
     }
@@ -555,7 +577,7 @@
       min-height:46px;
       padding:11px 44px 11px 13px;
       border-radius:12px;
-      border:1.5px solid #cfd9ea;
+      border:1.5px solid var(--line-strong);
       font:inherit;
       color:var(--text);
       background:
@@ -682,7 +704,7 @@
     }
     .select-enhanced-option.is-selected::after{
       content:"✓";
-      font-size:13px;
+      font-size:var(--font-size-sm);
       font-weight:800;
     }
     .select-enhanced-empty{
@@ -692,7 +714,7 @@
       border:1px dashed #d8e2ef;
       color:var(--muted);
       text-align:center;
-      font-size:13px;
+      font-size:var(--font-size-sm);
       font-weight:600;
     }
     input[type="date"]::-webkit-calendar-picker-indicator,
@@ -720,7 +742,7 @@
     .quick-add-input-wrap{display:grid; gap:8px}
     .quick-add-status{
       min-height:20px;
-      font-size:13px;
+      font-size:var(--font-size-sm);
       color:var(--muted);
     }
     .quick-add-status.success{color:var(--green)}
@@ -1221,7 +1243,7 @@
       min-height:46px;
       padding:11px 13px;
       border-radius:12px;
-      border:1.5px solid #cfd9ea;
+      border:1.5px solid var(--line-strong);
       font:inherit;
       color:var(--text);
       background:linear-gradient(180deg,#ffffff,#f8fbff);
@@ -1315,6 +1337,16 @@
       transition:none;
     }
     .floating-back-btn.hidden{display:none !important}
+    
+    .section-header h2,.section-header h3{font-size:var(--font-size-xl)}
+    .header-title h1{font-size:28px}
+    .header-title p,.auth-status,.file-status,.hint,.readonly-note,.monthly-helper-note,.monthly-table-note{font-size:var(--font-size-sm)}
+    .month-box h4,.installment-name,.trip-card h4,.trip-day-block h4{font-size:var(--font-size-lg)}
+    .entry-card-title strong,.trip-item-title-row strong,.trip-item-amount,.budget-stat .value,.goal-stat .value{font-size:var(--font-size-md)}
+    .quick-action-copy strong{font-size:var(--font-size-md)}
+    .quick-action-copy small,.bottom-nav-label,.entry-meta-box .value,.trip-progress-meta,.budget-progress-meta,.goal-progress-meta{font-size:var(--font-size-sm)}
+    .badge,.pill,.status-pill{font-size:var(--font-size-xs)}
+
     @media (max-width:1180px){
       .app{padding:12px}
       .layout{grid-template-columns:1fr}
@@ -1769,7 +1801,7 @@
       border-radius:20px;
       border:1px solid rgba(191,219,254,.9);
       background:linear-gradient(180deg,#f8fbff,#eef6ff);
-      color:#0f172a;
+      color:var(--text);
       text-align:left;
       box-shadow:0 12px 28px rgba(37,99,235,.09);
     }
@@ -1996,7 +2028,7 @@
       color:var(--muted);
     }
     .entry-meta-box .value{
-      font-size:13px;
+      font-size:var(--font-size-sm);
       color:#0f172a;
       word-break:break-word;
     }
@@ -2498,8 +2530,8 @@
             <div class="summary-grid summary-grid-5">
               <div class="summary-card income" data-icon="💵"><div class="name">รายรับรวม</div><div class="value" id="monthlyIncomeTotal">฿0.00</div></div>
               <div class="summary-card expense" data-icon="💸"><div class="name">รายจ่ายรวม</div><div class="value" id="monthlyExpenseTotal">฿0.00</div></div>
-              <div class="summary-card balance" data-icon="🪙"><div class="name">คงเหลือสุทธิ</div><div class="value" id="monthlyBalanceTotal">฿0.00</div></div>
-              <div class="summary-card violet" data-icon="🧾"><div class="name">จำนวนรายการ</div><div class="value" id="monthlyEntryCount">0</div></div>
+              <div class="summary-card balance" data-icon="💰"><div class="name">คงเหลือสุทธิ</div><div class="value" id="monthlyBalanceTotal">฿0.00</div></div>
+              <div class="summary-card violet" data-icon="📄"><div class="name">จำนวนรายการ</div><div class="value" id="monthlyEntryCount">0</div></div>
               <div class="summary-card due" data-icon="📌"><div class="name">ยอด readonly รวม</div><div class="value" id="monthlyInstallmentTotal">฿0.00</div></div>
             </div>
             <div class="toolbar-inline" style="margin-top:14px">
@@ -2599,7 +2631,7 @@
             <div class="quick-actions">
             <div class="notice-box">กด <strong>เพิ่มรายการ</strong> เพื่อสร้างรายรับหรือรายจ่ายใหม่ และกด <strong>แก้ไข</strong> หรือ <strong>คัดลอก</strong> จากรายการด้านล่างเพื่อเปิด modal เดิมกลับมาอย่างรวดเร็ว</div>
               <div class="small-actions">
-                <button id="openEntryModalBtnSecondary" class="btn-primary">🪄 เพิ่มรายการใหม่</button>
+                <button id="openEntryModalBtnSecondary" class="btn-primary">➕ เพิ่มรายการใหม่</button>
               </div>
             </div>
           </div>
@@ -2650,11 +2682,11 @@
                 </div>
               </div>
               <div class="summary-grid summary-grid-5">
-              <div class="summary-card income" data-icon="🌱"><div class="name">รายรับทั้งปี</div><div class="value" id="yearlyIncomeTotal">฿0.00</div></div>
-              <div class="summary-card expense" data-icon="🔥"><div class="name">รายจ่ายทั้งปี</div><div class="value" id="yearlyExpenseTotal">฿0.00</div></div>
+              <div class="summary-card income" data-icon="💵"><div class="name">รายรับทั้งปี</div><div class="value" id="yearlyIncomeTotal">฿0.00</div></div>
+              <div class="summary-card expense" data-icon="💸"><div class="name">รายจ่ายทั้งปี</div><div class="value" id="yearlyExpenseTotal">฿0.00</div></div>
               <div class="summary-card balance" data-icon="🏦"><div class="name">คงเหลือทั้งปี</div><div class="value" id="yearlyBalanceTotal">฿0.00</div></div>
-              <div class="summary-card violet" data-icon="📚"><div class="name">จำนวนรายการ</div><div class="value" id="yearlyEntryCount">0</div></div>
-              <div class="summary-card due" data-icon="🧩"><div class="name">ยอด readonly ทั้งปี</div><div class="value" id="yearlyInstallmentTotal">฿0.00</div></div>
+              <div class="summary-card violet" data-icon="📄"><div class="name">จำนวนรายการ</div><div class="value" id="yearlyEntryCount">0</div></div>
+              <div class="summary-card due" data-icon="📌"><div class="name">ยอด readonly ทั้งปี</div><div class="value" id="yearlyInstallmentTotal">฿0.00</div></div>
               </div>
             </div>
 
@@ -2805,10 +2837,10 @@
             </div>
             <div class="summary-grid summary-grid-5">
               <div class="summary-card violet" data-icon="🧳"><div class="name">จำนวนทริป</div><div class="value" id="tripTotalCount">0</div></div>
-              <div class="summary-card expense" data-icon="🍜"><div class="name">ค่าใช้จ่ายรวม</div><div class="value" id="tripExpenseTotal">฿0.00</div></div>
+              <div class="summary-card expense" data-icon="💸"><div class="name">ค่าใช้จ่ายรวม</div><div class="value" id="tripExpenseTotal">฿0.00</div></div>
               <div class="summary-card balance" data-icon="📍"><div class="name">จำนวนวัน</div><div class="value" id="tripDayCount">0</div></div>
-              <div class="summary-card due" data-icon="🗂️"><div class="name">จำนวนรายการ</div><div class="value" id="tripItemCount">0</div></div>
-              <div class="summary-card income" data-icon="🏷️"><div class="name">หมวดหลัก</div><div class="value" id="tripTopCategory">-</div></div>
+              <div class="summary-card due" data-icon="📄"><div class="name">จำนวนรายการ</div><div class="value" id="tripItemCount">0</div></div>
+              <div class="summary-card income" data-icon="📌"><div class="name">หมวดหลัก</div><div class="value" id="tripTopCategory">-</div></div>
             </div>
           </div>
 
@@ -2955,7 +2987,7 @@
         </div>
         <div class="small-actions">
           <div id="entryEditBadge" class="badge hidden">✏️ กำลังแก้ไข</div>
-          <button id="closeEntryModalBtn" class="btn-light modal-close">✕ ปิด</button>
+          <button id="closeEntryModalBtn" class="btn-light modal-close">ปิด</button>
         </div>
       </div>
       <div class="modal-body">
@@ -2978,8 +3010,8 @@
           <div>
             <label for="entryType">ประเภท</label>
             <select id="entryType">
-              <option value="expense">💸 รายจ่าย</option>
-              <option value="income">💵 รายรับ</option>
+              <option value="expense">รายจ่าย</option>
+              <option value="income">รายรับ</option>
             </select>
           </div>
           <div>
@@ -3021,7 +3053,7 @@
           </div>
           <div class="full small-actions">
             <button id="saveEntryBtn" class="btn-primary">💾 บันทึกรายการ</button>
-            <button id="clearEntryBtn" class="btn-light">✕ ล้างฟอร์ม</button>
+            <button id="clearEntryBtn" class="btn-light">ล้างฟอร์ม</button>
           </div>
         </div>
       </div>
@@ -3037,7 +3069,7 @@
         </div>
         <div class="small-actions">
           <div id="loanEditBadge" class="badge hidden">✏️ กำลังแก้ไข</div>
-          <button id="closeLoanModalBtn" class="btn-light modal-close">✕ ปิด</button>
+          <button id="closeLoanModalBtn" class="btn-light modal-close">ปิด</button>
         </div>
       </div>
       <div class="modal-body">
@@ -3099,7 +3131,7 @@
           </div>
           <div class="full small-actions">
             <button id="saveLoanBtn" class="btn-primary">💾 บันทึกรายการผ่อน</button>
-            <button id="clearLoanBtn" class="btn-light">✕ ล้างฟอร์ม</button>
+            <button id="clearLoanBtn" class="btn-light">ล้างฟอร์ม</button>
           </div>
         </div>
       </div>
@@ -3115,7 +3147,7 @@
         </div>
         <div class="small-actions">
           <div id="tripEditBadge" class="badge hidden">✏️ กำลังแก้ไข</div>
-          <button id="closeTripModalBtn" class="btn-light modal-close">✕ ปิด</button>
+          <button id="closeTripModalBtn" class="btn-light modal-close">ปิด</button>
         </div>
       </div>
       <div class="modal-body">
@@ -3146,7 +3178,7 @@
           </div>
           <div class="full small-actions">
             <button id="saveTripBtn" class="btn-primary">💾 บันทึกทริป</button>
-            <button id="clearTripBtn" class="btn-light">✕ ล้างฟอร์ม</button>
+            <button id="clearTripBtn" class="btn-light">ล้างฟอร์ม</button>
           </div>
         </div>
       </div>
@@ -3162,7 +3194,7 @@
         </div>
         <div class="small-actions">
           <div id="tripItemEditBadge" class="badge hidden">✏️ กำลังแก้ไข</div>
-          <button id="closeTripItemModalBtn" class="btn-light modal-close">✕ ปิด</button>
+          <button id="closeTripItemModalBtn" class="btn-light modal-close">ปิด</button>
         </div>
       </div>
       <div class="modal-body">
@@ -3200,7 +3232,7 @@
           </div>
           <div class="full small-actions">
             <button id="saveTripItemBtn" class="btn-primary">💾 บันทึกรายการ</button>
-            <button id="clearTripItemBtn" class="btn-light">✕ ล้างฟอร์ม</button>
+            <button id="clearTripItemBtn" class="btn-light">ล้างฟอร์ม</button>
           </div>
         </div>
       </div>
@@ -3216,7 +3248,7 @@
         </div>
         <div class="small-actions">
           <div id="tripBudgetEditBadge" class="badge hidden">✏️ กำลังแก้ไข</div>
-          <button id="closeTripBudgetModalBtn" class="btn-light modal-close">✕ ปิด</button>
+          <button id="closeTripBudgetModalBtn" class="btn-light modal-close">ปิด</button>
         </div>
       </div>
       <div class="modal-body">
@@ -3242,7 +3274,7 @@
           </div>
           <div class="full small-actions">
             <button id="saveTripBudgetBtn" class="btn-primary">💾 บันทึกแผนงบ</button>
-            <button id="clearTripBudgetBtn" class="btn-light">✕ ล้างฟอร์ม</button>
+            <button id="clearTripBudgetBtn" class="btn-light">ล้างฟอร์ม</button>
           </div>
         </div>
       </div>
@@ -3259,7 +3291,7 @@
         </div>
         <div class="small-actions">
           <div id="budgetEditBadge" class="badge hidden">✏️ กำลังแก้ไข</div>
-          <button id="closeBudgetModalBtn" class="btn-light modal-close">✕ ปิด</button>
+          <button id="closeBudgetModalBtn" class="btn-light modal-close">ปิด</button>
         </div>
       </div>
       <div class="modal-body">
@@ -3282,7 +3314,7 @@
           </div>
           <div class="full small-actions">
             <button id="saveBudgetBtn" class="btn-primary">💾 บันทึก Budget</button>
-            <button id="clearBudgetBtn" class="btn-light">✕ ล้างฟอร์ม</button>
+            <button id="clearBudgetBtn" class="btn-light">ล้างฟอร์ม</button>
           </div>
         </div>
       </div>
@@ -3299,7 +3331,7 @@
         </div>
         <div class="small-actions">
           <div id="goalEditBadge" class="badge hidden">✏️ กำลังแก้ไข</div>
-          <button id="closeGoalModalBtn" class="btn-light modal-close">✕ ปิด</button>
+          <button id="closeGoalModalBtn" class="btn-light modal-close">ปิด</button>
         </div>
       </div>
       <div class="modal-body">
@@ -3334,7 +3366,7 @@
           </div>
           <div class="full small-actions">
             <button id="saveGoalBtn" class="btn-primary">💾 บันทึก Goal</button>
-            <button id="clearGoalBtn" class="btn-light">✕ ล้างฟอร์ม</button>
+            <button id="clearGoalBtn" class="btn-light">ล้างฟอร์ม</button>
           </div>
         </div>
       </div>
@@ -3386,7 +3418,7 @@
       'รถยนต์':'🚘',
       'ช้อปปิ้ง':'🛒',
       'สัตว์เลี้ยง':'🐾',
-      'สุขภาพ':'🩺',
+      'สุขภาพ':'🏥',
       'ยา/รักษา':'💊',
       'ประกัน':'🛡️',
       'การศึกษา':'📚',
@@ -3399,7 +3431,7 @@
       'ท่องเที่ยว':'✈️',
       'ออมเงิน/ลงทุน':'🏦',
       'ภาษี/ค่าธรรมเนียม':'🏛️',
-      'อื่นๆ':'🗂️'
+      'อื่นๆ':'📌'
     };
 
     let appData = { entries: [], installments: [], trips: [], budgets: [], goals: [] }; // --CHANGED
@@ -3744,7 +3776,7 @@
         .replace(/"/g,'&quot;').replace(/'/g,'&#039;');
     }
     function getCategoryIcon(category){
-      return CATEGORY_ICONS[String(category || 'อื่นๆ').trim()] || '🏷️';
+      return CATEGORY_ICONS[String(category || 'อื่นๆ').trim()] || '📌';
     }
     function formatCategoryLabel(category){
       const name = String(category || 'อื่นๆ').trim() || 'อื่นๆ';
@@ -5493,7 +5525,7 @@
       return `${monthKey}-${String(safeDay).padStart(2,'0')}`;
     }
     function getPaymentStatusBadge(isPaid){
-      return `<span class="badge ${isPaid ? 'badge-paid' : 'badge-unpaid'}">${isPaid ? '🟢 จ่ายแล้ว' : '🔴 ยังไม่จ่าย'}</span>`;
+      return `<span class="badge ${isPaid ? 'badge-paid' : 'badge-unpaid'}">${isPaid ? 'ชำระแล้ว' : 'ยังไม่ชำระ'}</span>`;
     }
     function focusElementById(elementId){
       if(!elementId) return false;
@@ -6681,7 +6713,7 @@
             </button>
           </div>
           <div class="entry-actions-right">
-            <button class="btn-icon" type="button" title="ไปหน้ายอดผ่อน" aria-label="ไปหน้ายอดผ่อน" onclick="goToInstallments('${item.sourceId}','${monthKey}')">↗<span class="sr-only">ไปหน้ายอดผ่อน</span></button>
+            <button class="btn-icon" type="button" title="ไปหน้ายอดผ่อน" aria-label="ไปหน้ายอดผ่อน" onclick="goToInstallments('${item.sourceId}','${monthKey}')">📌<span class="sr-only">ไปหน้ายอดผ่อน</span></button>
           </div>
         `;
       }
@@ -6694,7 +6726,7 @@
             </button>
           </div>
           <div class="entry-actions-right">
-            <button class="btn-icon" type="button" title="เปิดทริป" aria-label="เปิดทริป" onclick="goToTrip('${item.sourceId}','${item.tripItemId}','${item.date || ''}')">↗<span class="sr-only">เปิดทริป</span></button>
+            <button class="btn-icon" type="button" title="เปิดทริป" aria-label="เปิดทริป" onclick="goToTrip('${item.sourceId}','${item.tripItemId}','${item.date || ''}')">🧳<span class="sr-only">เปิดทริป</span></button>
           </div>
         `;
       }
@@ -6708,9 +6740,9 @@
           ` : '<span class="pill">เคลียร์แล้ว</span>'}
         </div>
         <div class="entry-actions-right">
-          <button class="btn-icon" type="button" title="คัดลอกรายการ" aria-label="คัดลอกรายการ" onclick="duplicateEntry('${item.id}')">⧉<span class="sr-only">คัดลอกรายการ</span></button>
-          <button class="btn-icon" type="button" title="แก้ไขรายการ" aria-label="แก้ไขรายการ" onclick="editEntry('${item.id}')">✎<span class="sr-only">แก้ไขรายการ</span></button>
-          <button class="btn-icon btn-danger" type="button" title="ลบรายการ" aria-label="ลบรายการ" onclick="deleteEntry('${item.id}')">🗑<span class="sr-only">ลบรายการ</span></button>
+          <button class="btn-icon" type="button" title="คัดลอกรายการ" aria-label="คัดลอกรายการ" onclick="duplicateEntry('${item.id}')">📄<span class="sr-only">คัดลอกรายการ</span></button>
+          <button class="btn-icon" type="button" title="แก้ไขรายการ" aria-label="แก้ไขรายการ" onclick="editEntry('${item.id}')">✏️<span class="sr-only">แก้ไขรายการ</span></button>
+          <button class="btn-icon btn-danger" type="button" title="ลบรายการ" aria-label="ลบรายการ" onclick="deleteEntry('${item.id}')">🗑️<span class="sr-only">ลบรายการ</span></button>
         </div>
       `;
     }
