@@ -81,13 +81,26 @@
       max-width:100%;
     }
     button:hover{transform:translateY(-1px)}
-    .btn-primary{background:var(--primary); color:#fff}
-    .btn-light{background:#fff; color:var(--primary); border:1px solid #bfd5ff}
+    .btn-primary{
+      background:linear-gradient(180deg,#2563eb,#1d4ed8);
+      color:#fff;
+      box-shadow:0 12px 24px rgba(37,99,235,.18);
+    }
+    .btn-light{
+      background:linear-gradient(180deg,#ffffff,#f8fbff);
+      color:var(--primary);
+      border:1px solid #bfd5ff;
+      box-shadow:0 8px 18px rgba(15,23,42,.05);
+    }
     .btn-success{background:var(--green-soft); color:var(--green); border:1px solid #bbf7d0}
-    .btn-danger{background:var(--red-soft); color:var(--red); border:1px solid #fecdd3}
+    .btn-danger{
+      background:linear-gradient(180deg,#fff1f2,#fff7f8);
+      color:var(--red);
+      border:1px solid #fecdd3;
+    }
     .btn-dark{background:#0f172a; color:#fff}
     .btn-ghost{background:rgba(255,255,255,.16); color:#fff; border:1px solid rgba(255,255,255,.25)}
-    .btn-sm{padding:8px 12px; font-size:13px}
+    .btn-sm{padding:9px 12px; font-size:13px; line-height:1.2}
     .hint{
       margin-top:12px; padding:12px 14px; background:#f8fbff; border:1px solid var(--line);
       border-radius:12px; color:var(--muted); font-size:13px
@@ -337,9 +350,15 @@
     .violet .name,.violet .value{color:var(--violet)}
     .year-grid{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px}
     .month-box{
-      border:1px solid var(--line); border-radius:16px; padding:16px; background:#fff; display:grid; gap:10px
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:16px;
+      background:linear-gradient(180deg,#ffffff,#fbfdff);
+      display:grid;
+      gap:10px;
+      box-shadow:0 12px 28px rgba(15,23,42,.05)
     }
-    .month-box-head{display:flex; justify-content:space-between; gap:8px; align-items:flex-start}
+    .month-box-head{display:flex; justify-content:space-between; gap:10px; align-items:flex-start}
     .month-box h4{margin:0; font-size:16px}
     .pill,.badge{
       display:inline-flex; align-items:center; gap:6px; padding:5px 10px; border-radius:999px;
@@ -356,9 +375,37 @@
     .bar-income > div{background:linear-gradient(90deg,#22c55e,#86efac)}
     .bar-expense > div{background:linear-gradient(90deg,#ef4444,#fca5a5)}
     .month-stack{display:grid; gap:14px}
-    .month-group{border:1px solid var(--line); border-radius:16px; padding:16px; background:#fff}
-    .month-group-head{display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap; margin-bottom:12px}
-    .month-group-stats{display:flex; gap:8px; flex-wrap:wrap}
+    .month-group{
+      border:1px solid #dbe6f3;
+      border-radius:24px;
+      padding:16px;
+      background:
+        radial-gradient(circle at top right, rgba(191,219,254,.36), transparent 36%),
+        linear-gradient(180deg,#ffffff,#fbfdff 72%);
+      display:grid;
+      gap:12px;
+      box-shadow:0 14px 30px rgba(15,23,42,.06)
+    }
+    .month-group-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-bottom:0;
+      padding-bottom:4px
+    }
+    .month-group-head h3{margin:0; font-size:18px; line-height:1.15}
+    .month-group-head .meta{margin-top:4px; font-size:12px}
+    .month-group-stats{display:flex; gap:8px; flex-wrap:wrap; align-items:center}
+    .month-group-stats .pill{
+      padding:7px 11px;
+      background:rgba(248,250,252,.92);
+      border-color:#dbe6f3;
+      color:#334155;
+      font-size:11.5px;
+      line-height:1.2
+    }
     table{width:100%; border-collapse:collapse}
     th,td{padding:11px 10px; border-bottom:1px solid var(--line); text-align:left; vertical-align:top}
     th{font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); font-weight:800; background:#fbfdff}
@@ -367,22 +414,49 @@
     .amount-expense{color:var(--red); font-weight:800}
     .readonly-note{font-size:12px; color:var(--primary); font-weight:700}
     .installment-list{display:grid; gap:12px}
-    .installment-item{border:1px solid var(--line); border-radius:16px; padding:16px; background:#fff}
-    .installment-headline{display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap}
-    .installment-kv{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin-top:10px}
+    .installment-item{
+      border:1px solid #dbe3ef;
+      border-radius:22px;
+      padding:16px;
+      background:
+        radial-gradient(circle at top right, rgba(191,219,254,.28), transparent 34%),
+        linear-gradient(180deg,#ffffff,#fbfdff);
+      display:grid;
+      gap:12px;
+      box-shadow:0 12px 28px rgba(15,23,42,.05)
+    }
+    .installment-headline{display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap}
+    .installment-kv{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin-top:0}
     .installment-kv .notice-box{padding:10px 12px}
     .installment-filters{display:grid; grid-template-columns:1.5fr .9fr 1fr 1fr auto; gap:10px; align-items:end}
-    .installment-view-switch{display:flex; gap:8px; justify-content:flex-end}
+    .installment-view-switch{
+      display:inline-grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:6px;
+      justify-content:flex-end;
+      padding:6px;
+      border-radius:18px;
+      background:#eff6ff;
+      border:1px solid #dbeafe;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.9)
+    }
+    .installment-view-switch > *{
+      display:inline-flex;
+      align-items:center;
+      min-height:40px;
+      border-radius:14px;
+      justify-content:center
+    }
     .calendar-grid{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px}
     .calendar-month{
       border:1px solid #cfe1ff;
-      border-radius:18px;
+      border-radius:20px;
       background:
         radial-gradient(circle at top right, rgba(96,165,250,.22), transparent 42%),
         linear-gradient(180deg,#ffffff,#f3f8ff);
-      padding:14px;
+      padding:15px;
       display:grid;
-      gap:8px;
+      gap:9px;
       box-shadow:0 10px 24px rgba(37,99,235,.08);
       transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease;
     }
@@ -391,7 +465,7 @@
       border-color:#93c5fd;
       box-shadow:0 18px 34px rgba(37,99,235,.13);
     }
-    .calendar-month-head{display:flex; justify-content:space-between; align-items:flex-start; gap:8px}
+    .calendar-month-head{display:flex; justify-content:space-between; align-items:flex-start; gap:10px}
     .calendar-month-head .pill{
       background:#eff6ff;
       border-color:#bfdbfe;
@@ -728,16 +802,17 @@
     .soft-insight-item.success{border-color:#bbf7d0; background:linear-gradient(180deg,#f0fdf4,#ffffff); color:#166534}
     .budget-list,.goal-list{display:grid; gap:12px}
     .budget-card,.goal-card{
-      border:1px solid #dbe3ef; border-radius:18px; padding:16px;
+      border:1px solid #dbe3ef; border-radius:22px; padding:16px;
       background:linear-gradient(180deg,#ffffff,#fbfdff);
       display:grid; gap:12px;
+      box-shadow:0 12px 28px rgba(15,23,42,.05);
     }
     .budget-card.is-near-limit{border-color:#fde68a; background:linear-gradient(180deg,#fffdf5,#ffffff)}
     .budget-card.is-over-budget{border-color:#fecdd3; background:linear-gradient(180deg,#fff1f2,#ffffff)}
     .goal-card.is-completed{border-color:#bbf7d0; background:linear-gradient(180deg,#f0fdf4,#ffffff)}
     .goal-card.is-paused{border-color:#d8e2ef; background:linear-gradient(180deg,#f8fafc,#ffffff)}
-    .budget-card-head,.goal-card-head{display:flex; justify-content:space-between; gap:10px; align-items:flex-start; flex-wrap:wrap}
-    .budget-card-title,.goal-card-title{display:grid; gap:4px}
+    .budget-card-head,.goal-card-head{display:flex; justify-content:space-between; gap:12px; align-items:flex-start; flex-wrap:wrap}
+    .budget-card-title,.goal-card-title{display:grid; gap:3px}
     .budget-card-title h4,.goal-card-title h4{margin:0}
     .budget-stat-grid,.goal-stat-grid{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px}
     .budget-stat,.goal-stat{
@@ -788,7 +863,7 @@
       background:
         radial-gradient(circle at top right, rgba(96,165,250,.14), transparent 32%),
         linear-gradient(180deg,#ffffff,#f8fbff);
-      display:grid; gap:12px;
+      display:grid; gap:14px;
       transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease
     }
     .trip-card:hover{transform:translateY(-2px); box-shadow:0 16px 34px rgba(15,23,42,.08)}
@@ -798,9 +873,33 @@
     .trip-card-title{display:grid; gap:4px}
     .trip-card-title .meta strong{color:var(--text)}
     .trip-meta-line{display:flex; gap:8px; flex-wrap:wrap}
-    .trip-card-total{display:flex; justify-content:space-between; gap:12px; align-items:end; padding:14px 16px; border-radius:16px; background:#ffffff; border:1px solid #dbeafe; flex-wrap:wrap}
+    .trip-card-total{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      align-items:end;
+      padding:14px 16px;
+      border-radius:18px;
+      background:linear-gradient(180deg,#ffffff,#f8fbff);
+      border:1px solid #dbeafe;
+      flex-wrap:wrap
+    }
     .trip-card-total strong{font-size:22px; color:#1d4ed8}
-    .trip-card-footer{display:flex; justify-content:space-between; gap:10px; align-items:center; flex-wrap:wrap}
+    .trip-card-footer{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+      padding-top:2px
+    }
+    .trip-chip-row .pill,
+    .trip-filter-summary .pill,
+    .trip-day-summary .pill{
+      background:rgba(255,255,255,.92);
+      border-color:#dbeafe;
+      color:#334155;
+    }
     .trip-inline-filters{
       display:grid;
       grid-template-columns:minmax(200px,1.2fr) repeat(4,minmax(0,.82fr)) auto;
@@ -880,7 +979,27 @@
     .trip-detail-grid{display:grid; grid-template-columns:1fr; gap:16px}
     .trip-note-box{padding:14px 16px; border-radius:16px; background:#fff; border:1px solid #dbeafe; color:#1e3a8a}
     .trip-filter-summary{display:flex; gap:8px; flex-wrap:wrap}
-    .trip-view-switch{display:flex; gap:8px; justify-content:flex-end; margin-bottom:12px}
+    .trip-view-switch{
+      display:inline-grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:6px;
+      justify-content:flex-end;
+      margin-bottom:12px;
+      padding:6px;
+      border-radius:18px;
+      background:#eff6ff;
+      border:1px solid #dbeafe;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.92)
+    }
+    .trip-view-switch > *{
+      display:inline-flex;
+      align-items:center;
+      width:100%;
+      min-height:40px;
+      margin:0;
+      border-radius:14px;
+      justify-content:center
+    }
     .trip-day-header{
       display:flex; justify-content:space-between; gap:12px; align-items:center; flex-wrap:wrap;
       padding-bottom:8px; border-bottom:1px dashed #dbe3ef; margin-bottom:10px
@@ -912,9 +1031,30 @@
     }
     .trip-calendar-item:first-child{border-top:none}
     .trip-calendar-item button{width:100%; text-align:left}
-    .trip-detail-tabs{display:flex; gap:8px; flex-wrap:wrap} /* --NEW */
-    .trip-detail-tab{background:#fff; color:#334155; border:1px solid #dbeafe} /* --NEW */
-    .trip-detail-tab.is-active{background:var(--primary-soft); color:var(--primary); border-color:#93c5fd} /* --NEW */
+    .trip-detail-tabs{
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:6px;
+      padding:6px;
+      border-radius:20px;
+      background:rgba(239,246,255,.94);
+      border:1px solid #dbeafe
+    } /* --NEW */
+    .trip-detail-tab{
+      display:inline-flex;
+      align-items:center;
+      background:transparent;
+      color:#475569;
+      border:1px solid transparent;
+      min-height:42px;
+      justify-content:center
+    } /* --NEW */
+    .trip-detail-tab.is-active{
+      background:#fff;
+      color:var(--primary);
+      border-color:#bfdbfe;
+      box-shadow:0 10px 20px rgba(37,99,235,.12)
+    } /* --NEW */
     .trip-tab-panel{display:grid; gap:16px} /* --NEW */
     .trip-overview-grid{display:grid; grid-template-columns:1.15fr .85fr; gap:16px} /* --NEW */
     .trip-mini-summary-grid{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px} /* --NEW */
@@ -937,6 +1077,26 @@
     .trip-progress-meta{display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; color:var(--muted); font-size:13px} /* --NEW */
     .trip-budget-empty-state{display:grid; gap:12px} /* --NEW */
     .trip-budget-note{padding:14px 16px; border-radius:16px; background:#fff; border:1px solid #dbeafe; color:#334155} /* --NEW */
+    .trip-card-footer .small-actions,
+    .trip-detail-top .small-actions,
+    .trip-section-title .small-actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      align-items:stretch;
+    }
+    .trip-card-footer .small-actions > *,
+    .trip-detail-top .small-actions > *,
+    .trip-section-title .small-actions > *{
+      flex:1 1 108px;
+    }
+    .trip-item-actions button,
+    .trip-card-footer .small-actions button,
+    .trip-detail-top .small-actions button,
+    .trip-section-title .small-actions button{
+      min-height:40px;
+      border-radius:14px;
+    }
     .year-grid.year-grid-enhanced{grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px}
     .month-box.enhanced{padding:18px; gap:12px; background:linear-gradient(180deg,#ffffff,#fbfdff)}
     .month-balance-hero{display:flex; justify-content:space-between; gap:12px; align-items:end; padding:14px 16px; border-radius:16px; background:#f8fbff; border:1px solid #dbe7ff}
@@ -1007,6 +1167,7 @@
       background:rgba(255,255,255,.96);
       border-bottom:1px solid var(--line);
       backdrop-filter:blur(12px);
+      box-shadow:0 10px 24px rgba(15,23,42,.05);
     }
     .modal-header .meta{
       max-width:56ch;
@@ -1037,6 +1198,7 @@
       background:linear-gradient(180deg, rgba(255,255,255,.84), #fff 28%);
       border-top:1px solid var(--line);
       backdrop-filter:blur(12px);
+      box-shadow:0 -8px 24px rgba(15,23,42,.05);
     }
     .modal-footer .small-actions{
       display:flex;
@@ -1176,11 +1338,13 @@
     @media (max-width:900px){
       .main-header{
         padding:14px;
-        gap:14px
+        gap:14px;
       }
       .header-title h1{font-size:22px}
       .header-title p{font-size:13px}
-      .header-right{width:100%; justify-content:flex-start}
+      .app-bar{justify-items:start}
+      .header-title{justify-items:start; text-align:left}
+      .header-right{width:100%; justify-content:center}
       .file-status{text-align:center}
       .month-group-stats{flex-wrap:wrap; overflow:visible}
       .month-group-stats .pill{white-space:normal}
@@ -1201,10 +1365,27 @@
       .main-header{
         gap:10px;
         padding:12px;
+        margin:0 0 18px;
+        border-radius:22px;
       }
-      .header-right{justify-content:flex-start}
+      .app-bar{
+        width:100%;
+        justify-items:start;
+        text-align:left;
+      }
+      .header-title{
+        width:100%;
+        justify-items:start;
+        text-align:left;
+      }
+      .header-right{justify-content:center}
       .header-title h1{font-size:20px}
-      .header-title p{font-size:12px}
+      .header-title p{
+        font-size:12px;
+        max-width:unset;
+        margin-left:0;
+        margin-right:0;
+      }
       .header-panel{
         width:100%;
         flex-direction:column;
@@ -1238,7 +1419,6 @@
       }
       .modal-footer .small-actions button,
       .small-actions button{width:100%}
-      .entry-card-head,
       .trip-card-head,
       .trip-card-total,
       .trip-category-card,
@@ -1250,22 +1430,36 @@
         flex-direction:column;
         align-items:stretch;
       }
-      .entry-amount{
-        width:100%;
-        text-align:left;
-        white-space:normal;
+      .month-group-stats > *{
+        flex:1 1 calc(50% - 8px);
       }
-      .entry-actions-right{
-        justify-content:flex-start;
-      }
-      .trip-detail-tabs .trip-detail-tab,
-      .trip-view-switch > *,
-      .installment-view-switch > *,
-      .month-group-stats > *,
       .trip-chip-row > *,
       .trip-day-summary > *,
       .trip-filter-summary > *{
-        flex:1 1 100%;
+        flex:1 1 auto;
+      }
+      .trip-view-switch,
+      .installment-view-switch{
+        width:100%;
+      }
+      .trip-detail-tabs{
+        grid-template-columns:repeat(3,minmax(0,1fr));
+      }
+      .trip-card-footer .small-actions,
+      .trip-detail-top .small-actions,
+      .trip-section-title .small-actions{
+        width:100%;
+      }
+      .trip-card-footer .small-actions > *,
+      .trip-detail-top .small-actions > *,
+      .trip-section-title .small-actions > *{
+        flex:1 1 calc(50% - 8px);
+      }
+      .installment-item .small-actions{
+        grid-template-columns:repeat(3,minmax(0,1fr));
+      }
+      .installment-item .small-actions button:last-child{
+        grid-column:1 / -1;
       }
       .monthly-subnav-wrap{
         top:8px;
@@ -1475,6 +1669,12 @@
       padding:12px 14px 14px;
       box-shadow:0 20px 44px rgba(15,23,42,.18);
     }
+    @media (max-width:760px){
+      .main-header{
+        margin:0 0 18px;
+        border-radius:22px;
+      }
+    }
     .app-bar{
       min-height:58px;
       align-content:center;
@@ -1543,25 +1743,35 @@
     .compact-filter-actions > *{
       flex:1 1 160px;
     }
+    .quick-chip-row .pill,
+    .trip-filter-summary .pill,
+    .trip-day-summary .pill,
+    .trip-chip-row .pill,
+    .entry-chip-row .pill,
+    .entry-chip-row .badge,
+    .month-group-stats .pill{
+      border-radius:999px;
+      box-shadow:none;
+    }
     .quick-action-grid{
       display:grid;
       grid-template-columns:repeat(2,minmax(0,1fr));
-      gap:10px;
+      gap:12px;
       margin-top:16px;
     }
     .quick-action-btn{
-      min-height:68px;
+      min-height:72px;
       display:flex;
       align-items:center;
       gap:12px;
       width:100%;
-      padding:14px;
-      border-radius:18px;
+      padding:14px 15px;
+      border-radius:20px;
       border:1px solid rgba(191,219,254,.9);
       background:linear-gradient(180deg,#f8fbff,#eef6ff);
       color:#0f172a;
       text-align:left;
-      box-shadow:0 10px 28px rgba(37,99,235,.09);
+      box-shadow:0 12px 28px rgba(37,99,235,.09);
     }
     .quick-action-btn:hover{
       background:linear-gradient(180deg,#ffffff,#eff6ff);
@@ -1580,7 +1790,7 @@
     }
     .quick-action-copy{
       display:grid;
-      gap:2px;
+      gap:3px;
       min-width:0;
     }
     .quick-action-copy strong{
@@ -1597,7 +1807,7 @@
     }
     .utility-hub{
       display:grid;
-      gap:14px;
+      gap:16px;
     }
     .utility-hub .header-right{
       min-width:0;
@@ -1609,9 +1819,10 @@
       display:grid;
       gap:10px;
       padding:16px;
-      border-radius:18px;
+      border-radius:20px;
       border:1px solid var(--line);
       background:#f8fbff;
+      box-shadow:0 10px 24px rgba(15,23,42,.05);
     }
     .utility-hub .header-panel-label{
       color:#475569;
@@ -1693,18 +1904,18 @@
     }
     .entry-list{
       display:grid;
-      gap:12px;
+      gap:10px;
     }
     .entry-card{
-      border:1px solid var(--line);
-      border-radius:18px;
+      border:1px solid #dbe3ef;
+      border-radius:20px;
       padding:14px;
       background:
-        radial-gradient(circle at top right, rgba(219,234,254,.7), transparent 42%),
-        #fff;
+        radial-gradient(circle at top right, rgba(219,234,254,.54), transparent 40%),
+        linear-gradient(180deg,#ffffff,#fbfdff);
       display:grid;
-      gap:12px;
-      box-shadow:0 10px 24px rgba(15,23,42,.06);
+      gap:10px;
+      box-shadow:0 12px 26px rgba(15,23,42,.055);
     }
     .entry-card.nav-highlight{
       border-color:#93c5fd;
@@ -1713,7 +1924,7 @@
     .entry-card-head{
       display:flex;
       justify-content:space-between;
-      gap:12px;
+      gap:10px;
       align-items:flex-start;
       flex-wrap:wrap;
       min-width:0;
@@ -1721,24 +1932,32 @@
     .entry-card-title{
       min-width:0;
       display:grid;
-      gap:4px;
+      gap:3px;
     }
     .entry-card-title strong{
-      font-size:16px;
-      line-height:1.25;
+      font-size:15px;
+      line-height:1.3;
       word-break:break-word;
     }
     .entry-date{
-      font-size:12px;
+      font-size:11px;
       font-weight:800;
       letter-spacing:.04em;
       text-transform:uppercase;
       color:var(--muted);
     }
+    .entry-head-side{
+      display:flex;
+      align-items:center;
+      justify-content:flex-end;
+      gap:8px;
+      min-width:0;
+      flex:0 1 auto;
+    }
     .entry-amount{
-      font-size:24px;
+      font-size:22px;
       font-weight:800;
-      line-height:1;
+      line-height:1.05;
       white-space:nowrap;
       text-align:right;
       flex:0 1 auto;
@@ -1749,22 +1968,23 @@
     .entry-chip-row{
       display:flex;
       flex-wrap:wrap;
-      gap:8px;
+      gap:6px;
       align-items:center;
+      padding-top:1px;
     }
     .entry-meta-grid{
       display:grid;
       grid-template-columns:repeat(2,minmax(0,1fr));
-      gap:10px;
+      gap:8px;
     }
     .entry-meta-box{
-      padding:11px 12px;
+      padding:10px 11px;
       border-radius:14px;
-      border:1px solid var(--line);
-      background:#f8fafc;
-      min-height:64px;
+      border:1px solid #e2e8f0;
+      background:linear-gradient(180deg,#f8fafc,#ffffff);
+      min-height:60px;
       display:grid;
-      gap:4px;
+      gap:3px;
       align-content:start;
       min-width:0;
     }
@@ -1776,28 +1996,31 @@
       color:var(--muted);
     }
     .entry-meta-box .value{
-      font-size:14px;
+      font-size:13px;
       color:#0f172a;
       word-break:break-word;
     }
+    .entry-meta-box:has(.value:empty){
+      display:none;
+    }
     .entry-actions{
-      display:flex;
-      flex-wrap:wrap;
-      gap:8px;
+      display:grid;
+      grid-template-columns:minmax(0,1fr) auto;
+      gap:8px 10px;
       align-items:center;
-      justify-content:space-between;
+      padding-top:4px;
     }
     .entry-actions-left,
     .entry-actions-right{
       display:flex;
       flex-wrap:wrap;
-      gap:8px;
+      gap:6px;
       align-items:center;
       min-width:0;
-      flex:1 1 220px;
     }
     .entry-actions-right{
       justify-content:flex-end;
+      flex-wrap:nowrap;
     }
     .btn-icon{
       min-width:44px;
@@ -1833,13 +2056,49 @@
       white-space:nowrap;
       border:0;
     }
+    .payment-toggle{
+      min-height:40px;
+      padding:6px 11px;
+      gap:6px;
+      font-size:11px;
+      background:linear-gradient(180deg,#ffffff,#f8fafc);
+    }
+    .payment-toggle input{transform:scale(.94)}
+    .entry-actions-right .btn-icon{
+      min-width:40px;
+      min-height:40px;
+      padding:0 10px;
+      border-radius:12px;
+      box-shadow:0 6px 14px rgba(15,23,42,.05);
+    }
     .month-group{
-      padding:14px;
-      border-radius:20px;
+      padding:16px;
+      border-radius:24px;
     }
     .trip-detail-panel,
     .trip-list-panel{
       border-radius:22px;
+    }
+    .installment-item .meta{line-height:1.45}
+    .installment-name{font-size:16px; line-height:1.25}
+    .installment-item .small-actions{
+      display:grid;
+      grid-template-columns:1.05fr 1.25fr 1.25fr .72fr;
+      gap:8px;
+      align-items:stretch;
+    }
+    .installment-item .small-actions button{
+      width:100%;
+      min-height:42px;
+      padding:8px 8px;
+      border-radius:14px;
+      font-size:11.5px;
+      line-height:1.15;
+      text-align:center;
+      white-space:normal;
+    }
+    .installment-item .small-actions button:nth-child(2){
+      box-shadow:0 12px 22px rgba(34,197,94,.12);
     }
     .trip-mobile-back{
       display:none;
@@ -1890,17 +2149,99 @@
 
     @media (max-width:760px){
       .mobile-collapsible.is-collapsed{display:none}
-      .entry-meta-grid{grid-template-columns:1fr}
+      .view .card > .section-header .card-toggle:not(.trip-day-toggle){
+        display:none !important;
+      }
+      .view .card.card-collapsed > .collapsible-body{
+        display:grid !important;
+      }
+      .view .card > .section-header.has-toggle{
+        align-items:flex-start;
+      }
+      .entry-card{
+        padding:12px;
+        gap:8px;
+      }
+      .entry-card-head{
+        display:grid;
+        grid-template-columns:minmax(0,1fr) auto;
+        gap:8px;
+        align-items:start;
+      }
+      .entry-card-title{
+        gap:2px;
+      }
+      .entry-card-title strong{
+        font-size:14px;
+        line-height:1.25;
+      }
+      .entry-date{
+        font-size:10px;
+      }
+      .entry-amount{
+        width:auto;
+        min-width:max-content;
+        max-width:none;
+        text-align:right;
+        white-space:nowrap;
+        overflow-wrap:normal;
+        word-break:normal;
+        font-size:clamp(18px,5vw,21px);
+        line-height:1;
+        padding-left:0;
+      }
+      .entry-head-side{
+        gap:6px;
+        align-items:flex-start;
+      }
+      .entry-head-side .badge{
+        padding:4px 8px;
+        font-size:11px;
+        white-space:nowrap;
+        flex:0 0 auto;
+      }
+      .entry-chip-row{
+        gap:5px;
+      }
+      .entry-chip-row .badge{
+        padding:4px 8px;
+        font-size:11px;
+      }
+      .entry-meta-grid{
+        grid-template-columns:repeat(2,minmax(0,1fr));
+        gap:6px;
+      }
+      .entry-meta-box{
+        min-height:auto;
+        padding:8px 9px;
+        gap:2px 6px;
+        align-content:start;
+      }
+      .entry-meta-box .label{
+        font-size:10px;
+        letter-spacing:.03em;
+      }
+      .entry-meta-box .value{
+        font-size:12px;
+        line-height:1.3;
+      }
+      .entry-meta-box:nth-child(3),
+      .entry-meta-box:nth-child(4){
+        grid-column:1 / -1;
+      }
       .entry-actions{
-        flex-direction:column;
-        align-items:stretch;
+        grid-template-columns:minmax(0,1fr) auto;
+        gap:8px;
+        align-items:center;
       }
       .entry-actions-left,
       .entry-actions-right{
-        width:100%;
+        width:auto;
       }
+      .entry-actions-left{min-width:0}
+      .entry-actions-right{justify-content:flex-end}
       .entry-actions-right .btn-icon{
-        flex:1 1 calc(33.333% - 6px);
+        flex:0 0 auto;
       }
       .trip-shell.trip-detail-open .trip-list-panel{display:none}
       .trip-shell:not(.trip-detail-open) .trip-detail-panel{display:none}
@@ -6336,7 +6677,7 @@
           <div class="entry-actions-left">
             <button class="payment-toggle ${item.isPaid ? 'is-paid' : 'is-unpaid'}" onclick="toggleInstallmentMonthPaid('${item.sourceId}','${monthKey}')">
               <input type="checkbox" ${item.isPaid ? 'checked' : ''}>
-              <span>${item.isPaid ? 'จ่ายแล้ว' : 'ยังไม่จ่าย'}</span>
+              <span>${item.isPaid ? 'จ่ายแล้ว' : 'ค้างจ่าย'}</span>
             </button>
           </div>
           <div class="entry-actions-right">
@@ -6349,7 +6690,7 @@
           <div class="entry-actions-left">
             <button class="payment-toggle ${item.isPaid ? 'is-paid' : 'is-unpaid'}" onclick="toggleTripItemPaid('${item.sourceId}','${item.tripItemId}')">
               <input type="checkbox" ${item.isPaid ? 'checked' : ''}>
-              <span>${item.isPaid ? 'จ่ายแล้ว' : 'ยังไม่จ่าย'}</span>
+              <span>${item.isPaid ? 'จ่ายแล้ว' : 'ค้างจ่าย'}</span>
             </button>
           </div>
           <div class="entry-actions-right">
@@ -6362,7 +6703,7 @@
           ${item.type === 'expense' ? `
             <button class="payment-toggle ${item.isPaid ? 'is-paid' : 'is-unpaid'}" onclick="toggleEntryPaid('${item.id}')">
               <input type="checkbox" ${item.isPaid ? 'checked' : ''}>
-              <span>${item.isPaid ? 'จ่ายแล้ว' : 'ยังไม่จ่าย'}</span>
+              <span>${item.isPaid ? 'จ่ายแล้ว' : 'ค้างจ่าย'}</span>
             </button>
           ` : '<span class="pill">เคลียร์แล้ว</span>'}
         </div>
@@ -6374,7 +6715,8 @@
       `;
     }
     function buildMonthlyEntryCardHtml(item, monthKey){
-      const noteContent = item.note ? escapeHtml(item.note) : '-';
+      const noteText = String(item.note || '').trim();
+      const noteContent = noteText ? escapeHtml(noteText) : '';
       const sourceNote = item.sourceType === 'installment'
         ? 'แก้ไขได้เฉพาะในหน้ายอดผ่อน'
         : (item.sourceType === 'trip'
@@ -6386,12 +6728,11 @@
             <div class="entry-card-title">
               <div class="entry-date">${escapeHtml(item.date || '-')}</div>
               <strong>${escapeHtml(item.title || '-')}</strong>
-              <div class="entry-chip-row">
-                <span class="badge ${getMonthlyEntryTypeBadgeClass(item)}">${getMonthlyEntryTypeLabel(item)}</span>
-                ${item.type === 'expense' ? getPaymentStatusBadge(!!item.isPaid) : '<span class="pill">รายรับ</span>'}
-              </div>
             </div>
-            <div class="entry-amount ${item.type === 'income' ? 'amount-income' : 'amount-expense'}">${formatMoney(item.amount)}</div>
+            <div class="entry-head-side">
+              <span class="badge ${getMonthlyEntryTypeBadgeClass(item)}">${getMonthlyEntryTypeLabel(item)}</span>
+              <div class="entry-amount ${item.type === 'income' ? 'amount-income' : 'amount-expense'}">${formatMoney(item.amount)}</div>
+            </div>
           </div>
           <div class="entry-meta-grid">
             <div class="entry-meta-box">
