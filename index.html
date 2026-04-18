@@ -124,15 +124,11 @@
       position:relative;
       overflow:hidden;
     }
-    .header-bar{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:14px;
-      min-width:0;
-    }
+    .app-bar{display:grid; gap:6px}
     .header-title{
       min-width:0;
+      display:grid;
+      gap:4px;
     }
     .header-title h1{
       margin:0;
@@ -167,105 +163,6 @@
       text-transform:uppercase;
       color:rgba(255,255,255,.78);
     }
-    .main-header .small-actions{
-      display:flex;
-      flex-wrap:wrap;
-      gap:8px;
-      min-width:0;
-      align-items:center;
-    }
-    .main-header .small-actions > *{
-      min-width:0;
-      flex:0 1 auto;
-    }
-    .main-header .small-actions button{
-      padding:10px 14px;
-      font-size:13px;
-      line-height:1.35;
-      white-space:normal;
-      word-break:break-word;
-    }
-    .header-top{
-      display:grid;
-      grid-template-columns:minmax(0,1fr) auto;
-      gap:12px 16px;
-      align-items:center;
-    }
-    .header-mobile-bar{
-      display:none;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-    }
-    .header-mobile-title{
-      min-width:0;
-      font-size:18px;
-      font-weight:700;
-      line-height:1.2;
-    }
-    .header-menu{
-      display:grid;
-      gap:8px;
-      padding-top:12px;
-      border-top:1px solid rgba(255,255,255,.18);
-    }
-    .header-menu .menu-title{
-      margin-bottom:0;
-      color:rgba(255,255,255,.76);
-    }
-    .header-menu .menu{
-      grid-template-columns:repeat(4,minmax(0,1fr));
-      gap:8px;
-    }
-    .header-menu .menu button{
-      min-width:0;
-      border-color:rgba(255,255,255,.12);
-      color:#e2e8f0;
-      background:rgba(255,255,255,.08);
-    }
-    .header-menu .menu button.active{
-      background:#fff;
-      color:#1d4ed8;
-      border-color:transparent;
-    }
-    .mobile-menu-toggle{
-      display:none;
-      width:46px;
-      height:46px;
-      padding:0;
-      border-radius:14px;
-      background:rgba(255,255,255,.14);
-      border:1px solid rgba(255,255,255,.28);
-      color:#fff;
-      align-items:center;
-      justify-content:center;
-      flex:none;
-      box-shadow:0 10px 24px rgba(15,23,42,.14);
-    }
-    .mobile-menu-toggle:hover{background:rgba(255,255,255,.2)}
-    .hamburger-icon{
-      position:relative;
-      width:18px;
-      height:2px;
-      border-radius:999px;
-      background:currentColor;
-      transition:background .2s ease;
-    }
-    .hamburger-icon:before,.hamburger-icon:after{
-      content:"";
-      position:absolute;
-      left:0;
-      width:18px;
-      height:2px;
-      border-radius:999px;
-      background:currentColor;
-      transition:transform .2s ease, top .2s ease, opacity .2s ease;
-    }
-    .hamburger-icon:before{top:-6px}
-    .hamburger-icon:after{top:6px}
-    .mobile-menu-toggle.is-active .hamburger-icon{background:transparent}
-    .mobile-menu-toggle.is-active .hamburger-icon:before{top:0; transform:rotate(45deg)}
-    .mobile-menu-toggle.is-active .hamburger-icon:after{top:0; transform:rotate(-45deg)}
     .file-status{
       background:rgba(255,255,255,.18);
       border:1px solid rgba(255,255,255,.3);
@@ -298,17 +195,9 @@
       color:#b91c1c;
     }
     .layout{display:grid; grid-template-columns:1fr; gap:18px}
-    .sidebar{padding:14px 16px; height:fit-content; position:static}
-    .menu-title{font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); font-weight:800; margin-bottom:10px}
-    .menu{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px}
-    .menu button{
-      width:100%; text-align:center; justify-content:center; display:flex; align-items:center; gap:10px;
-      background:transparent; border:1px solid transparent; color:#334155
-    }
-    .menu button.active{background:var(--primary-soft); color:var(--primary); border-color:#bfd5ff}
     .content{display:grid; gap:16px}
     .view{display:grid; gap:16px}
-    .panel,.form-card,.table-card{padding:20px}
+    .panel,.form-card,.monthly-entry-panel{padding:20px}
     .section-header{display:flex; justify-content:space-between; align-items:flex-start; gap:12px; margin-bottom:14px; flex-wrap:wrap}
     .section-header h2,.section-header h3{margin:0; font-size:20px}
     .meta{color:var(--muted); font-size:13px}
@@ -1064,12 +953,88 @@
     .collapsible-body{display:grid; gap:14px}
     .card-collapsed .collapsible-body{display:none}
     .section-header.has-toggle{align-items:center}
-    .modal-backdrop{position:fixed; inset:0; background:rgba(15,23,42,.45); display:flex; align-items:center; justify-content:center; padding:20px; z-index:1000}
+    .modal-backdrop{
+      position:fixed;
+      inset:0;
+      display:flex;
+      align-items:flex-end;
+      justify-content:center;
+      padding:0;
+      background:rgba(15,23,42,.52);
+      z-index:1500;
+      overscroll-behavior:contain;
+      touch-action:pan-y;
+    }
     .modal-backdrop.hidden{display:none !important}
-    .modal-dialog{width:min(880px,100%); max-height:min(90vh,920px); overflow:auto; border-radius:22px; background:#fff; box-shadow:0 30px 80px rgba(15,23,42,.28)}
-    .modal-header{position:sticky; top:0; z-index:1; display:flex; justify-content:space-between; gap:12px; align-items:flex-start; padding:22px 24px; background:#fff; border-bottom:1px solid var(--line)}
-    .modal-body{padding:24px}
-    .modal-close{background:#f8fafc; color:#334155; border:1px solid var(--line)}
+    .modal-dialog{
+      width:min(920px,100%);
+      max-height:min(92dvh,960px);
+      background:#fff;
+      border-radius:28px 28px 0 0;
+      box-shadow:0 30px 80px rgba(15,23,42,.28);
+      overflow:hidden;
+      display:grid;
+      grid-template-rows:auto minmax(0,1fr) auto;
+    }
+    .modal-header{
+      position:sticky;
+      top:0;
+      z-index:6;
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      align-items:flex-start;
+      padding:18px 16px 14px;
+      background:rgba(255,255,255,.96);
+      border-bottom:1px solid var(--line);
+      backdrop-filter:blur(12px);
+    }
+    .modal-header .meta{
+      max-width:56ch;
+      margin-top:4px;
+      font-size:12px;
+      line-height:1.45;
+    }
+    .modal-scroll-region{
+      min-height:0;
+      overflow:auto;
+      overscroll-behavior:contain;
+      -webkit-overflow-scrolling:touch;
+      scroll-padding-top:88px;
+      scroll-padding-bottom:112px;
+      padding-bottom:calc(16px + env(safe-area-inset-bottom));
+      background:#fff;
+    }
+    .modal-body{
+      padding:16px;
+      display:grid;
+      gap:16px;
+    }
+    .modal-footer{
+      position:sticky;
+      bottom:0;
+      z-index:7;
+      padding:14px 16px calc(14px + env(safe-area-inset-bottom));
+      background:linear-gradient(180deg, rgba(255,255,255,.84), #fff 28%);
+      border-top:1px solid var(--line);
+      backdrop-filter:blur(12px);
+    }
+    .modal-footer .small-actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      align-items:stretch;
+    }
+    .modal-footer .small-actions button{
+      flex:1 1 180px;
+      min-height:48px;
+    }
+    .modal-close{
+      background:#f8fafc;
+      color:#334155;
+      border:1px solid var(--line);
+      min-height:44px;
+    }
     .datepicker-alt-input{
       width:100%;
       min-height:46px;
@@ -1092,6 +1057,7 @@
       border-radius:16px;
       box-shadow:0 22px 42px rgba(15,23,42,.18), 0 3px 10px rgba(15,23,42,.08);
       overflow:hidden;
+      z-index:1700 !important;
     }
     .flatpickr-current-month{font-size:15px; font-weight:700}
     .flatpickr-monthDropdown-months,.numInputWrapper input{font-weight:700}
@@ -1131,19 +1097,21 @@
     .floating-back-btn{
       position:fixed;
       right:24px;
-      bottom:24px;
-      width:62px;
-      height:62px;
+      bottom:calc(104px + env(safe-area-inset-bottom));
+      min-width:52px;
+      height:52px;
+      padding:0 16px;
       border-radius:999px;
       display:flex;
       align-items:center;
       justify-content:center;
+      gap:8px;
       background:linear-gradient(135deg,#1d4ed8,#2563eb 60%,#60a5fa);
       color:#fff;
       box-shadow:0 18px 40px rgba(37,99,235,.28), 0 6px 14px rgba(15,23,42,.16);
       border:1px solid rgba(255,255,255,.24);
       z-index:1200;
-      font-size:26px;
+      font-size:18px;
       font-weight:800;
     }
     .floating-back-btn:hover{
@@ -1151,30 +1119,23 @@
       box-shadow:0 22px 46px rgba(37,99,235,.34), 0 8px 18px rgba(15,23,42,.18);
     }
     .floating-back-btn .floating-back-label{
-      position:absolute;
-      right:74px;
+      position:static;
       white-space:nowrap;
-      background:rgba(15,23,42,.92);
+      background:transparent;
       color:#fff;
-      border-radius:999px;
-      padding:8px 12px;
-      font-size:13px;
+      border-radius:0;
+      padding:0;
+      font-size:12px;
       font-weight:700;
-      opacity:0;
-      transform:translateX(8px);
-      pointer-events:none;
-      transition:opacity .18s ease, transform .18s ease;
-    }
-    .floating-back-btn:hover .floating-back-label,
-    .floating-back-btn:focus-visible .floating-back-label{
       opacity:1;
-      transform:translateX(0);
+      transform:none;
+      pointer-events:none;
+      transition:none;
     }
     .floating-back-btn.hidden{display:none !important}
     @media (max-width:1180px){
       .app{padding:12px}
       .layout{grid-template-columns:1fr}
-      .sidebar{position:static}
     .toolbar-inline,.year-grid,.form-grid,.year-grid.year-grid-enhanced,.monthly-insight-grid,.mini-summary-grid,.monthly-budget-grid,.monthly-workspace-grid,.trip-overview-grid,.trip-mini-summary-grid,.trip-plan-row-grid{grid-template-columns:1fr 1fr}
       .compact-filter-bar,.compact-filter-row,.trip-inline-filters,.trip-stat-grid{grid-template-columns:1fr 1fr}
       .quick-add-bar{grid-template-columns:1fr}
@@ -1191,34 +1152,28 @@
       }
       .trip-shell.trip-shell-list .trip-list-sticky{position:static; top:auto}
       .form-grid .span-2,.form-grid .full{grid-column:auto}
-      .sidebar .menu{grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px}
-      .sidebar .menu button{justify-content:center; text-align:center}
     }
     @media (max-width:900px){
       .main-header{
         padding:14px;
         gap:14px
       }
-      .header-top{grid-template-columns:1fr}
       .header-title h1{font-size:22px}
       .header-title p{font-size:13px}
       .header-right{width:100%; justify-content:flex-start}
-      .main-header .small-actions > *{flex:1 1 220px}
       .file-status{text-align:center}
-      .header-menu .menu{grid-template-columns:repeat(2,minmax(0,1fr))}
-      .table-card,.month-group{overflow-x:auto}
-      table{min-width:680px}
       .month-group-stats{flex-wrap:nowrap; overflow:auto}
       .month-group-stats .pill{white-space:nowrap}
     }
     @media (max-width:760px){
       .floating-back-btn{
         right:16px;
-        bottom:16px;
-        width:58px;
-        height:58px;
+        bottom:calc(92px + env(safe-area-inset-bottom));
+        width:auto;
+        height:48px;
+        padding:0 14px;
       }
-      .floating-back-btn .floating-back-label{display:none}
+      .floating-back-btn .floating-back-label{display:inline-flex; position:static; opacity:1; transform:none; background:transparent; padding:0; font-size:12px}
     .toolbar-inline,.year-grid,.form-grid,.year-grid.year-grid-enhanced,.compact-filter-bar,.compact-filter-row,.installment-filters,.calendar-grid,.installment-kv,.trip-inline-filters,.trip-stat-grid,.trip-detail-grid,.quick-add-bar,.monthly-insight-grid,.mini-summary-grid,.monthly-budget-grid,.budget-stat-grid,.goal-stat-grid,.monthly-workspace-grid,.trip-overview-grid,.trip-mini-summary-grid,.trip-plan-row-grid{grid-template-columns:1fr}
       .trip-card-footer,.trip-detail-top,.trip-section-title{align-items:flex-start}
       .trip-item-card{grid-template-columns:1fr}
@@ -1226,26 +1181,6 @@
       .main-header{
         gap:10px;
         padding:12px;
-      }
-      .header-mobile-bar{display:flex}
-      .header-bar{
-        align-items:flex-start;
-        width:100%;
-      }
-      .header-bar .mobile-menu-toggle{display:none}
-      .header-top{
-        max-height:0;
-        opacity:0;
-        overflow:hidden;
-        pointer-events:none;
-        transform:translateY(-8px);
-        transition:max-height .25s ease, opacity .2s ease, transform .25s ease;
-      }
-      .header-top.is-open{
-        max-height:480px;
-        opacity:1;
-        pointer-events:auto;
-        transform:translateY(0);
       }
       .header-right{justify-content:flex-start}
       .header-title h1{font-size:20px}
@@ -1256,53 +1191,32 @@
         align-items:stretch;
       }
       .header-panel-label{width:100%}
-      .main-header .small-actions{display:grid; grid-template-columns:1fr; gap:8px}
-      .main-header .small-actions > *{width:100%}
-      .main-header .small-actions button{width:100%}
       .auth-user,.file-status{text-align:left}
-      .mobile-menu-toggle{display:inline-flex}
-      .header-menu .menu-title{display:none}
-      .header-menu{
-        max-height:0;
-        opacity:0;
-        overflow:hidden;
-        pointer-events:none;
-        transform:translateY(-8px);
-        margin-top:-4px;
-        padding-top:0;
-        border-top:none;
-        transition:max-height .25s ease, opacity .2s ease, transform .25s ease, margin-top .25s ease, padding .25s ease, border-color .2s ease;
-      }
-      .header-menu.is-open{
-        max-height:320px;
-        opacity:1;
-        pointer-events:auto;
-        transform:translateY(0);
-        margin-top:0;
-        padding-top:10px;
-        border-top:1px solid rgba(255,255,255,.18);
-      }
-      .header-menu .menu{grid-template-columns:1fr}
-      .header-menu .menu button{text-align:left; justify-content:flex-start}
       .month-group-head,.section-header{align-items:flex-start}
       .app{padding:10px}
-      .panel,.form-card,.table-card{padding:14px}
+      .panel,.form-card,.monthly-entry-panel{padding:14px}
       .card{border-radius:14px}
       .summary-card{min-width:190px}
       .calendar-item{font-size:12px}
-      .modal-backdrop{padding:0}
+      .modal-backdrop{
+        align-items:stretch;
+      }
       .modal-dialog{
         width:100%;
-        height:100%;
-        max-height:none;
+        height:100dvh;
+        max-height:100dvh;
         border-radius:0;
       }
       .modal-header{
-        padding:16px 14px;
+        padding:calc(12px + env(safe-area-inset-top)) 14px 12px;
       }
       .modal-body{
         padding:14px;
       }
+      .modal-footer{
+        padding:12px 14px calc(12px + env(safe-area-inset-bottom));
+      }
+      .modal-footer .small-actions button,
       .small-actions button{width:100%}
       .monthly-subnav-wrap{
         top:8px;
@@ -1322,13 +1236,542 @@
     .app{width:100%; max-width:none; margin:0; padding:16px}
     .layout{display:grid; gap:18px}
     .content{min-width:0}
-    .table-card,.panel,.form-card,.sidebar{width:100%}
+    .monthly-entry-panel,.panel,.form-card{width:100%}
     .month-box.clickable{cursor:pointer; transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease}
     .month-box.clickable:hover{transform:translateY(-2px); border-color:#93c5fd; box-shadow:0 18px 36px rgba(37,99,235,.12)}
     .month-box-footer{display:flex; justify-content:space-between; gap:8px; align-items:center; font-size:12px; color:var(--primary); font-weight:800}
     .section-block{display:grid; gap:16px}
     @media (min-width:1400px){
       .year-grid,.year-grid.year-grid-enhanced{grid-template-columns:repeat(3,minmax(0,1fr))}
+    }
+
+    .app{
+      padding:0 14px calc(104px + env(safe-area-inset-bottom));
+      background:
+        radial-gradient(circle at top, rgba(191,219,254,.42), transparent 32%),
+        linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,0));
+    }
+    .main-header{
+      position:sticky;
+      top:0;
+      z-index:50;
+      margin:0 -14px 18px;
+      border-radius:0 0 28px 28px;
+      padding:12px 14px 14px;
+      box-shadow:0 20px 44px rgba(15,23,42,.18);
+    }
+    .app-bar{
+      min-height:58px;
+      align-content:center;
+    }
+    .layout{
+      gap:18px;
+      padding-bottom:8px;
+    }
+    .view{
+      gap:14px;
+    }
+    .panel,.form-card,.monthly-entry-panel{
+      padding:18px 16px;
+      border-radius:22px;
+    }
+    .section-header{
+      margin-bottom:16px;
+    }
+    .section-header h2,.section-header h3{
+      line-height:1.2;
+    }
+    .summary-grid{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:12px;
+      overflow:visible;
+      padding-bottom:0;
+    }
+    .summary-grid.summary-grid-5{
+      display:grid;
+    }
+    .summary-card{
+      min-width:0;
+      min-height:118px;
+      padding:16px;
+      border-radius:20px;
+    }
+    .summary-card .value{
+      font-size:22px;
+      line-height:1.15;
+    }
+    .toolbar-inline,
+    .monthly-insight-grid,
+    .monthly-budget-grid,
+    .monthly-workspace-grid,
+    .year-grid,
+    .calendar-grid,
+    .trip-shell{
+      grid-template-columns:1fr;
+    }
+    .compact-filter-bar,
+    .compact-filter-row,
+    .trip-inline-filters,
+    .installment-filters{
+      display:grid;
+      grid-template-columns:1fr;
+      gap:12px;
+      align-items:stretch;
+    }
+    .compact-filter-actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      align-items:center;
+    }
+    .compact-filter-actions > *{
+      flex:1 1 160px;
+    }
+    .quick-action-grid{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:10px;
+      margin-top:16px;
+    }
+    .quick-action-btn{
+      min-height:68px;
+      display:flex;
+      align-items:center;
+      gap:12px;
+      width:100%;
+      padding:14px;
+      border-radius:18px;
+      border:1px solid rgba(191,219,254,.9);
+      background:linear-gradient(180deg,#f8fbff,#eef6ff);
+      color:#0f172a;
+      text-align:left;
+      box-shadow:0 10px 28px rgba(37,99,235,.09);
+    }
+    .quick-action-btn:hover{
+      background:linear-gradient(180deg,#ffffff,#eff6ff);
+    }
+    .quick-action-icon{
+      width:42px;
+      height:42px;
+      border-radius:14px;
+      display:grid;
+      place-items:center;
+      background:#fff;
+      color:var(--primary);
+      font-size:19px;
+      box-shadow:0 8px 20px rgba(37,99,235,.12);
+      flex:none;
+    }
+    .quick-action-copy{
+      display:grid;
+      gap:2px;
+      min-width:0;
+    }
+    .quick-action-copy strong{
+      font-size:14px;
+      line-height:1.2;
+    }
+    .quick-action-copy small{
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.35;
+    }
+    .more-quick-grid{
+      margin-top:0;
+    }
+    .utility-hub{
+      display:grid;
+      gap:14px;
+    }
+    .utility-hub .header-right{
+      min-width:0;
+      display:grid;
+      gap:14px;
+      justify-content:stretch;
+    }
+    .utility-hub .header-panel{
+      display:grid;
+      gap:10px;
+      padding:16px;
+      border-radius:18px;
+      border:1px solid var(--line);
+      background:#f8fbff;
+    }
+    .utility-hub .header-panel-label{
+      color:#475569;
+      font-size:11px;
+    }
+    .utility-hub .small-actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      align-items:stretch;
+    }
+    .utility-hub .small-actions > *{
+      flex:1 1 160px;
+    }
+    .utility-hub .btn-ghost,
+    .utility-hub .btn-light{
+      background:#fff;
+      color:var(--primary);
+      border:1px solid #bfd5ff;
+    }
+    .utility-hub .file-status{
+      background:#fff;
+      color:#334155;
+      border-color:#dbe3ef;
+      white-space:normal;
+    }
+    .bottom-nav{
+      position:fixed;
+      left:12px;
+      right:12px;
+      bottom:calc(12px + env(safe-area-inset-bottom));
+      z-index:60;
+      display:grid;
+      grid-template-columns:repeat(5,minmax(0,1fr));
+      gap:8px;
+      padding:8px;
+      border-radius:24px;
+      background:rgba(15,23,42,.88);
+      backdrop-filter:blur(18px);
+      box-shadow:0 20px 40px rgba(15,23,42,.28);
+    }
+    .bottom-nav-btn{
+      min-height:62px;
+      display:grid;
+      place-items:center;
+      gap:4px;
+      padding:10px 8px;
+      border-radius:18px;
+      background:transparent;
+      color:rgba(226,232,240,.82);
+      font-weight:700;
+      transform:none;
+    }
+    .bottom-nav-btn.active{
+      background:#fff;
+      color:#1d4ed8;
+      box-shadow:0 10px 24px rgba(15,23,42,.18);
+    }
+    .bottom-nav-icon{
+      font-size:18px;
+      line-height:1;
+    }
+    .bottom-nav-label{
+      font-size:11px;
+      line-height:1.1;
+      text-align:center;
+    }
+    .mobile-panel-toggle{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-height:40px;
+    }
+    .mobile-collapsible{
+      display:grid;
+      gap:12px;
+    }
+    .entry-list{
+      display:grid;
+      gap:12px;
+    }
+    .entry-card{
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:14px;
+      background:
+        radial-gradient(circle at top right, rgba(219,234,254,.7), transparent 42%),
+        #fff;
+      display:grid;
+      gap:12px;
+      box-shadow:0 10px 24px rgba(15,23,42,.06);
+    }
+    .entry-card.nav-highlight{
+      border-color:#93c5fd;
+      box-shadow:0 0 0 3px rgba(147,197,253,.28), 0 18px 34px rgba(37,99,235,.12);
+    }
+    .entry-card-head{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      align-items:flex-start;
+    }
+    .entry-card-title{
+      min-width:0;
+      display:grid;
+      gap:4px;
+    }
+    .entry-card-title strong{
+      font-size:16px;
+      line-height:1.25;
+      word-break:break-word;
+    }
+    .entry-date{
+      font-size:12px;
+      font-weight:800;
+      letter-spacing:.04em;
+      text-transform:uppercase;
+      color:var(--muted);
+    }
+    .entry-amount{
+      font-size:24px;
+      font-weight:800;
+      line-height:1;
+      white-space:nowrap;
+      text-align:right;
+    }
+    .entry-chip-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      align-items:center;
+    }
+    .entry-meta-grid{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:10px;
+    }
+    .entry-meta-box{
+      padding:11px 12px;
+      border-radius:14px;
+      border:1px solid var(--line);
+      background:#f8fafc;
+      min-height:64px;
+      display:grid;
+      gap:4px;
+      align-content:start;
+    }
+    .entry-meta-box .label{
+      font-size:11px;
+      font-weight:800;
+      letter-spacing:.05em;
+      text-transform:uppercase;
+      color:var(--muted);
+    }
+    .entry-meta-box .value{
+      font-size:14px;
+      color:#0f172a;
+      word-break:break-word;
+    }
+    .entry-actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      align-items:center;
+      justify-content:space-between;
+    }
+    .entry-actions-left,
+    .entry-actions-right{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      align-items:center;
+    }
+    .btn-icon{
+      min-width:44px;
+      min-height:44px;
+      padding:0 12px;
+      border-radius:14px;
+      border:1px solid var(--line);
+      background:#fff;
+      color:#334155;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:6px;
+      font-size:16px;
+      box-shadow:0 8px 18px rgba(15,23,42,.06);
+      transform:none;
+    }
+    .btn-icon.btn-danger{
+      background:#fff1f2;
+      color:var(--red);
+      border-color:#fecdd3;
+    }
+    .btn-icon .sr-only{
+      position:absolute;
+      width:1px;
+      height:1px;
+      padding:0;
+      margin:-1px;
+      overflow:hidden;
+      clip:rect(0,0,0,0);
+      white-space:nowrap;
+      border:0;
+    }
+    .month-group{
+      padding:14px;
+      border-radius:20px;
+    }
+    .trip-detail-panel,
+    .trip-list-panel{
+      border-radius:22px;
+    }
+    .trip-mobile-back{
+      display:none;
+      margin-bottom:8px;
+    }
+    .modal-body .form-grid{
+      grid-template-columns:1fr;
+      gap:12px;
+    }
+    .modal-body .form-grid .span-2,
+    .modal-body .form-grid .full{
+      grid-column:1 / -1;
+    }
+    .modal-body .quick-add-bar{
+      padding:14px;
+      border-radius:18px;
+      border:1px solid var(--line);
+      background:linear-gradient(180deg,#fbfdff,#f3f8ff);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.8);
+    }
+    .modal-section-divider{
+      margin-top:-2px;
+    }
+    .modal-body .notice-box{
+      font-size:13px;
+      line-height:1.5;
+    }
+    .modal-body textarea{
+      min-height:116px;
+      resize:vertical;
+    }
+    .modal-dialog .select-enhanced{
+      z-index:2;
+    }
+    .modal-dialog .select-enhanced-panel{
+      z-index:1605;
+    }
+    body.overlay-open .bottom-nav,
+    body.overlay-open .floating-back-btn{
+      opacity:0;
+      pointer-events:none;
+      transform:translateY(20px);
+    }
+    body.overlay-open .main-header{
+      z-index:45;
+    }
+
+    @media (max-width:760px){
+      .mobile-collapsible.is-collapsed{display:none}
+      .entry-meta-grid{grid-template-columns:1fr}
+      .entry-actions{
+        flex-direction:column;
+        align-items:stretch;
+      }
+      .entry-actions-left,
+      .entry-actions-right{
+        width:100%;
+      }
+      .entry-actions-right .btn-icon{
+        flex:1 1 calc(33.333% - 6px);
+      }
+      .trip-shell.trip-detail-open .trip-list-panel{display:none}
+      .trip-shell:not(.trip-detail-open) .trip-detail-panel{display:none}
+      .trip-mobile-back{
+        display:inline-flex;
+      }
+    }
+
+    @media (min-width:761px){
+      .mobile-panel-toggle{display:none !important}
+      .mobile-collapsible{display:grid !important}
+      .bottom-nav{
+        left:50%;
+        right:auto;
+        transform:translateX(-50%);
+        width:min(720px,calc(100% - 32px));
+      }
+      .main-header{
+        margin:12px 0 18px;
+        border-radius:28px;
+        top:12px;
+      }
+      .summary-grid{
+        grid-template-columns:repeat(3,minmax(0,1fr));
+      }
+      .toolbar-inline{
+        grid-template-columns:repeat(3,minmax(0,1fr));
+      }
+      .quick-action-grid{
+        grid-template-columns:repeat(4,minmax(0,1fr));
+      }
+      .compact-filter-bar{
+        grid-template-columns:repeat(4,minmax(0,1fr));
+      }
+      .compact-filter-bar .compact-filter-actions{
+        grid-column:1 / -1;
+      }
+      .compact-filter-row{
+        grid-template-columns:repeat(3,minmax(0,1fr));
+      }
+      .compact-filter-row .compact-filter-actions{
+        grid-column:1 / -1;
+      }
+      .trip-inline-filters{
+        grid-template-columns:repeat(3,minmax(0,1fr));
+      }
+      .trip-inline-filters .compact-filter-actions{
+        grid-column:1 / -1;
+      }
+      .installment-filters{
+        grid-template-columns:repeat(3,minmax(0,1fr));
+      }
+      .installment-filters > div:last-child{
+        grid-column:1 / -1;
+      }
+      .modal-backdrop{
+        align-items:center;
+        padding:16px;
+        touch-action:auto;
+      }
+      .modal-dialog{
+        border-radius:26px;
+        height:auto;
+        max-height:min(92dvh,960px);
+      }
+    }
+
+    @media (min-width:1024px){
+      .summary-grid.summary-grid-5{
+        grid-template-columns:repeat(5,minmax(0,1fr));
+      }
+      .monthly-insight-grid,
+      .monthly-budget-grid{
+        grid-template-columns:repeat(2,minmax(0,1fr));
+      }
+      .monthly-workspace-grid{
+        grid-template-columns:1.05fr .95fr;
+      }
+      .trip-shell{
+        grid-template-columns:minmax(330px,.88fr) minmax(0,1.12fr);
+      }
+      .calendar-grid{
+        grid-template-columns:repeat(3,minmax(0,1fr));
+      }
+      .year-grid{
+        grid-template-columns:repeat(3,minmax(0,1fr));
+      }
+      .trip-shell .trip-detail-panel,
+      .trip-shell .trip-list-panel{
+        display:block;
+      }
+      .trip-mobile-back{
+        display:none !important;
+      }
+      .modal-body .form-grid{
+        grid-template-columns:repeat(2,minmax(0,1fr));
+      }
+      .modal-body .form-grid .span-2{
+        grid-column:span 2;
+      }
+      .modal-footer .small-actions{
+        flex-wrap:nowrap;
+      }
     }
 
   </style>
@@ -1371,47 +1814,10 @@
 
   <div id="appScreen" class="app hidden">
     <div class="main-header card">
-      <div class="header-mobile-bar">
-        <div class="header-mobile-title">แดชบอร์ดการเงินส่วนตัว</div>
-        <button id="mobileMenuToggle" class="mobile-menu-toggle" type="button" aria-label="เปิดเมนูหลัก" aria-expanded="false" aria-controls="mainMenuPanel">
-          <span class="hamburger-icon" aria-hidden="true"></span>
-        </button>
-      </div>
-      <div id="headerTop" class="header-top">
-        <div class="header-bar">
-          <div class="header-title">
-            <h1>แดชบอร์ดการเงินส่วนตัว</h1>
-            <p>จัดการรายรับ รายจ่าย และไฟล์ข้อมูลของคุณได้ในที่เดียว</p>
-          </div>
-        </div>
-        <div class="header-right">
-          <div class="header-panel">
-            <div class="header-panel-label">บัญชี</div>
-            <div class="small-actions">
-              <div id="authUserBadge" class="file-status auth-user hidden"></div>
-              <button id="logoutBtn" class="btn-light btn-sm hidden" type="button">Logout</button>
-            </div>
-          </div>
-          <div class="header-panel">
-            <div class="header-panel-label">ไฟล์</div>
-            <div class="small-actions">
-              <button id="saveJsonBtn" class="btn-ghost">💾 Export JSON</button>
-              <button id="loadAnotherBtn" class="btn-ghost">📂 Import</button>
-            </div>
-            <div class="small-actions">
-              <div id="saveStatusBadge" class="file-status save-status-badge save-status-idle">พร้อมใช้งาน</div>
-              <div id="fileStatus" class="file-status">ยังไม่ได้ผูกไฟล์สำหรับ Save ทับ</div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div id="mainMenuPanel" class="header-menu" aria-hidden="false">
-        <div class="menu-title">เมนูหลัก</div>
-        <div class="menu">
-          <button class="menu-btn active" data-view="monthly">🗓️ รายเดือน</button>
-          <button class="menu-btn" data-view="yearly">🌤️ ภาพรวมทั้งปี</button>
-          <button class="menu-btn" data-view="trips">✈️ ทริป</button>
-          <button class="menu-btn" data-view="installments">💳 ยอดผ่อน</button>
+      <div class="app-bar">
+        <div class="header-title">
+          <h1 id="appViewTitle">แดชบอร์ดการเงินส่วนตัว</h1>
+          <p id="appViewSubtitle">จัดการรายรับ รายจ่าย และไฟล์ข้อมูลของคุณได้ในที่เดียว</p>
         </div>
       </div>
     </div>
@@ -1528,6 +1934,36 @@
               <div class="notice-box"><strong id="monthlyTopCategory">-</strong><br><span class="meta">หมวดที่พบมากสุด</span></div>
               <div class="notice-box"><strong id="monthlyAverageExpense">฿0.00</strong><br><span class="meta">เฉลี่ยต่อรายการจ่าย</span></div>
             </div>
+            <div id="homeQuickActions" class="quick-action-grid home-quick-actions">
+              <button id="quickAddIncomeBtn" class="quick-action-btn" type="button" title="เพิ่มรายรับ">
+                <span class="quick-action-icon" aria-hidden="true">＋</span>
+                <span class="quick-action-copy">
+                  <strong>เพิ่มรายรับ</strong>
+                  <small>บันทึกรายการรับทันที</small>
+                </span>
+              </button>
+              <button id="quickAddExpenseBtn" class="quick-action-btn" type="button" title="เพิ่มรายจ่าย">
+                <span class="quick-action-icon" aria-hidden="true">－</span>
+                <span class="quick-action-copy">
+                  <strong>เพิ่มรายจ่าย</strong>
+                  <small>เปิดฟอร์มรายการรายวัน</small>
+                </span>
+              </button>
+              <button id="quickAddLoanBtn" class="quick-action-btn" type="button" title="เพิ่มยอดผ่อน">
+                <span class="quick-action-icon" aria-hidden="true">◌</span>
+                <span class="quick-action-copy">
+                  <strong>เพิ่มยอดผ่อน</strong>
+                  <small>สร้างหรืออัปเดตค่างวด</small>
+                </span>
+              </button>
+              <button id="quickAddTripBtn" class="quick-action-btn" type="button" title="สร้างทริป">
+                <span class="quick-action-icon" aria-hidden="true">✈</span>
+                <span class="quick-action-copy">
+                  <strong>สร้างทริป</strong>
+                  <small>วางแผนค่าใช้จ่ายทริป</small>
+                </span>
+              </button>
+            </div>
           </div>
 
           <!-- --NEW -->
@@ -1595,7 +2031,7 @@
             </div>
           </div>
 
-          <div class="table-card card">
+          <div class="panel card monthly-entry-panel">
             <div class="section-header">
               <div>
                 <h3>📄 รายการตามช่วงเดือน</h3>
@@ -1661,6 +2097,71 @@
           </div>
         </section>
 
+        <section id="view-more" class="view hidden">
+          <div class="panel card">
+            <div class="section-header">
+              <div>
+                <h2>เพิ่มเติม</h2>
+                <div class="meta">ไฟล์ บัญชี และเครื่องมือรองที่ยังต้องใช้</div>
+              </div>
+            </div>
+            <div class="quick-action-grid more-quick-grid">
+              <button id="openYearlyOverviewBtn" class="quick-action-btn" type="button" title="เปิดภาพรวมรายปี">
+                <span class="quick-action-icon" aria-hidden="true">▦</span>
+                <span class="quick-action-copy">
+                  <strong>ภาพรวมรายปี</strong>
+                  <small>เปิดสรุปทั้งปีแบบเต็มหน้า</small>
+                </span>
+              </button>
+              <button id="moreOpenBudgetBtn" class="quick-action-btn" type="button" title="เพิ่ม Budget">
+                <span class="quick-action-icon" aria-hidden="true">฿</span>
+                <span class="quick-action-copy">
+                  <strong>Budget</strong>
+                  <small>เพิ่มงบรายเดือน</small>
+                </span>
+              </button>
+              <button id="moreOpenGoalBtn" class="quick-action-btn" type="button" title="เพิ่ม Goal">
+                <span class="quick-action-icon" aria-hidden="true">◎</span>
+                <span class="quick-action-copy">
+                  <strong>Goal</strong>
+                  <small>ตั้งเป้าหมายการออม</small>
+                </span>
+              </button>
+            </div>
+          </div>
+
+          <div class="panel card">
+            <div class="section-header">
+              <div>
+                <h3>ไฟล์ บัญชี และ Sync</h3>
+                <div class="meta">จัดการการบันทึก นำเข้า ส่งออก และบัญชีจากจุดเดียว</div>
+              </div>
+            </div>
+            <div id="utilityHub" class="utility-hub">
+              <div class="header-right">
+                <div class="header-panel">
+                  <div class="header-panel-label">บัญชี</div>
+                  <div class="small-actions">
+                    <div id="authUserBadge" class="file-status auth-user hidden"></div>
+                    <button id="logoutBtn" class="btn-light btn-sm hidden" type="button">Logout</button>
+                  </div>
+                </div>
+                <div class="header-panel">
+                  <div class="header-panel-label">ไฟล์</div>
+                  <div class="small-actions">
+                    <button id="saveJsonBtn" class="btn-light">💾 Export JSON</button>
+                    <button id="loadAnotherBtn" class="btn-light">📂 Import</button>
+                  </div>
+                  <div class="small-actions">
+                    <div id="saveStatusBadge" class="file-status save-status-badge save-status-idle">พร้อมใช้งาน</div>
+                    <div id="fileStatus" class="file-status">ยังไม่ได้ผูกไฟล์สำหรับ Save ทับ</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
 
         <section id="view-trips" class="view hidden">
           <div class="panel card">
@@ -1671,11 +2172,12 @@
               </div>
               <div class="small-actions">
                 <button id="backFromTripsBtn" class="btn-light hidden">← ย้อนกลับ</button>
+                <button id="toggleTripFiltersBtn" class="btn-light btn-sm mobile-panel-toggle" type="button" aria-expanded="false" aria-controls="tripFiltersPanel">ตัวกรอง</button>
                 <button id="openTripModalBtn" class="btn-primary">＋ สร้างทริป</button>
                 <button id="openTripItemModalBtn" class="btn-light">＋ เพิ่มรายการในทริป</button>
               </div>
             </div>
-            <div class="trip-inline-filters">
+            <div id="tripFiltersPanel" class="trip-inline-filters mobile-collapsible is-collapsed">
               <div>
                 <label for="tripSearchKeyword">ค้นหา</label>
                 <input type="text" id="tripSearchKeyword" placeholder="ชื่อทริป รายการ หมายเหตุ หรือประเทศ">
@@ -1806,11 +2308,12 @@
                 <div id="loanFilterResultLabel" class="meta">กำลังแสดงทั้งหมด</div>
               </div>
               <div class="installment-view-switch">
+                <button id="toggleInstallmentFiltersBtn" class="btn-light btn-sm mobile-panel-toggle" type="button" aria-expanded="false" aria-controls="installmentFiltersPanel">ตัวกรอง</button>
                 <button id="loanListViewBtn" class="btn-light btn-sm">มุมมองรายการ</button>
                 <button id="loanCalendarViewBtn" class="btn-light btn-sm">มุมมองปฏิทิน</button>
               </div>
             </div>
-            <div class="installment-filters" style="margin-bottom:12px">
+            <div id="installmentFiltersPanel" class="installment-filters mobile-collapsible is-collapsed" style="margin-bottom:12px">
               <div>
                 <label for="loanSearchKeyword">ค้นหา</label>
                 <input type="text" id="loanSearchKeyword" placeholder="ชื่อรายการ / หมวด / หมายเหตุ">
@@ -1845,6 +2348,29 @@
         <span class="floating-back-label">ย้อนกลับ</span>
       </button>
     </div>
+
+    <nav id="bottomNav" class="bottom-nav" aria-label="Primary navigation">
+      <button class="bottom-nav-btn active" type="button" data-destination="home">
+        <span class="bottom-nav-icon" aria-hidden="true">⌂</span>
+        <span class="bottom-nav-label">หน้าหลัก</span>
+      </button>
+      <button class="bottom-nav-btn" type="button" data-destination="entries">
+        <span class="bottom-nav-icon" aria-hidden="true">≡</span>
+        <span class="bottom-nav-label">รายการ</span>
+      </button>
+      <button class="bottom-nav-btn" type="button" data-destination="installments">
+        <span class="bottom-nav-icon" aria-hidden="true">◔</span>
+        <span class="bottom-nav-label">ผ่อน</span>
+      </button>
+      <button class="bottom-nav-btn" type="button" data-destination="trips">
+        <span class="bottom-nav-icon" aria-hidden="true">✈</span>
+        <span class="bottom-nav-label">ทริป</span>
+      </button>
+      <button class="bottom-nav-btn" type="button" data-destination="more">
+        <span class="bottom-nav-icon" aria-hidden="true">⋯</span>
+        <span class="bottom-nav-label">เพิ่มเติม</span>
+      </button>
+    </nav>
   </div>
 
   <div id="entryModal" class="modal-backdrop hidden" aria-hidden="true">
@@ -2337,7 +2863,7 @@
     let entryHighlightTimer = null;
     let lastManualEntryType = 'expense';
     let lastManualEntryCategoryByType = { income:'เงินเดือน', expense:'อื่นๆ' };
-    let monthlySubView = 'entries'; // --NEW
+    let monthlySubView = 'summary'; // --NEW
     let monthlyQuickFilterMode = '';
     let monthlyQuickFilterSnapshot = null;
     let lastPersistedDataFingerprint = '';
@@ -2390,9 +2916,8 @@
     const saveJsonBtn = $('saveJsonBtn');
     const saveStatusBadge = $('saveStatusBadge');
     const fileStatus = $('fileStatus');
-    const mobileMenuToggle = $('mobileMenuToggle');
-    const headerTop = $('headerTop');
-    const mainMenuPanel = $('mainMenuPanel');
+    const appViewTitle = $('appViewTitle');
+    const appViewSubtitle = $('appViewSubtitle');
 
     const rangeStartMonth = $('rangeStartMonth');
     const rangeEndMonth = $('rangeEndMonth');
@@ -2431,6 +2956,10 @@
 
     const openEntryModalBtn = $('openEntryModalBtn');
     const openEntryModalBtnSecondary = $('openEntryModalBtnSecondary');
+    const quickAddIncomeBtn = $('quickAddIncomeBtn');
+    const quickAddExpenseBtn = $('quickAddExpenseBtn');
+    const quickAddLoanBtn = $('quickAddLoanBtn');
+    const quickAddTripBtn = $('quickAddTripBtn');
     const entryModal = $('entryModal');
     const closeEntryModalBtn = $('closeEntryModalBtn');
     const budgetModal = $('budgetModal'); // --NEW
@@ -2497,6 +3026,9 @@
     const yearlyEntryCount = $('yearlyEntryCount');
     const yearlyInstallmentTotal = $('yearlyInstallmentTotal');
     const yearlyGrid = $('yearlyGrid');
+    const openYearlyOverviewBtn = $('openYearlyOverviewBtn');
+    const moreOpenBudgetBtn = $('moreOpenBudgetBtn');
+    const moreOpenGoalBtn = $('moreOpenGoalBtn');
 
     const loanFormTitle = $('loanFormTitle');
     const loanEditBadge = $('loanEditBadge');
@@ -2579,6 +3111,8 @@
     const tripShell = document.querySelector('.trip-shell');
     const tripListViewBtn = $('tripListViewBtn');
     const tripCalendarViewBtn = $('tripCalendarViewBtn');
+    const toggleTripFiltersBtn = $('toggleTripFiltersBtn');
+    const toggleInstallmentFiltersBtn = $('toggleInstallmentFiltersBtn');
     const DEFAULT_ENTRY_FORM_TITLE = entryFormTitle?.textContent || '';
     const DEFAULT_SAVE_ENTRY_TEXT = saveEntryBtn?.textContent || '';
     const DEFAULT_BUDGET_FORM_TITLE = budgetFormTitle?.textContent || ''; // --NEW
@@ -2594,7 +3128,18 @@
     const DEFAULT_TRIP_ITEM_FORM_TITLE = tripItemFormTitle?.textContent || '';
     const DEFAULT_SAVE_TRIP_ITEM_TEXT = saveTripItemBtn?.textContent || '';
     const DEFAULT_AUTH_STATUS = authStatus?.textContent || '';
+    const TASK_SHEET_MODALS = [
+      entryModal,
+      budgetModal,
+      goalModal,
+      loanModal,
+      tripModal,
+      tripItemModal,
+      tripBudgetModal
+    ].filter(Boolean);
     const enhancedSelectRegistry = new Map();
+    let lockedBodyScrollY = 0;
+    let isBodyScrollLocked = false;
     const QUICK_ADD_INCOME_KEYWORDS = [
       'income','salary','bonus','commission','refund','allowance','payday',
       'เงินเดือน','โบนัส','รายรับ','รายได้','คืนเงิน','ค่าคอม','คอมมิชชั่น','เบี้ยเลี้ยง'
@@ -4501,7 +5046,7 @@
     }
     function restoreViewState(snapshot){
       if(!snapshot) return;
-      currentView = snapshot.view || 'yearly';
+      currentView = snapshot.view || 'monthly';
 
       rangeStartMonth.value = snapshot.monthly?.rangeStartMonth || currentMonth();
       rangeEndMonth.value = snapshot.monthly?.rangeEndMonth || rangeStartMonth.value;
@@ -5437,6 +5982,8 @@
     function setMonthlySubView(view){ // --NEW
       monthlySubView = normalizeMonthlySubView(view);
       updateMonthlySubViewUi();
+      updatePrimaryNavUi();
+      updateAppChrome();
     }
     function setupMonthlySubViewLayout(){ // --NEW
       const monthlyView = $('view-monthly');
@@ -5450,12 +5997,14 @@
       const budgetGrid = monthlyBudgetContainer?.closest('.monthly-budget-grid');
       const recentPanel = recentEntriesContainer?.closest('.panel.card');
       const managePanel = openEntryModalBtnSecondary?.closest('.panel.card');
-      const tablePanel = entriesContainer?.closest('.table-card.card');
+      const tablePanel = entriesContainer?.closest('.monthly-entry-panel.card');
 
       if(!monthlyHeaderPanel || !entryControlsBlock || !insightGrid || !summaryPanel || !softInsightPanel || !budgetGrid || !recentPanel || !managePanel || !tablePanel) return;
 
       const headerMeta = monthlyHeaderPanel.querySelector('.section-header .meta');
       if(headerMeta) headerMeta.textContent = 'เลือกโหมดทำงานให้เหมาะกับสิ่งที่กำลังจะทำ';
+      entryControlsBlock.id = 'monthlyFilterStack';
+      entryControlsBlock.classList.add('mobile-collapsible','is-collapsed');
 
       const entryControlsPanel = document.createElement('div');
       entryControlsPanel.id = 'monthlyEntryControlsPanel';
@@ -5465,6 +6014,9 @@
           <div>
             <h3>รายการประจำวัน</h3>
             <div class="meta">เพิ่ม ค้นหา และกรองรายการได้ไวในจุดเดียว</div>
+          </div>
+          <div class="small-actions">
+            <button id="toggleMonthlyFiltersBtn" class="btn-light btn-sm mobile-panel-toggle" type="button" aria-expanded="false" aria-controls="monthlyFilterStack">ตัวกรอง</button>
           </div>
         </div>
       `;
@@ -5501,9 +6053,9 @@
       subnavWrap.className = 'monthly-subnav-wrap';
       subnavWrap.innerHTML = `
         <div class="monthly-subnav" role="tablist" aria-label="Monthly sub navigation">
-          <button id="monthlyEntriesTabBtn" class="monthly-subtab active" type="button" role="tab" aria-selected="true" aria-controls="monthlyTabEntries" data-monthly-subview="entries">รายการ</button>
-          <button id="monthlySummaryTabBtn" class="monthly-subtab" type="button" role="tab" aria-selected="false" aria-controls="monthlyTabSummary" data-monthly-subview="summary">สรุป</button>
-          <button id="monthlyBudgetTabBtn" class="monthly-subtab" type="button" role="tab" aria-selected="false" aria-controls="monthlyTabBudget" data-monthly-subview="budget">Budget / Goal</button>
+          <button id="monthlySummaryTabBtn" class="monthly-subtab active" type="button" role="tab" aria-selected="true" aria-controls="monthlyTabSummary" data-monthly-subview="summary">หน้าหลัก</button>
+          <button id="monthlyEntriesTabBtn" class="monthly-subtab" type="button" role="tab" aria-selected="false" aria-controls="monthlyTabEntries" data-monthly-subview="entries">รายการ</button>
+          <button id="monthlyBudgetTabBtn" class="monthly-subtab" type="button" role="tab" aria-selected="false" aria-controls="monthlyTabBudget" data-monthly-subview="budget">งบ / Goal</button>
         </div>
       `;
 
@@ -5535,6 +6087,103 @@
 
       monthlyView.append(subnavWrap, entriesPanel, summaryPanelWrap, budgetPanelWrap);
       updateMonthlySubViewUi();
+    }
+
+    function getMonthlyEntryTypeBadgeClass(item){
+      if(item.sourceType === 'installment' || item.sourceType === 'trip') return 'badge-installment';
+      return item.type === 'income' ? 'badge-income' : 'badge-expense';
+    }
+    function getMonthlyEntryTypeLabel(item){
+      if(item.sourceType === 'installment') return 'ยอดผ่อน';
+      if(item.sourceType === 'trip') return 'ทริป';
+      return item.type === 'income' ? 'รายรับ' : 'รายจ่าย';
+    }
+    function buildMonthlyEntryActionHtml(item, monthKey){
+      if(item.sourceType === 'installment'){
+        return `
+          <div class="entry-actions-left">
+            <button class="payment-toggle ${item.isPaid ? 'is-paid' : 'is-unpaid'}" onclick="toggleInstallmentMonthPaid('${item.sourceId}','${monthKey}')">
+              <input type="checkbox" ${item.isPaid ? 'checked' : ''}>
+              <span>${item.isPaid ? 'จ่ายแล้ว' : 'ยังไม่จ่าย'}</span>
+            </button>
+          </div>
+          <div class="entry-actions-right">
+            <button class="btn-icon" type="button" title="ไปหน้ายอดผ่อน" aria-label="ไปหน้ายอดผ่อน" onclick="goToInstallments('${item.sourceId}','${monthKey}')">↗<span class="sr-only">ไปหน้ายอดผ่อน</span></button>
+          </div>
+        `;
+      }
+      if(item.sourceType === 'trip'){
+        return `
+          <div class="entry-actions-left">
+            <button class="payment-toggle ${item.isPaid ? 'is-paid' : 'is-unpaid'}" onclick="toggleTripItemPaid('${item.sourceId}','${item.tripItemId}')">
+              <input type="checkbox" ${item.isPaid ? 'checked' : ''}>
+              <span>${item.isPaid ? 'จ่ายแล้ว' : 'ยังไม่จ่าย'}</span>
+            </button>
+          </div>
+          <div class="entry-actions-right">
+            <button class="btn-icon" type="button" title="เปิดทริป" aria-label="เปิดทริป" onclick="goToTrip('${item.sourceId}','${item.tripItemId}','${item.date || ''}')">↗<span class="sr-only">เปิดทริป</span></button>
+          </div>
+        `;
+      }
+      return `
+        <div class="entry-actions-left">
+          ${item.type === 'expense' ? `
+            <button class="payment-toggle ${item.isPaid ? 'is-paid' : 'is-unpaid'}" onclick="toggleEntryPaid('${item.id}')">
+              <input type="checkbox" ${item.isPaid ? 'checked' : ''}>
+              <span>${item.isPaid ? 'จ่ายแล้ว' : 'ยังไม่จ่าย'}</span>
+            </button>
+          ` : '<span class="pill">เคลียร์แล้ว</span>'}
+        </div>
+        <div class="entry-actions-right">
+          <button class="btn-icon" type="button" title="คัดลอกรายการ" aria-label="คัดลอกรายการ" onclick="duplicateEntry('${item.id}')">⧉<span class="sr-only">คัดลอกรายการ</span></button>
+          <button class="btn-icon" type="button" title="แก้ไขรายการ" aria-label="แก้ไขรายการ" onclick="editEntry('${item.id}')">✎<span class="sr-only">แก้ไขรายการ</span></button>
+          <button class="btn-icon btn-danger" type="button" title="ลบรายการ" aria-label="ลบรายการ" onclick="deleteEntry('${item.id}')">🗑<span class="sr-only">ลบรายการ</span></button>
+        </div>
+      `;
+    }
+    function buildMonthlyEntryCardHtml(item, monthKey){
+      const noteContent = item.note ? escapeHtml(item.note) : '-';
+      const sourceNote = item.sourceType === 'installment'
+        ? 'แก้ไขได้เฉพาะในหน้ายอดผ่อน'
+        : (item.sourceType === 'trip'
+          ? `มาจากทริป ${escapeHtml(item.tripName || '')} · แก้ไขได้เฉพาะในหน้าทริป`
+          : 'รายการปกติ');
+      return `
+        <article class="entry-card" data-entry-id="${escapeHtml(item.id || '')}">
+          <div class="entry-card-head">
+            <div class="entry-card-title">
+              <div class="entry-date">${escapeHtml(item.date || '-')}</div>
+              <strong>${escapeHtml(item.title || '-')}</strong>
+              <div class="entry-chip-row">
+                <span class="badge ${getMonthlyEntryTypeBadgeClass(item)}">${getMonthlyEntryTypeLabel(item)}</span>
+                ${item.type === 'expense' ? getPaymentStatusBadge(!!item.isPaid) : '<span class="pill">รายรับ</span>'}
+              </div>
+            </div>
+            <div class="entry-amount ${item.type === 'income' ? 'amount-income' : 'amount-expense'}">${formatMoney(item.amount)}</div>
+          </div>
+          <div class="entry-meta-grid">
+            <div class="entry-meta-box">
+              <div class="label">หมวดหมู่</div>
+              <div class="value">${escapeHtml(formatCategoryLabel(item.category || 'อื่นๆ'))}</div>
+            </div>
+            <div class="entry-meta-box">
+              <div class="label">สถานะ</div>
+              <div class="value">${item.type === 'expense' ? (item.isPaid ? 'จ่ายแล้ว' : 'ยังไม่จ่าย') : 'รับเงินแล้ว'}</div>
+            </div>
+            <div class="entry-meta-box">
+              <div class="label">หมายเหตุ</div>
+              <div class="value">${noteContent}</div>
+            </div>
+            <div class="entry-meta-box">
+              <div class="label">ที่มา</div>
+              <div class="value">${sourceNote}</div>
+            </div>
+          </div>
+          <div class="entry-actions">
+            ${buildMonthlyEntryActionHtml(item, monthKey)}
+          </div>
+        </article>
+      `;
     }
 
     function renderMonthly(){
@@ -5602,70 +6251,9 @@
                 </div>
               </div>
               ${group.items.length ? `
-                <table>
-                  <thead>
-                    <tr>
-                      <th>วันที่</th>
-                      <th>ประเภท</th>
-                      <th>สถานะ</th>
-                      <th>รายการ</th>
-                      <th>จำนวนเงิน</th>
-                      <th>จัดการ</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    ${group.items.map(item => `
-                      <tr data-entry-id="${escapeHtml(item.id || '')}">
-                        <td>${escapeHtml(item.date || '-')}</td>
-                        <td>
-                          <span class="badge ${item.sourceType === 'installment' || item.sourceType === 'trip' ? 'badge-installment' : (item.type === 'income' ? 'badge-income' : 'badge-expense')}">
-                            ${item.sourceType === 'installment' ? 'ยอดผ่อน' : (item.sourceType === 'trip' ? 'ทริป' : (item.type === 'income' ? 'รายรับ' : 'รายจ่าย'))}
-                          </span>
-                        </td>
-                        <td>${item.type === 'expense' ? getPaymentStatusBadge(!!item.isPaid) : '<span class="meta">-</span>'}</td>
-                        <td>
-                          <div><strong>${escapeHtml(item.title)}</strong></div>
-                          <div class="meta">${escapeHtml(formatCategoryLabel(item.category || 'อื่นๆ'))}</div>
-                          ${item.note ? `<div class="meta">${escapeHtml(item.note)}</div>` : ''}
-                          ${item.sourceType === 'installment' ? '<div class="readonly-note">แก้ไขได้เฉพาะในหน้ายอดผ่อน</div>' : ''}
-                          ${item.sourceType === 'trip' ? `<div class="readonly-note">มาจากทริป ${escapeHtml(item.tripName || '')} · แก้ไขได้เฉพาะในหน้าทริป</div>` : ''}
-                        </td>
-                        <td class="${item.type === 'income' ? 'amount-income' : 'amount-expense'}">${formatMoney(item.amount)}</td>
-                        <td>
-                          ${item.sourceType === 'installment' ? `
-                            <div class="small-actions">
-                              <button class="payment-toggle ${item.isPaid ? 'is-paid' : 'is-unpaid'}" onclick="toggleInstallmentMonthPaid('${item.sourceId}','${group.monthKey}')">
-                                <input type="checkbox" ${item.isPaid ? 'checked' : ''}>
-                                <span>${item.isPaid ? 'จ่ายแล้ว' : 'ยังไม่จ่าย'}</span>
-                              </button>
-                              <button class="btn-light btn-sm" onclick="goToInstallments('${item.sourceId}','${group.monthKey}')">ไปหน้ายอดผ่อน</button>
-                            </div>
-                          ` : item.sourceType === 'trip' ? `
-                            <div class="small-actions">
-                              <button class="payment-toggle ${item.isPaid ? 'is-paid' : 'is-unpaid'}" onclick="toggleTripItemPaid('${item.sourceId}','${item.tripItemId}')">
-                                <input type="checkbox" ${item.isPaid ? 'checked' : ''}>
-                                <span>${item.isPaid ? 'จ่ายแล้ว' : 'ยังไม่จ่าย'}</span>
-                              </button>
-                              <button class="btn-light btn-sm" onclick="goToTrip('${item.sourceId}','${item.tripItemId}','${item.date || ''}')">ไปหน้าทริป</button>
-                            </div>
-                          ` : `
-                            <div class="small-actions">
-                              ${item.type === 'expense' ? `
-                                <button class="payment-toggle ${item.isPaid ? 'is-paid' : 'is-unpaid'}" onclick="toggleEntryPaid('${item.id}')">
-                                  <input type="checkbox" ${item.isPaid ? 'checked' : ''}>
-                                  <span>${item.isPaid ? 'จ่ายแล้ว' : 'ยังไม่จ่าย'}</span>
-                                </button>
-                              ` : ''}
-                              <button class="btn-light btn-sm" onclick="duplicateEntry('${item.id}')">📄 Duplicate</button>
-                              <button class="btn-light btn-sm" onclick="editEntry('${item.id}')">แก้ไข</button>
-                              <button class="btn-danger btn-sm" onclick="deleteEntry('${item.id}')">ลบ</button>
-                            </div>
-                          `}
-                        </td>
-                      </tr>
-                    `).join('')}
-                  </tbody>
-                </table>
+                <div class="entry-list">
+                  ${group.items.map(item => buildMonthlyEntryCardHtml(item, group.monthKey)).join('')}
+                </div>
               ` : '<div class="empty">ไม่มีรายการในเดือนนี้ตามตัวกรองที่เลือก</div>'}
             </div>
           `).join('')}
@@ -6537,7 +7125,7 @@
     }
     function ensureActiveTrip(filteredTrips){
       if(filteredTrips.some(trip => trip.id === activeTripId)) return;
-      activeTripId = filteredTrips[0]?.id || null;
+      activeTripId = shouldAutoSelectTripDetail() ? (filteredTrips[0]?.id || null) : null;
     }
     function scrollToTripDetail(){
       if(!tripDetailPanel) return;
@@ -6552,6 +7140,7 @@
       if(tripShell){
         tripShell.classList.toggle('trip-shell-list', tripViewMode === 'list');
         tripShell.classList.toggle('trip-shell-calendar', tripViewMode === 'calendar');
+        tripShell.classList.toggle('trip-detail-open', tripViewMode === 'list' && !!activeTripId);
       }
       const trips = appData.trips.slice().sort((a,b) => String(a.startDate || '').localeCompare(String(b.startDate || '')) || String(a.name || '').localeCompare(String(b.name || ''),'th'));
       const filteredTrips = trips.filter(tripMatchesFilter);
@@ -6665,7 +7254,30 @@
       tripCalendarViewBtn.classList.toggle('btn-primary', tripViewMode === 'calendar');
       tripCalendarViewBtn.classList.toggle('btn-light', tripViewMode !== 'calendar');
 
-      const trip = filteredTrips.find(item => item.id === activeTripId) || filteredTrips[0];
+      const selectedTrip = filteredTrips.find(item => item.id === activeTripId) || (shouldAutoSelectTripDetail() ? filteredTrips[0] : null);
+      if(!selectedTrip){
+        const totalActual = filteredTrips.reduce((sum, trip) => sum + getTripActualTotal(trip.id), 0);
+        const totalDays = filteredTrips.reduce((sum, trip) => sum + getTripDays(trip).length, 0);
+        const totalItems = filteredTrips.reduce((sum, trip) => sum + (trip.items || []).length, 0);
+        const categoryTotals = new Map();
+        filteredTrips.forEach(trip => {
+          Object.entries(getTripActualByCategory(trip.id)).forEach(([categoryId, amount]) => {
+            categoryTotals.set(categoryId, round2((categoryTotals.get(categoryId) || 0) + Number(amount || 0)));
+          });
+        });
+        const topCategoryEntry = Array.from(categoryTotals.entries()).sort((a,b) => Number(b[1] || 0) - Number(a[1] || 0))[0];
+        tripSummaryLabel.textContent = 'แตะทริปจากรายการเพื่อดูรายละเอียด';
+        tripExpenseTotal.textContent = formatMoney(totalActual);
+        tripDayCount.textContent = String(totalDays);
+        tripItemCount.textContent = String(totalItems);
+        tripTopCategory.textContent = topCategoryEntry ? formatCategoryLabel(topCategoryEntry[0]) : '-';
+        tripDetailContainer.innerHTML = '<div class="empty">เลือกทริปจากรายการด้านบนเพื่อเปิดรายละเอียดแบบเต็มหน้าบนมือถือ</div>';
+        if(tripShell){
+          tripShell.classList.toggle('trip-detail-open', false);
+        }
+        return;
+      }
+      const trip = selectedTrip;
       const items = (trip.items || []).slice().sort((a,b) => String(a.date || '').localeCompare(String(b.date || '')) || Number(b.amount || 0) - Number(a.amount || 0));
       const dayList = getTripDays(trip);
       const actualByCategory = getTripActualByCategory(trip.id); // --NEW
@@ -6689,6 +7301,7 @@
 
       tripDetailContainer.innerHTML = `
         <div class="trip-detail">
+          <button class="btn-light btn-sm trip-mobile-back" type="button" onclick="closeTripMobileDetail()">← รายการทริป</button>
           <div class="trip-detail-hero">
             <div class="trip-detail-top">
               <div>
@@ -6724,50 +7337,251 @@
           ${detailTabContent}
         </div>
       `;
+      if(tripShell){
+        tripShell.classList.toggle('trip-detail-open', tripViewMode === 'list' && !!activeTripId);
+      }
+    }
+
+    function isDesktopLayout(){
+      return window.innerWidth >= 1024;
+    }
+    function shouldAutoSelectTripDetail(){
+      return window.innerWidth > 900;
+    }
+    function getPrimaryDestination(){
+      if(currentView === 'more' || currentView === 'yearly') return 'more';
+      if(currentView === 'installments') return 'installments';
+      if(currentView === 'trips') return 'trips';
+      if(currentView === 'monthly' && monthlySubView === 'entries') return 'entries';
+      return 'home';
+    }
+    function updatePrimaryNavUi(){
+      const destination = getPrimaryDestination();
+      document.querySelectorAll('.bottom-nav-btn').forEach(button => {
+        const isActive = button.dataset.destination === destination;
+        button.classList.toggle('active', isActive);
+        button.setAttribute('aria-current', isActive ? 'page' : 'false');
+      });
+    }
+    function setPrimaryDestination(destination, options = {}){
+      if(destination === 'entries'){
+        currentView = 'monthly';
+        monthlySubView = 'entries';
+      }else if(destination === 'installments'){
+        currentView = 'installments';
+      }else if(destination === 'trips'){
+        currentView = 'trips';
+      }else if(destination === 'more'){
+        currentView = 'more';
+      }else{
+        currentView = 'monthly';
+        monthlySubView = 'summary';
+      }
+      if(options.updateView !== false) updateView();
+      if(options.scroll !== false) window.scrollTo({ top: 0, behavior:'smooth' });
+    }
+    function openYearlyOverview(options = {}){
+      if(options.rememberCurrent !== false) pushNavigationHistory();
+      currentView = 'yearly';
+      updateView();
+      if(options.scroll !== false) window.scrollTo({ top: 0, behavior:'smooth' });
+    }
+    function getAppViewMeta(){
+      if(currentView === 'monthly'){
+        if(monthlySubView === 'entries'){
+          return {
+            title: 'รายรับรายจ่าย',
+            subtitle: 'ค้นหา กรอง และจัดการรายการประจำวันได้เร็วขึ้น'
+          };
+        }
+        if(monthlySubView === 'budget'){
+          return {
+            title: 'Budget และ Goal',
+            subtitle: 'ติดตามงบรายเดือนและเป้าหมายการออมในหน้าเดียว'
+          };
+        }
+        return {
+          title: 'หน้าหลัก',
+          subtitle: 'ภาพรวมการเงิน รายการด่วน และสิ่งที่ต้องจัดการก่อน'
+        };
+      }
+      if(currentView === 'installments'){
+        return {
+          title: 'ผ่อน',
+          subtitle: 'ดูค่างวด ความคืบหน้า และยอดคงเหลือแบบสแกนง่าย'
+        };
+      }
+      if(currentView === 'trips'){
+        return {
+          title: 'ทริป',
+          subtitle: 'แยกรายการจริง แผนงบ และรายละเอียดทริปให้แตะง่ายขึ้น'
+        };
+      }
+      if(currentView === 'yearly'){
+        return {
+          title: 'ภาพรวมรายปี',
+          subtitle: 'ดูสรุปทั้งปีและแตะลงไปยังเดือนที่ต้องการได้ทันที'
+        };
+      }
+      return {
+        title: 'เพิ่มเติม',
+        subtitle: 'ไฟล์ บัญชี และเครื่องมือรองที่ยังต้องใช้'
+      };
+    }
+    function updateAppChrome(){
+      const meta = getAppViewMeta();
+      if(appViewTitle) appViewTitle.textContent = meta.title;
+      if(appViewSubtitle) appViewSubtitle.textContent = meta.subtitle;
+    }
+    function setResponsivePanelState(targetId, open = false){
+      const panel = $(targetId);
+      if(!panel) return;
+      const shouldOpen = window.innerWidth > 760 ? true : Boolean(open);
+      panel.classList.toggle('is-collapsed', !shouldOpen);
+      document.querySelectorAll(`[aria-controls="${targetId}"]`).forEach(button => {
+        button.setAttribute('aria-expanded', shouldOpen ? 'true' : 'false');
+      });
+    }
+    function toggleResponsivePanel(targetId){
+      const panel = $(targetId);
+      if(!panel) return;
+      setResponsivePanelState(targetId, panel.classList.contains('is-collapsed'));
+    }
+    function syncResponsivePanels(){
+      ['monthlyFilterStack','tripFiltersPanel','installmentFiltersPanel'].forEach(targetId => setResponsivePanelState(targetId, false));
+    }
+    function openEntryModalForType(type){
+      clearEntryForm();
+      lastManualEntryType = type === 'income' ? 'income' : 'expense';
+      entryType.value = lastManualEntryType;
+      entryCategory.value = getSmartDefaultCategory(entryType.value);
+      if(entryType.value === 'income') entryIsPaid.checked = true;
+      updateEntryPaidVisibility();
+      refreshAllEnhancedSelects();
+      openEntryModal();
     }
 
     function updateView(){
       document.querySelectorAll('.view').forEach(el => el.classList.add('hidden'));
       document.getElementById(`view-${currentView}`).classList.remove('hidden');
-      document.querySelectorAll('.menu-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.view === currentView));
+      updatePrimaryNavUi();
+      updateAppChrome();
+      if(tripShell){
+        tripShell.classList.toggle('trip-detail-open', currentView === 'trips' && tripViewMode === 'list' && !!activeTripId);
+      }
       updateMonthlySubViewUi(); // --NEW
       updateBackButtons();
     }
-
-    function isMobileMenuLayout(){
-      return window.innerWidth <= 760;
-    }
-
-    function setMobileMenu(open){
-      if(!mobileMenuToggle || !mainMenuPanel) return;
-      const shouldOpen = isMobileMenuLayout() ? Boolean(open) : true;
-      if(headerTop) headerTop.classList.toggle('is-open', shouldOpen && isMobileMenuLayout());
-      mainMenuPanel.classList.toggle('is-open', shouldOpen && isMobileMenuLayout());
-      mainMenuPanel.setAttribute('aria-hidden', shouldOpen ? 'false' : 'true');
-      mobileMenuToggle.classList.toggle('is-active', shouldOpen && isMobileMenuLayout());
-      mobileMenuToggle.setAttribute('aria-expanded', shouldOpen && isMobileMenuLayout() ? 'true' : 'false');
-    }
-
-    function syncResponsiveMenu(){
-      if(!mobileMenuToggle || !mainMenuPanel) return;
-      if(isMobileMenuLayout()){
-        const isOpen = mainMenuPanel.classList.contains('is-open');
-        if(headerTop) headerTop.classList.toggle('is-open', isOpen);
-        mainMenuPanel.setAttribute('aria-hidden', isOpen ? 'false' : 'true');
-        mobileMenuToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-        return;
+    function syncResponsiveLayout(){
+      syncResponsivePanels();
+      if(tripShell){
+        tripShell.classList.toggle('trip-detail-open', currentView === 'trips' && tripViewMode === 'list' && !!activeTripId);
       }
-      if(headerTop) headerTop.classList.remove('is-open');
-      mainMenuPanel.classList.remove('is-open');
-      mainMenuPanel.setAttribute('aria-hidden', 'false');
-      mobileMenuToggle.classList.remove('is-active');
-      mobileMenuToggle.setAttribute('aria-expanded', 'false');
+      syncOverlayChrome();
+    }
+    function setupTaskSheetModal(modal){
+      if(!modal || modal.dataset.sheetReady === '1') return;
+      const dialog = modal.querySelector('.modal-dialog');
+      const header = dialog?.querySelector('.modal-header');
+      const body = dialog?.querySelector('.modal-body');
+      if(!dialog || !header || !body) return;
+      modal.dataset.sheetReady = '1';
+      modal.dataset.overlayType = 'task-sheet';
+      modal.classList.add('modal-task-sheet');
+      dialog.classList.add('modal-task-sheet-dialog');
+      dialog.setAttribute('tabindex', '-1');
+      const scrollRegion = document.createElement('div');
+      scrollRegion.className = 'modal-scroll-region';
+      dialog.insertBefore(scrollRegion, body);
+      scrollRegion.appendChild(body);
+      const actionRow = body.querySelector('.small-actions.full, .full.small-actions');
+      if(actionRow){
+        actionRow.classList.remove('full');
+        actionRow.classList.add('modal-footer-actions');
+        const footer = document.createElement('div');
+        footer.className = 'modal-footer';
+        footer.appendChild(actionRow);
+        dialog.appendChild(footer);
+      }
+    }
+    function initializeModalSheets(){
+      TASK_SHEET_MODALS.forEach(setupTaskSheetModal);
+    }
+    function getOpenOverlayCount(){
+      return document.querySelectorAll('.modal-backdrop:not(.hidden)').length;
+    }
+    function lockBodyScroll(){
+      if(isBodyScrollLocked) return;
+      lockedBodyScrollY = window.scrollY || window.pageYOffset || 0;
+      document.body.dataset.lockedScrollY = String(lockedBodyScrollY);
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${lockedBodyScrollY}px`;
+      document.body.style.left = '0';
+      document.body.style.right = '0';
+      document.body.style.width = '100%';
+      document.body.style.overflow = 'hidden';
+      document.body.classList.add('overlay-open');
+      document.documentElement.classList.add('overlay-open');
+      isBodyScrollLocked = true;
+    }
+    function unlockBodyScroll(){
+      if(!isBodyScrollLocked) return;
+      const restoreY = Number(document.body.dataset.lockedScrollY || lockedBodyScrollY || 0);
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.left = '';
+      document.body.style.right = '';
+      document.body.style.width = '';
+      document.body.style.overflow = '';
+      document.body.classList.remove('overlay-open');
+      document.documentElement.classList.remove('overlay-open');
+      delete document.body.dataset.lockedScrollY;
+      isBodyScrollLocked = false;
+      window.scrollTo(0, restoreY);
+    }
+    function syncOverlayChrome(){
+      const hasOpenOverlay = getOpenOverlayCount() > 0;
+      if(hasOpenOverlay) lockBodyScroll();
+      else unlockBodyScroll();
+    }
+    function shouldAllowBackdropClose(modal){
+      if(!modal) return false;
+      if(window.innerWidth <= 760 && modal.dataset.overlayType === 'task-sheet') return false;
+      return true;
+    }
+    function focusModalSurface(modal){
+      if(!modal) return;
+      const target = modal.querySelector('input:not([type="hidden"]):not([disabled]), textarea:not([disabled]), select:not([disabled]), button:not([disabled])')
+        || modal.querySelector('.modal-dialog');
+      requestAnimationFrame(() => {
+        if(typeof target?.focus === 'function'){
+          target.focus({ preventScroll:true });
+        }
+      });
     }
     function setModalOpen(modal, isOpen){
       if(!modal) return;
-      modal.classList.toggle('hidden', !isOpen);
-      modal.setAttribute('aria-hidden', isOpen ? 'false' : 'true');
-      document.body.style.overflow = isOpen ? 'hidden' : '';
+      if(isOpen){
+        modal.__lastFocusedElement = document.activeElement;
+        closeAllEnhancedSelects();
+        modal.classList.remove('hidden');
+        modal.setAttribute('aria-hidden', 'false');
+        modal.classList.add('is-open');
+        const scrollRegion = modal.querySelector('.modal-scroll-region');
+        if(scrollRegion) scrollRegion.scrollTop = 0;
+        syncOverlayChrome();
+        focusModalSurface(modal);
+        return;
+      }
+      modal.classList.add('hidden');
+      modal.setAttribute('aria-hidden', 'true');
+      modal.classList.remove('is-open');
+      syncOverlayChrome();
+      if(getOpenOverlayCount() === 0 && typeof modal.__lastFocusedElement?.focus === 'function'){
+        requestAnimationFrame(() => {
+          modal.__lastFocusedElement.focus({ preventScroll:true });
+        });
+      }
     }
 
     function openEntryModal(){
@@ -7733,6 +8547,13 @@
       updateView();
       scrollToTripDetail();
     };
+    window.closeTripMobileDetail = function(){
+      activeTripId = null;
+      activeTripDetailTab = 'overview';
+      renderTrips();
+      updateView();
+      window.scrollTo({ top: 0, behavior:'smooth' });
+    };
     window.goToTrip = function(id, itemId = '', focusDate = ''){
       applyTripNavigation(id, { itemId, focusDate });
     };
@@ -7950,8 +8771,9 @@
 
     async function boot(){
       setupMonthlySubViewLayout(); // --NEW
+      initializeModalSheets();
       bindEvents();
-      syncResponsiveMenu();
+      syncResponsiveLayout();
       initializeEnhancedSelects();
       populateCategoryDropdowns();
 
@@ -8001,7 +8823,7 @@
       const bindModalDismiss = (modal, closeButton, closeModal) => {
         bind(closeButton, 'click', closeModal);
         bind(modal, 'click', (e) => {
-          if(e.target === modal) closeModal();
+          if(e.target === modal && shouldAllowBackdropClose(modal)) closeModal();
         });
       };
       const openImportPicker = () => {
@@ -8051,8 +8873,30 @@
       });
       bind(loadAnotherBtn, 'click', openImportPicker);
       bind(saveJsonBtn, 'click', saveJsonFile);
-      bind(mobileMenuToggle, 'click', () => {
-        setMobileMenu(!mainMenuPanel.classList.contains('is-open'));
+      bind(quickAddIncomeBtn, 'click', () => openEntryModalForType('income'));
+      bind(quickAddExpenseBtn, 'click', () => openEntryModalForType('expense'));
+      bind(quickAddLoanBtn, 'click', () => {
+        clearLoanForm();
+        openLoanModal();
+      });
+      bind(quickAddTripBtn, 'click', () => {
+        clearTripForm();
+        openTripModal();
+      });
+      bind(moreOpenBudgetBtn, 'click', () => {
+        clearBudgetForm();
+        openBudgetModal();
+      });
+      bind(moreOpenGoalBtn, 'click', () => {
+        clearGoalForm();
+        openGoalModal();
+      });
+      bind(openYearlyOverviewBtn, 'click', () => openYearlyOverview());
+      bind($('toggleMonthlyFiltersBtn'), 'click', () => toggleResponsivePanel('monthlyFilterStack'));
+      bind(toggleTripFiltersBtn, 'click', () => toggleResponsivePanel('tripFiltersPanel'));
+      bind(toggleInstallmentFiltersBtn, 'click', () => toggleResponsivePanel('installmentFiltersPanel'));
+      document.querySelectorAll('.bottom-nav-btn').forEach(btn => {
+        bind(btn, 'click', () => setPrimaryDestination(btn.dataset.destination));
       });
 
       bindMany([
@@ -8164,14 +9008,6 @@
       });
       bind(yearlyYearPicker, 'change', renderYearly);
 
-      document.querySelectorAll('.menu-btn').forEach(btn => {
-        bind(btn, 'click', () => {
-          currentView = btn.dataset.view;
-          updateView();
-          if(isMobileMenuLayout()) setMobileMenu(false);
-        });
-      });
-
       bind(document, 'keydown', (e) => {
         if(e.key !== 'Escape') return;
         if(!entryModal.classList.contains('hidden')) closeEntryModal();
@@ -8182,15 +9018,11 @@
         if(!tripModal.classList.contains('hidden')) closeTripModal();
         if(!tripItemModal.classList.contains('hidden')) closeTripItemModal();
         closeAllEnhancedSelects();
-        if(isMobileMenuLayout()) setMobileMenu(false);
       });
       bind(document, 'click', (e) => {
         if(!e.target.closest('.select-enhanced')) closeAllEnhancedSelects();
-        if(isMobileMenuLayout() && mainMenuPanel.classList.contains('is-open') && !e.target.closest('#mainMenuPanel') && !e.target.closest('#mobileMenuToggle')){
-          setMobileMenu(false);
-        }
       });
-      bind(window, 'resize', syncResponsiveMenu);
+      bind(window, 'resize', syncResponsiveLayout);
     }
 
     boot().catch(error => {

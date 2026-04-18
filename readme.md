@@ -14,7 +14,6 @@
 * ไม่ต้องมี backend server
 * ข้อมูล sync ข้ามอุปกรณ์ได้ (ผ่าน Firebase)
 * มีระบบ login แยก user
-* รองรับ offline/cache ผ่าน IndexedDB
 
 ---
 
@@ -23,7 +22,7 @@
 ## Frontend
 
 * HTML + CSS + Vanilla JavaScript (Single file)
-* IndexedDB (สำหรับ cache/offline)
+* Flatpickr (date/month picker พร้อม locale TH)
 
 ## Backend (Serverless)
 
@@ -47,7 +46,7 @@
         │ Firebase SDK (client-side)
         ▼
 [ Firebase Auth ]  → login user
-[ Firestore DB ]   → store appData
+[ Firestore DB ]   → store appData (v2 schema)
 [ App Check ]      → protect API usage
 ```
 
@@ -55,32 +54,57 @@
 
 # 📦 Data Structure
 
-แอปใช้ state หลัก:
+## Runtime appData (Legacy / UI Layer)
+
+แอปใช้ state หลักที่ UI อ่าน/เขียนโดยตรง:
 
 ```js
 appData = {
-  entries: [],
-  installments: [],
-  trips: []
+  entries: [],       // รายรับ–รายจ่ายรายวัน
+  installments: [],  // แผนผ่อนชำระ
+  trips: [],         // ทริปพร้อมรายการค่าใช้จ่าย
+  budgets: [],       // งบประมาณรายเดือน + งบทริป (NEW)
+  goals: []          // เป้าหมายการเก็บเงิน (NEW)
 }
 ```
 
-เก็บใน Firestore ที่ path:
+## V2 Schema (Firestore / Export)
+
+ข้อมูลที่บันทึกลง Firestore และ export ใช้ schema v2:
+
+```js
+{
+  schemaVersion: 2,
+  profile: { displayName, baseCurrency, locale, timezone },
+  settings: { defaultView, monthStartsOn, includePendingInMonthlyTotals },
+  masters: { categories: [], tags: [] },
+  transactions: [],       // รายการทั้งหมด (manual + trip + installment)
+  recurringRules: [],
+  installmentPlans: [],
+  trips: [],
+  budgets: [],            // monthly budget + trip budget
+  goals: [],
+  meta: { createdAt, updatedAt, exportedAt }
+}
+```
+
+เก็บใน Firestore แบบแยก subcollection ต่อ data type:
 
 ```text
-users/{uid}/finance/main
+users/{uid}/meta/app
+users/{uid}/profile/main
+users/{uid}/settings/main
+users/{uid}/masters/main
+users/{uid}/transactions/{docId}
+users/{uid}/recurringRules/{docId}
+users/{uid}/installmentPlans/{docId}
+users/{uid}/trips/{docId}
+users/{uid}/budgets/{docId}
+users/{uid}/goals/{docId}
 ```
 
-ตัวอย่าง document:
+อ่านพร้อมกันด้วย `Promise.all()` และเขียนด้วย Firestore batch write
 
-```json
-{
-  "entries": [],
-  "installments": [],
-  "trips": [],
-  "updatedAt": "2026-04-08T12:00:00Z"
-}
-```
 
 ---
 
@@ -146,7 +170,7 @@ yourname.github.io
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /users/{userId}/finance/{docId} {
+    match /users/{userId}/{collection}/{docId} {
       allow read, write: if request.auth != null && request.auth.uid == userId;
     }
   }
@@ -210,9 +234,9 @@ firebase.appCheck(app).activate(
 2. initialize Firebase
 3. ตรวจ auth state
 4. ถ้า login:
-     → load Firestore data
-     → set appData
-     → render UI
+     → load Firestore data (v2 schema)
+     → แปลงเป็น runtime appData
+     → render UI (monthly view เป็น default)
 5. ถ้าไม่ login:
      → แสดงหน้า login
 ```
@@ -223,10 +247,11 @@ firebase.appCheck(app).activate(
 
 ```text
 1. user แก้ข้อมูล
-2. update appData
-3. debounce save
-4. save → Firestore
-5. update save status UI
+2. update appData (runtime)
+3. แปลงเป็น v2 schema ด้วย ensureV2Data()
+4. เช็ค fingerprint (ถ้าไม่เปลี่ยน → ไม่ save)
+5. debounce → save to Firestore
+6. update save status UI
 ```
 
 ---
@@ -245,12 +270,7 @@ firebase.appCheck(app).activate(
 
 * sync ข้อมูลผ่าน Firestore
 * แยกข้อมูลตาม user (uid)
-
----
-
-## 📡 Offline Support
-
-* IndexedDB เป็น cache/fallback
+* fingerprint check เพื่อไม่ save ซ้ำโดยไม่จำเป็น
 
 ---
 
@@ -274,11 +294,82 @@ firebase.appCheck(app).activate(
 
 ## 📦 Backup Export
 
-สามารถ export JSON:
+สามารถ export JSON (v2 schema):
 
 ```js
 finance-backup-YYYY-MM-DD.json
 ```
+
+---
+
+# 🗓️ หน้าหลัก (Views)
+
+แอปมี 4 มุมมองหลัก สลับได้จากเมนูบนหน้าจอ:
+
+| View | ชื่อ | คำอธิบาย |
+|---|---|---|
+| `monthly` | รายเดือน | ดูและจัดการรายรับ–รายจ่ายตามช่วงเดือน |
+| `yearly` | ภาพรวมทั้งปี | สรุปรายเดือนแบบ grid ภายในปีที่เลือก |
+| `trips` | ทริป | จัดการค่าใช้จ่ายแยกตามทริป |
+| `installments` | ยอดผ่อน | ติดตามแผนผ่อนชำระรายเดือน |
+
+---
+
+# ✨ Feature Overview
+
+ภาพรวมฟีเจอร์ทั้งหมดในระบบ:
+
+## 📅 รายเดือน (Monthly View)
+
+* **Daily Dashboard** – สรุปสถานะวันนี้ทันทีเมื่อเปิดหน้า รวมถึงรายการที่ต้องจัดการในเดือนนี้
+* **Smart Keyword Search** – ค้นหาด้วยภาษาธรรมชาติ เช่น `ยังไม่จ่าย`, `เดือนนี้`, `ของกิน เกิน 500`
+* **ตัวกรองละเอียด** – กรองตามหมวดหมู่, ประเภท, ช่วงยอดเงิน และเรียงลำดับได้หลายแบบ
+* **สรุปช่วงเดือน** – แสดงรายรับรวม, รายจ่ายรวม, คงเหลือสุทธิ, จำนวนรายการ และยอด readonly จากการผ่อน
+* **Monthly Sub-navigation** – แถบ sub-tab แบบ sticky แยกส่วนของ monthly view ให้ใช้งานง่ายขึ้น
+* **รายการใช้บ่อย** – กดครั้งเดียวเพื่อสร้างรายการเดิมซ้ำสำหรับวันนี้
+* **Repeat Entry** – สร้างรายการซ้ำหลายงวดพร้อมกันได้
+
+## 💰 Budget (NEW)
+
+* ตั้งงบประมาณรายหมวดสำหรับแต่ละเดือน
+* แสดง progress bar พร้อม status: `on-track`, `near-limit`, `over-budget`
+* มี **Budget/Goal Insight** ที่คอยแจ้งเตือนแบบ soft เมื่อหมวดใดใกล้เกินงบ
+
+## 🎯 Goal (NEW)
+
+* เพิ่มเป้าหมายการเก็บเงินพร้อมกำหนดยอดเป้าหมายและวันที่
+* อัปเดตยอดปัจจุบันได้ด้วยมือ (Quick Update)
+* สถานะ: `Active`, `Paused`, `Completed` (auto เมื่อถึงเป้า)
+* แสดง % คืบหน้าและยอดคงเหลือที่ต้องเก็บ
+
+## 🌤️ ภาพรวมทั้งปี (Yearly View)
+
+* แสดงสรุปรายรับ–รายจ่ายแบบ grid แยกตามเดือน
+* กดที่เดือนใดก็ไปหน้า monthly ของเดือนนั้นได้ทันที
+* เลื่อนปีได้อิสระทั้งย้อนหลังและล่วงหน้า
+
+## ✈️ ทริป (Trip View)
+
+* จัดการค่าใช้จ่ายแยกเป็นทริปอิสระ
+* **Trip Detail Tabs**: แยก `ภาพรวม`, `รายการจริง`, `แผนงบ` ออกจากกัน
+* **Trip Budget (NEW)** – วางแผนงบแยกตามหมวดหมู่ภายในทริป พร้อมเทียบกับค่าจริงอัตโนมัติ
+* เชื่อมรายการผ่อนเข้ากับทริปได้ (linked installment)
+* สลับ List View / Calendar View ได้
+
+## 💳 ยอดผ่อน (Installments View)
+
+* บันทึกแผนผ่อนพร้อมดอกเบี้ย (flat-rate / effective rate / ไม่มีดอกเบี้ย)
+* Smart Hint คำนวณยอดรวมและยอดคงเหลืออัตโนมัติ
+* กรองตามสถานะ, เดือน, คีย์เวิร์ด
+* สลับ List View / Calendar View ได้
+
+## 🛠️ UI / UX
+
+* **Flatpickr** date picker พร้อม locale ภาษาไทย
+* **Enhanced Select** – custom dropdown พร้อมช่องค้นหาในตัว
+* **Collapsible Cards** – ปุ่มพับ/ขยาย card ได้ทุกส่วน
+* **Mobile Responsive** – hamburger menu และ layout ปรับตาม breakpoint
+* **Floating Back Button** – ปุ่มกลับลอยอยู่มุมขวาล่างเมื่อ drill-down ลึก
 
 ---
 
@@ -320,7 +411,7 @@ https://yourname.github.io/repo-name/
 * ไม่มี conflict resolution (multi-device overwrite)
 * ไม่มี version history
 * save แบบ last-write-wins
-* Firestore document เดียว (ยังไม่ scale)
+* Budget และ Goal ยังไม่มีการ link อัตโนมัติกับรายการ entry (update ยอด Goal ด้วยมือ)
 
 ---
 
@@ -340,6 +431,7 @@ https://yourname.github.io/repo-name/
 
 * multi-user sharing
 * analytics
+* recurring rules (ตั้งรายการซ้ำอัตโนมัติตาม recurringRules ใน v2 schema)
 
 ---
 
@@ -362,6 +454,12 @@ https://yourname.github.io/repo-name/
 * deploy ง่ายสุด
 * เหมาะกับ GitHub Pages
 
+## ทำไมมี Runtime appData และ V2 Schema แยกกัน
+
+* Runtime `appData` เป็น UI-friendly format ที่อ่านเขียนง่าย
+* V2 Schema เป็น normalized format สำหรับ Firestore และ export ที่ extensible กว่า
+* แปลงไป-มาด้วย `buildV2FromCurrentAppData()` และ `buildCurrentAppDataFromV2()`
+
 ---
 
 # ✅ Final Status
@@ -373,10 +471,12 @@ https://yourname.github.io/repo-name/
 มีครบ:
 
 * auth
-* database
+* database (v2 schema)
+* budget & goal tracking
+* trip budget planning
 * security
 * deploy
-* backup
+* backup (v2 JSON export)
 
 ---
 
