@@ -14,6 +14,7 @@
 * ไม่ต้องมี backend server
 * ข้อมูล sync ข้ามอุปกรณ์ได้ (ผ่าน Firebase)
 * มีระบบ login แยก user
+* import / export ข้อมูลสำรองเป็น JSON ได้
 
 ---
 
@@ -22,7 +23,8 @@
 ## Frontend
 
 * HTML + CSS + Vanilla JavaScript (Single file)
-* Flatpickr (date/month picker พร้อม locale TH)
+* Flatpickr + Month Select plugin (date/month picker พร้อม locale TH)
+* Responsive UI พร้อม modal, sticky header, sticky monthly sub-navigation และ bottom navigation
 
 ## Backend (Serverless)
 
@@ -263,6 +265,7 @@ firebase.appCheck(app).activate(
 * Email/Password login
 * Logout
 * Reset password
+* แสดงสถานะผู้ใช้ปัจจุบันในหน้า More / Utility Hub
 
 ---
 
@@ -292,7 +295,7 @@ firebase.appCheck(app).activate(
 
 ---
 
-## 📦 Backup Export
+## 📦 Backup Export / Import
 
 สามารถ export JSON (v2 schema):
 
@@ -300,18 +303,21 @@ firebase.appCheck(app).activate(
 finance-backup-YYYY-MM-DD.json
 ```
 
+และ import กลับเข้าระบบได้จากหน้า More โดยไฟล์ที่ import ต้องเป็น `schemaVersion: 2`
+
 ---
 
 # 🗓️ หน้าหลัก (Views)
 
-แอปมี 4 มุมมองหลัก สลับได้จากเมนูบนหน้าจอ:
+แอปมี 5 มุมมองหลัก และใช้งานผ่าน bottom navigation / ปุ่ม quick action บนหน้าจอ:
 
 | View | ชื่อ | คำอธิบาย |
 |---|---|---|
-| `monthly` | รายเดือน | ดูและจัดการรายรับ–รายจ่ายตามช่วงเดือน |
+| `monthly` | รายเดือน | ดู dashboard, summary และจัดการรายรับ–รายจ่ายตามช่วงเดือน |
 | `yearly` | ภาพรวมทั้งปี | สรุปรายเดือนแบบ grid ภายในปีที่เลือก |
-| `trips` | ทริป | จัดการค่าใช้จ่ายแยกตามทริป |
+| `trips` | ทริป | จัดการค่าใช้จ่ายแยกตามทริป พร้อม detail tabs |
 | `installments` | ยอดผ่อน | ติดตามแผนผ่อนชำระรายเดือน |
+| `more` | เพิ่มเติม | รวมไฟล์, บัญชี, import / export, และทางลัดไป yearly / budget / goal |
 
 ---
 
@@ -321,11 +327,13 @@ finance-backup-YYYY-MM-DD.json
 
 ## 📅 รายเดือน (Monthly View)
 
-* **Daily Dashboard** – สรุปสถานะวันนี้ทันทีเมื่อเปิดหน้า รวมถึงรายการที่ต้องจัดการในเดือนนี้
+* **Daily Dashboard + Action Needed** – สรุปสถานะวันนี้และรายการที่ควรตามต่อในเดือนปัจจุบันทันทีเมื่อเปิดหน้า
 * **Smart Keyword Search** – ค้นหาด้วยภาษาธรรมชาติ เช่น `ยังไม่จ่าย`, `เดือนนี้`, `ของกิน เกิน 500`
 * **ตัวกรองละเอียด** – กรองตามหมวดหมู่, ประเภท, ช่วงยอดเงิน และเรียงลำดับได้หลายแบบ
 * **สรุปช่วงเดือน** – แสดงรายรับรวม, รายจ่ายรวม, คงเหลือสุทธิ, จำนวนรายการ และยอด readonly จากการผ่อน
 * **Monthly Sub-navigation** – แถบ sub-tab แบบ sticky แยกส่วนของ monthly view ให้ใช้งานง่ายขึ้น
+* **Quick Add** – พิมพ์รายการสั้น ๆ เช่น `ค่าไฟ 1200 ยังไม่จ่าย` แล้วบันทึกได้ทันที
+* **Quick Actions** – ปุ่มลัดสำหรับเพิ่มรายรับ, รายจ่าย, ยอดผ่อน และทริป
 * **รายการใช้บ่อย** – กดครั้งเดียวเพื่อสร้างรายการเดิมซ้ำสำหรับวันนี้
 * **Repeat Entry** – สร้างรายการซ้ำหลายงวดพร้อมกันได้
 
@@ -363,12 +371,19 @@ finance-backup-YYYY-MM-DD.json
 * กรองตามสถานะ, เดือน, คีย์เวิร์ด
 * สลับ List View / Calendar View ได้
 
+## ➕ เพิ่มเติม (More View)
+
+* รวมส่วน **บัญชี**, **สถานะการ save**, **Export JSON**, **Import JSON** และ **Logout** ไว้ในหน้าเดียว
+* มี quick action ไปยัง **Yearly Overview**, **Budget**, และ **Goal**
+* เหมาะสำหรับงานตั้งค่าและจัดการข้อมูลที่ไม่ต้องใช้ทุกวัน
+
 ## 🛠️ UI / UX
 
-* **Flatpickr** date picker พร้อม locale ภาษาไทย
+* **Flatpickr** date picker พร้อม locale ภาษาไทย และ month picker สำหรับข้อมูลรายเดือน
 * **Enhanced Select** – custom dropdown พร้อมช่องค้นหาในตัว
 * **Collapsible Cards** – ปุ่มพับ/ขยาย card ได้ทุกส่วน
-* **Mobile Responsive** – hamburger menu และ layout ปรับตาม breakpoint
+* **Bottom Navigation** – ปุ่มนำทางหลัก 5 เมนู: หน้าหลัก, รายการ, ผ่อน, ทริป, เพิ่มเติม
+* **Responsive Modal UX** – บนมือถือ modal จะขยายเต็มจอเพื่อกรอกข้อมูลง่ายขึ้น
 * **Floating Back Button** – ปุ่มกลับลอยอยู่มุมขวาล่างเมื่อ drill-down ลึก
 
 ---
@@ -411,6 +426,7 @@ https://yourname.github.io/repo-name/
 * ไม่มี conflict resolution (multi-device overwrite)
 * ไม่มี version history
 * save แบบ last-write-wins
+* Import รองรับเฉพาะไฟล์ `schemaVersion: 2`
 * Budget และ Goal ยังไม่มีการ link อัตโนมัติกับรายการ entry (update ยอด Goal ด้วยมือ)
 
 ---
