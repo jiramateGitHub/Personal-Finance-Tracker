@@ -396,17 +396,17 @@
     .bar > div{height:100%; border-radius:inherit}
     .bar-income > div{background:linear-gradient(90deg,#22c55e,#86efac)}
     .bar-expense > div{background:linear-gradient(90deg,#ef4444,#fca5a5)}
-    .month-stack{display:grid; gap:14px}
+    .month-stack{display:grid; gap:12px}
     .month-group{
       border:1px solid #dbe6f3;
-      border-radius:24px;
-      padding:16px;
+      border-radius:20px;
+      padding:14px;
       background:
-        radial-gradient(circle at top right, rgba(191,219,254,.36), transparent 36%),
-        linear-gradient(180deg,#ffffff,#fbfdff 72%);
+        radial-gradient(circle at top right, rgba(191,219,254,.28), transparent 34%),
+        linear-gradient(180deg,#ffffff,#fcfdff 72%);
       display:grid;
-      gap:12px;
-      box-shadow:0 14px 30px rgba(15,23,42,.06)
+      gap:10px;
+      box-shadow:0 10px 24px rgba(15,23,42,.05)
     }
     .month-group-head{
       display:flex;
@@ -415,17 +415,23 @@
       gap:12px;
       flex-wrap:wrap;
       margin-bottom:0;
-      padding-bottom:4px
+      padding:0 0 6px;
+      border-bottom:1px solid rgba(219,230,243,.8)
     }
     .month-group-head h3{margin:0; font-size:18px; line-height:1.15}
+    .month-group-summary{
+      min-width:0;
+      display:grid;
+      gap:2px;
+    }
     .month-group-head .meta{margin-top:4px; font-size:12px}
-    .month-group-stats{display:flex; gap:8px; flex-wrap:wrap; align-items:center}
+    .month-group-stats{display:flex; gap:6px; flex-wrap:wrap; align-items:center}
     .month-group-stats .pill{
-      padding:7px 11px;
+      padding:6px 10px;
       background:rgba(248,250,252,.92);
       border-color:#dbe6f3;
       color:#334155;
-      font-size:11.5px;
+      font-size:11px;
       line-height:1.2
     }
     table{width:100%; border-collapse:collapse}
@@ -750,37 +756,94 @@
     .quick-add-submit{min-height:46px; white-space:nowrap}
     .frequent-entry-grid{
       display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-      gap:10px;
+      grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+      gap:8px;
     }
     .frequent-entry-btn{
       width:100%;
-      padding:14px 16px;
-      border-radius:16px;
-      border:1px solid #d7e7ff;
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid #dbe6f3;
       background:
-        radial-gradient(circle at top right, rgba(37,99,235,.12), transparent 34%),
-        linear-gradient(180deg,#ffffff,#f8fbff);
+        radial-gradient(circle at top right, rgba(37,99,235,.08), transparent 32%),
+        linear-gradient(180deg,#ffffff,#fafcff);
       color:var(--text);
       display:grid;
       gap:6px;
       text-align:left;
       align-content:start;
+      box-shadow:0 6px 16px rgba(15,23,42,.04);
+      transition:border-color .18s ease, box-shadow .18s ease, transform .18s ease, background-color .18s ease;
     }
     .frequent-entry-btn:hover{
       border-color:#93c5fd;
-      box-shadow:0 12px 26px rgba(37,99,235,.12);
+      box-shadow:0 10px 22px rgba(37,99,235,.1);
+      transform:translateY(-1px);
+    }
+    .frequent-entry-btn:active{
+      transform:translateY(0);
+      box-shadow:0 4px 12px rgba(37,99,235,.08);
+    }
+    .frequent-entry-btn:focus-visible{
+      outline:2px solid rgba(37,99,235,.2);
+      outline-offset:2px;
+      border-color:#60a5fa;
     }
     .frequent-entry-btn .meta{
       display:flex;
-      gap:8px;
+      gap:6px;
       flex-wrap:wrap;
       align-items:center;
     }
     .frequent-entry-amount{
-      font-size:18px;
+      font-size:15px;
       font-weight:800;
       color:#1d4ed8;
+      line-height:1.1;
+      white-space:nowrap;
+      text-align:right;
+    }
+    .frequent-entry-top{
+      display:grid;
+      grid-template-columns:minmax(0,1fr) auto;
+      align-items:start;
+      gap:8px;
+      min-width:0;
+    }
+    .frequent-entry-title-wrap{
+      min-width:0;
+      display:grid;
+      gap:2px;
+    }
+    .frequent-entry-title{
+      display:-webkit-box;
+      -webkit-line-clamp:2;
+      -webkit-box-orient:vertical;
+      overflow:hidden;
+      font-size:13px;
+      line-height:1.3;
+      font-weight:700;
+      color:#0f172a;
+      word-break:break-word;
+    }
+    .frequent-entry-subline{
+      font-size:11px;
+      color:var(--muted);
+      line-height:1.25;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .frequent-entry-btn .meta .pill{
+      padding:3px 8px;
+      font-size:10.5px;
+      font-weight:700;
+      background:#f8fafc;
+      border-color:#e2e8f0;
+      color:#475569;
+    }
+    .frequent-entry-btn .meta .pill:last-child{
+      margin-left:auto;
     }
     .entry-row-highlight td{
       background:#eff6ff;
@@ -1936,18 +1999,18 @@
     }
     .entry-list{
       display:grid;
-      gap:10px;
+      gap:8px;
     }
     .entry-card{
       border:1px solid #dbe3ef;
-      border-radius:20px;
-      padding:14px;
+      border-radius:16px;
+      padding:12px 13px;
       background:
-        radial-gradient(circle at top right, rgba(219,234,254,.54), transparent 40%),
-        linear-gradient(180deg,#ffffff,#fbfdff);
+        radial-gradient(circle at top right, rgba(219,234,254,.35), transparent 38%),
+        linear-gradient(180deg,#ffffff,#fcfdff);
       display:grid;
-      gap:10px;
-      box-shadow:0 12px 26px rgba(15,23,42,.055);
+      gap:9px;
+      box-shadow:0 8px 18px rgba(15,23,42,.04);
     }
     .entry-card.nav-highlight{
       border-color:#93c5fd;
@@ -1964,12 +2027,16 @@
     .entry-card-title{
       min-width:0;
       display:grid;
-      gap:3px;
+      gap:4px;
     }
     .entry-card-title strong{
       font-size:15px;
-      line-height:1.3;
+      line-height:1.35;
       word-break:break-word;
+      display:-webkit-box;
+      -webkit-line-clamp:2;
+      -webkit-box-orient:vertical;
+      overflow:hidden;
     }
     .entry-date{
       font-size:11px;
@@ -1979,15 +2046,15 @@
       color:var(--muted);
     }
     .entry-head-side{
-      display:flex;
-      align-items:center;
+      display:grid;
+      justify-items:end;
       justify-content:flex-end;
-      gap:8px;
+      gap:6px;
       min-width:0;
       flex:0 1 auto;
     }
     .entry-amount{
-      font-size:22px;
+      font-size:20px;
       font-weight:800;
       line-height:1.05;
       white-space:nowrap;
@@ -2006,31 +2073,42 @@
     }
     .entry-meta-grid{
       display:grid;
-      grid-template-columns:repeat(2,minmax(0,1fr));
-      gap:8px;
+      grid-template-columns:repeat(12,minmax(0,1fr));
+      gap:7px;
     }
     .entry-meta-box{
-      padding:10px 11px;
-      border-radius:14px;
-      border:1px solid #e2e8f0;
-      background:linear-gradient(180deg,#f8fafc,#ffffff);
-      min-height:60px;
+      padding:8px 10px;
+      border-radius:12px;
+      border:1px solid #e5edf6;
+      background:linear-gradient(180deg,#fbfdff,#ffffff);
+      min-height:0;
       display:grid;
-      gap:3px;
+      gap:2px;
       align-content:start;
       min-width:0;
     }
+    .entry-meta-box.is-primary{grid-column:span 4}
+    .entry-meta-box.is-secondary{grid-column:span 8}
     .entry-meta-box .label{
-      font-size:11px;
+      font-size:10px;
       font-weight:800;
-      letter-spacing:.05em;
+      letter-spacing:.04em;
       text-transform:uppercase;
       color:var(--muted);
     }
     .entry-meta-box .value{
       font-size:var(--font-size-sm);
-      color:#0f172a;
+      color:#334155;
       word-break:break-word;
+    }
+    .entry-meta-box.note-box .value,
+    .entry-meta-box.source-box .value{
+      color:#475569;
+      line-height:1.4;
+      display:-webkit-box;
+      -webkit-line-clamp:2;
+      -webkit-box-orient:vertical;
+      overflow:hidden;
     }
     .entry-meta-box:has(.value:empty){
       display:none;
@@ -2040,7 +2118,10 @@
       grid-template-columns:minmax(0,1fr) auto;
       gap:8px 10px;
       align-items:center;
-      padding-top:4px;
+      padding-top:2px;
+      border-top:1px solid rgba(226,232,240,.7);
+      margin-top:2px;
+      padding-top:10px;
     }
     .entry-actions-left,
     .entry-actions-right{
@@ -2097,15 +2178,15 @@
     }
     .payment-toggle input{transform:scale(.94)}
     .entry-actions-right .btn-icon{
-      min-width:40px;
-      min-height:40px;
-      padding:0 10px;
-      border-radius:12px;
-      box-shadow:0 6px 14px rgba(15,23,42,.05);
+      min-width:36px;
+      min-height:36px;
+      padding:0 9px;
+      border-radius:10px;
+      box-shadow:none;
     }
     .month-group{
-      padding:16px;
-      border-radius:24px;
+      padding:14px;
+      border-radius:20px;
     }
     .trip-detail-panel,
     .trip-list-panel{
@@ -2194,6 +2275,26 @@
         padding:12px;
         gap:8px;
       }
+      .frequent-entry-grid{
+        grid-template-columns:repeat(2,minmax(0,1fr));
+        gap:7px;
+      }
+      .frequent-entry-btn{
+        padding:9px 10px;
+        border-radius:11px;
+      }
+      .frequent-entry-top{
+        gap:6px;
+      }
+      .frequent-entry-title{
+        font-size:12px;
+      }
+      .frequent-entry-amount{
+        font-size:14px;
+      }
+      .frequent-entry-btn .meta .pill:last-child{
+        margin-left:0;
+      }
       .entry-card-head{
         display:grid;
         grid-template-columns:minmax(0,1fr) auto;
@@ -2224,7 +2325,7 @@
       }
       .entry-head-side{
         gap:6px;
-        align-items:flex-start;
+        align-items:flex-end;
       }
       .entry-head-side .badge{
         padding:4px 8px;
@@ -2243,6 +2344,10 @@
         grid-template-columns:repeat(2,minmax(0,1fr));
         gap:6px;
       }
+      .entry-meta-box.is-primary,
+      .entry-meta-box.is-secondary{
+        grid-column:span 1;
+      }
       .entry-meta-box{
         min-height:auto;
         padding:8px 9px;
@@ -2257,8 +2362,8 @@
         font-size:12px;
         line-height:1.3;
       }
-      .entry-meta-box:nth-child(3),
-      .entry-meta-box:nth-child(4){
+      .entry-meta-box.note-box,
+      .entry-meta-box.source-box{
         grid-column:1 / -1;
       }
       .entry-actions{
@@ -2279,6 +2384,18 @@
       .trip-shell:not(.trip-detail-open) .trip-detail-panel{display:none}
       .trip-mobile-back{
         display:inline-flex;
+      }
+    }
+
+    @media (max-width:480px){
+      .frequent-entry-grid{
+        grid-template-columns:1fr;
+      }
+      .entry-actions{
+        grid-template-columns:1fr;
+      }
+      .entry-actions-right{
+        justify-content:flex-start;
       }
     }
 
@@ -6341,12 +6458,16 @@
         <div class="frequent-entry-grid">
           ${groups.map(group => `
             <button class="frequent-entry-btn" onclick="createRecentEntry('${group.item.id}')">
-              <strong>${escapeHtml(group.item.title || '-')}</strong>
-              <div class="frequent-entry-amount">${formatMoney(group.item.amount)}</div>
+              <div class="frequent-entry-top">
+                <div class="frequent-entry-title-wrap">
+                  <div class="frequent-entry-title">${escapeHtml(group.item.title || '-')}</div>
+                  <div class="frequent-entry-subline">${group.item.type === 'income' ? 'รายรับ' : 'รายจ่าย'} · ${escapeHtml(formatCategoryLabel(group.item.category || 'อื่นๆ'))}</div>
+                </div>
+                <div class="frequent-entry-amount">${formatMoney(group.item.amount)}</div>
+              </div>
               <div class="meta">
-                <span class="pill">${group.item.type === 'income' ? 'รายรับ' : 'รายจ่าย'}</span>
-                <span class="pill">${escapeHtml(formatCategoryLabel(group.item.category || 'อื่นๆ'))}</span>
                 <span class="pill">ใช้ ${group.count} ครั้ง</span>
+                <span class="pill">${escapeHtml(group.item.date || '')}</span>
               </div>
             </button>
           `).join('')}
@@ -6727,6 +6848,7 @@
     function buildMonthlyEntryCardHtml(item, monthKey){
       const noteText = String(item.note || '').trim();
       const noteContent = noteText ? escapeHtml(noteText) : '';
+      const statusText = item.type === 'expense' ? (item.isPaid ? 'จ่ายแล้ว' : 'ยังไม่จ่าย') : 'รับเงินแล้ว';
       const sourceNote = item.sourceType === 'installment'
         ? 'แก้ไขได้เฉพาะในหน้ายอดผ่อน'
         : (item.sourceType === 'trip'
@@ -6740,24 +6862,24 @@
               <strong>${escapeHtml(item.title || '-')}</strong>
             </div>
             <div class="entry-head-side">
-              <span class="badge ${getMonthlyEntryTypeBadgeClass(item)}">${getMonthlyEntryTypeLabel(item)}</span>
               <div class="entry-amount ${item.type === 'income' ? 'amount-income' : 'amount-expense'}">${formatMoney(item.amount)}</div>
+              <span class="badge ${getMonthlyEntryTypeBadgeClass(item)}">${getMonthlyEntryTypeLabel(item)}</span>
             </div>
           </div>
           <div class="entry-meta-grid">
-            <div class="entry-meta-box">
+            <div class="entry-meta-box is-primary">
               <div class="label">หมวดหมู่</div>
               <div class="value">${escapeHtml(formatCategoryLabel(item.category || 'อื่นๆ'))}</div>
             </div>
-            <div class="entry-meta-box">
+            <div class="entry-meta-box is-primary">
               <div class="label">สถานะ</div>
-              <div class="value">${item.type === 'expense' ? (item.isPaid ? 'จ่ายแล้ว' : 'ยังไม่จ่าย') : 'รับเงินแล้ว'}</div>
+              <div class="value">${statusText}</div>
             </div>
-            <div class="entry-meta-box">
+            <div class="entry-meta-box is-secondary note-box">
               <div class="label">หมายเหตุ</div>
               <div class="value">${noteContent}</div>
             </div>
-            <div class="entry-meta-box">
+            <div class="entry-meta-box is-secondary source-box">
               <div class="label">ที่มา</div>
               <div class="value">${sourceNote}</div>
             </div>
@@ -6822,7 +6944,7 @@
           ${groups.map(group => `
             <div class="month-group">
               <div class="month-group-head">
-                <div>
+                <div class="month-group-summary">
                   <h3 style="margin:0">${formatMonthThai(group.monthKey)}</h3>
                   <div class="meta">${group.items.length} รายการ</div>
                 </div>
