@@ -332,6 +332,11 @@
       display:block; margin-bottom:7px; font-size:var(--font-size-xs); text-transform:uppercase; letter-spacing:.05em;
       color:var(--muted); font-weight:800
     }
+    label.is-required::after{
+      content:" *";
+      color:var(--red);
+      font-weight:900;
+    }
     input,select,textarea{
       width:100%; min-height:var(--control-height); padding:11px 13px; border-radius:14px; border:1.5px solid var(--line);
       font:inherit; font-size:var(--font-size-base); color:var(--text); background:#fff; outline:none
@@ -1131,6 +1136,22 @@
       margin:0;
       border-radius:14px;
       justify-content:center
+    }
+    .trip-page-view-switch{
+      width:max-content;
+      max-width:100%;
+      display:inline-grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:8px;
+      padding:6px;
+      border:1px solid var(--line);
+      border-radius:16px;
+      background:var(--surface);
+      box-shadow:var(--shadow-sm);
+    }
+    .trip-page-view-switch > *{
+      min-width:132px;
+      justify-content:center;
     }
     .trip-day-header{
       display:flex; justify-content:space-between; gap:12px; align-items:center; flex-wrap:wrap;
@@ -3078,6 +3099,10 @@
       }
       .trip-shell.trip-detail-open .trip-list-panel{display:none}
       .trip-shell:not(.trip-detail-open) .trip-detail-panel{display:none}
+      .trip-shell.trip-shell-list:not(.trip-detail-open) .trip-list-panel,
+      .trip-shell.trip-shell-calendar .trip-list-panel{
+        display:block;
+      }
       .trip-mobile-back{
         display:inline-flex;
       }
@@ -4813,6 +4838,73 @@
       }
     }
 
+    /* Targeted UX fixes */
+    .modal-body .quick-add-bar{
+      grid-template-columns:minmax(0,1fr) max-content;
+      grid-template-areas:
+        "quick-field quick-submit"
+        "quick-status quick-status";
+      align-items:end;
+    }
+    .modal-body .quick-add-input-wrap{
+      display:contents;
+    }
+    .modal-body .quick-add-input-wrap > div{
+      grid-area:quick-field;
+      min-width:0;
+    }
+    .modal-body .quick-add-status{
+      grid-area:quick-status;
+      min-width:0;
+    }
+    .modal-body .quick-add-submit{
+      grid-area:quick-submit;
+      align-self:end;
+      width:auto;
+      min-width:104px;
+      padding-left:14px;
+      padding-right:14px;
+      white-space:nowrap;
+    }
+    .calendar-month{
+      align-content:start;
+      align-items:start;
+      grid-auto-rows:max-content;
+    }
+    .calendar-list{
+      align-self:start;
+    }
+    @media (min-width:768px){
+      .installment-item .small-actions{
+        display:flex;
+        flex-wrap:nowrap;
+        align-items:center;
+        gap:8px;
+      }
+      .installment-item .small-actions button{
+        flex:1 1 0;
+        width:auto;
+        min-width:0;
+        white-space:nowrap;
+        padding-left:8px;
+        padding-right:8px;
+        font-size:12px;
+      }
+    }
+    @media (max-width:767px){
+      .modal-body .quick-add-bar{
+        grid-template-columns:minmax(0,1fr) max-content !important;
+        grid-template-areas:
+          "quick-field quick-submit"
+          "quick-status quick-status";
+        gap:8px;
+      }
+      .modal-body .quick-add-submit{
+        min-width:96px;
+        min-height:42px;
+      }
+    }
+
   </style>
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
@@ -5272,6 +5364,11 @@
             </div>
           </div>
 
+          <div class="trip-page-view-switch" aria-label="สลับมุมมองทริป">
+            <button class="btn-primary btn-sm" type="button" data-trip-view-mode="list" onclick="setTripViewMode('list')">มุมมองรายการ</button>
+            <button class="btn-light btn-sm" type="button" data-trip-view-mode="calendar" onclick="setTripViewMode('calendar')">ปฏิทิน</button>
+          </div>
+
           <div class="trip-shell">
             <div class="panel card trip-list-panel trip-list-sticky">
               <div class="section-header">
@@ -5281,8 +5378,8 @@
                 </div>
               </div>
               <div class="trip-view-switch">
-                <button id="tripListViewBtn" class="btn-primary btn-sm">มุมมองรายการ</button>
-                <button id="tripCalendarViewBtn" class="btn-light btn-sm">มุมมองปฏิทิน</button>
+                <button id="tripListViewBtn" class="btn-primary btn-sm" type="button" data-trip-view-mode="list" onclick="setTripViewMode('list')">มุมมองรายการ</button>
+                <button id="tripCalendarViewBtn" class="btn-light btn-sm" type="button" data-trip-view-mode="calendar" onclick="setTripViewMode('calendar')">ปฏิทิน</button>
               </div>
               <div id="tripFilterSummary" class="trip-filter-summary" style="margin-bottom:12px"></div>
               <div id="tripListContainer" class="trip-list"></div>
@@ -9022,6 +9119,7 @@
       `;
       monthlyFilterShell.appendChild(entryControlsBlock);
       entryControlsPanel.appendChild(monthlyFilterShell);
+      openEntryModalBtn?.closest('.compact-filter-actions')?.remove();
 
       monthlyHeaderPanel.id = 'monthlyPageSwitchPanel';
       monthlyHeaderPanel.classList.add('monthly-page-switch-panel');
@@ -10197,6 +10295,18 @@
         tripDetailPanel.scrollIntoView({ behavior:'smooth', block:'start' });
       });
     }
+    function switchTripViewMode(mode){
+      tripViewMode = mode === 'calendar' ? 'calendar' : 'list';
+      if(tripViewMode === 'list'){
+        activeTripId = null;
+      }
+      if(tripShell){
+        tripShell.classList.toggle('trip-detail-open', false);
+      }
+      renderTrips();
+      updatePrimaryNavUi();
+      updateAppChrome();
+    }
     function renderTrips(){
       updateTripTimeFilterOptions();
       if(tripShell){
@@ -10217,6 +10327,9 @@
       tripTotalCount.textContent = String(filteredTrips.length);
 
       if(!filteredTrips.length){
+        if(tripShell){
+          tripShell.classList.toggle('trip-detail-open', false);
+        }
         tripSummaryLabel.textContent = 'ไม่พบทริปตามตัวกรอง';
         tripExpenseTotal.textContent = formatMoney(0);
         tripDayCount.textContent = '0';
@@ -10402,6 +10515,12 @@
       listBtn.classList.toggle('btn-light', mode !== 'list');
       calendarBtn.classList.toggle('btn-primary', mode === 'calendar');
       calendarBtn.classList.toggle('btn-light', mode !== 'calendar');
+      document.querySelectorAll('[data-trip-view-mode]').forEach(button => {
+        const isActive = button.dataset.tripViewMode === mode;
+        button.classList.toggle('btn-primary', isActive);
+        button.classList.toggle('btn-light', !isActive);
+        button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+      });
     }
     function isDesktopLayout(){
       return window.innerWidth >= 1024;
@@ -10544,6 +10663,23 @@
       }
       syncOverlayChrome();
       runOverflowDebugAudit();
+    }
+    function markRequiredFields(){
+      [
+        'authEmail','authPassword',
+        'entryType','entryDate','entryCategory','entryAmount','entryTitle',
+        'loanName','loanCategory','loanMonthlyAmount','loanMonthsTotal','loanPrincipal',
+        'tripName','tripStartDate','tripEndDate',
+        'tripItemTripId','tripItemDate','tripItemCategory','tripItemTitle','tripItemAmount',
+        'tripBudgetTripId','tripBudgetLineCategory','tripBudgetLineAmount',
+        'budgetMonth','budgetCategory','budgetAmount',
+        'goalName','goalTargetAmount'
+      ].forEach(id => {
+        const field = $(id);
+        const label = document.querySelector(`label[for="${id}"]`);
+        if(field) field.required = true;
+        if(label) label.classList.add('is-required');
+      });
     }
     let overflowDebugRaf = 0;
     function runOverflowDebugAudit(){
@@ -11596,6 +11732,7 @@
     };
 
     window.goToInstallments = (id, monthKey = '') => applyInstallmentNavigation(id, { monthKey });
+    window.setTripViewMode = switchTripViewMode;
     window.selectTrip = function(id){
       activeTripId = id;
       activeTripDetailTab = 'overview';
@@ -11821,6 +11958,7 @@
 
     async function boot(){
       setupMonthlySubViewLayout();
+      markRequiredFields();
       initializeModalSheets();
       bindEvents();
       syncResponsiveLayout();
@@ -11900,8 +12038,7 @@
         renderTrips();
       };
       const setTripViewMode = (mode) => {
-        tripViewMode = mode;
-        renderTrips();
+        switchTripViewMode(mode);
       };
       const setInstallmentViewMode = (mode) => {
         installmentViewMode = mode;
