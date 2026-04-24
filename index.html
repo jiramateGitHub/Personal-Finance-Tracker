@@ -5377,10 +5377,6 @@
                   <div id="tripFilterResultLabel" class="meta">กำลังแสดงทั้งหมด</div>
                 </div>
               </div>
-              <div class="trip-view-switch">
-                <button id="tripListViewBtn" class="btn-primary btn-sm" type="button" data-trip-view-mode="list" onclick="setTripViewMode('list')">มุมมองรายการ</button>
-                <button id="tripCalendarViewBtn" class="btn-light btn-sm" type="button" data-trip-view-mode="calendar" onclick="setTripViewMode('calendar')">ปฏิทิน</button>
-              </div>
               <div id="tripFilterSummary" class="trip-filter-summary" style="margin-bottom:12px"></div>
               <div id="tripListContainer" class="trip-list"></div>
               <div id="tripCalendarContainer" class="calendar-grid hidden"></div>
@@ -10511,10 +10507,10 @@
     function applyViewModeUi(listEl, calendarEl, listBtn, calendarBtn, mode){
       listEl.classList.toggle('hidden', mode === 'calendar');
       calendarEl.classList.toggle('hidden', mode !== 'calendar');
-      listBtn.classList.toggle('btn-primary', mode === 'list');
-      listBtn.classList.toggle('btn-light', mode !== 'list');
-      calendarBtn.classList.toggle('btn-primary', mode === 'calendar');
-      calendarBtn.classList.toggle('btn-light', mode !== 'calendar');
+      listBtn?.classList.toggle('btn-primary', mode === 'list');
+      listBtn?.classList.toggle('btn-light', mode !== 'list');
+      calendarBtn?.classList.toggle('btn-primary', mode === 'calendar');
+      calendarBtn?.classList.toggle('btn-light', mode !== 'calendar');
       document.querySelectorAll('[data-trip-view-mode]').forEach(button => {
         const isActive = button.dataset.tripViewMode === mode;
         button.classList.toggle('btn-primary', isActive);
@@ -12177,8 +12173,6 @@
       bind(resetLoanFiltersBtn, 'click', resetLoanFilters);
       bind(resetTripFiltersBtn, 'click', resetTripFilters);
       [
-        [tripListViewBtn,    () => setTripViewMode('list')],
-        [tripCalendarViewBtn, () => setTripViewMode('calendar')],
         [loanListViewBtn,    () => setInstallmentViewMode('list')],
         [loanCalendarViewBtn, () => setInstallmentViewMode('calendar')]
       ].forEach(([btn, fn]) => bind(btn, 'click', fn));
